@@ -2,6 +2,28 @@
 
 This repo contains OpenMPC, an open, flexible and easy-to-use MPC toolkit for teaching and research. It contains functionality for linear and nonlinear MPC, along with invariant set computations. The optimization relies on cvxpy (for linear MPC) and casadi (for nonlinear MPC). It is compatible with the control package (for both linear and nonlinear systems), and contains invariant set functionality based on cddlib.
 
+
+
+## Dependencies
+
+OpenMPC depends on the following Python packages:
+
+* numpy>=1.21.0
+* casadi>=3.6.3
+* cvxpy>=1.3.0
+* matplotlib
+* control
+
+
+These dependencies will be installed automatically when you run the `pip install . ` command.
+
+Once the setup is complete, you can simply run:
+
+```bash
+jupyter notebook index.ipynb
+```
+
+
 **Note.** Since `pycddlib` is in pre-release, you may need to install `cddlib` separately (e.g., using Homebrew):
 
 ```bash
@@ -16,27 +38,6 @@ export CFLAGS="-I/usr/local/include"
 export LDFLAGS="-L/usr/local/lib"
 pip install .
 ```
-
-Once the setup is complete, you can simply run:
-
-```bash
-jupyter notebook index.ipynb
-```
-
-## Dependencies
-
-OpenMPC depends on the following Python packages:
-
--numpy>=1.21.0
--casadi>=3.6.3
--cvxpy>=1.3.0
--matplotlib
--control
-
-
-These dependencies will be installed automatically when you run the `pip install . ` command.
-
-**Note.** If you encounter any issues during installation, refer to the `pycddlib` documentation for additional guidance on building and installing pycddlib.
 
 ## License
 
