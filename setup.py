@@ -12,9 +12,9 @@ setup(
     packages=find_packages(),  # Automatically find all packages and sub-packages
     install_requires=[
         'numpy>=1.21.0',  # List your dependencies here
-        'casadi>=3.6.3'
+        'casadi>=3.6.3',
         'cvxpy>=1.3.0',
-        'pycddlib>=3.0.0b6'
+        'pycddlib>=3.0.0b6',
         'matplotlib',
         'control'
     ],
