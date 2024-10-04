@@ -60,6 +60,43 @@ class MPCParameters:
         constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
         self.u_constraints.append(constraint)
 
+    def add_input_bound_constraint(self, limits, input_index=None, is_hard=True, penalty_weight=1):
+        """
+        Adds input bounds constraints. The constraints can be symmetric or asymmetric based on `limits`.
+
+        Args:
+            limits (float or tuple): If a single float, the bounds are symmetric: -limits <= u_t <= limits.
+                                    If a tuple (lb, ub), the bounds are asymmetric: lb <= u_t <= ub.
+            input_index (int or None): If None, apply the constraints to all inputs uniformly.
+                                       If an int, apply the constraint to a specific input.
+            is_hard (bool): Whether the constraint is hard or soft.
+            penalty_weight (float): The penalty weight for soft constraints.
+        """
+        # Determine the bounds
+        if isinstance(limits, (int, float)):
+            lb, ub = -limits, limits  # Symmetric bounds
+        elif isinstance(limits, tuple) and len(limits) == 2:
+            lb, ub = limits  # Asymmetric bounds
+        else:
+            raise ValueError("limits must be a single value or a tuple of two values (lb, ub).")
+
+        if input_index is None:
+            # Apply uniformly to all inputs
+            n_inputs = self.B.shape[1]
+            A = np.vstack([np.eye(n_inputs), -np.eye(n_inputs)])  # Identity and negative identity for constraints
+            b = np.hstack([ub * np.ones(n_inputs), -lb * np.ones(n_inputs)])
+        else:
+            # Apply to a specific input
+            A = np.zeros((2, self.B.shape[1]))
+            A[0, input_index] = 1  # Upper bound for the specified input
+            A[1, input_index] = -1  # Lower bound for the specified input
+            b = np.array([ub, -lb])
+
+        # Create and store the constraint
+        constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
+        self.u_constraints.append(constraint)
+        
+        
     def add_output_magnitude_constraint(self, limit, output_index=None, is_hard=True, penalty_weight=1):
         """Add magnitude constraint on a specific output: -limit <= y[output_index] <= limit."""
         if output_index is None:
@@ -73,6 +110,43 @@ class MPCParameters:
         constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
         self.x_constraints.append(constraint)
 
+    def add_output_bound_constraint(self, limits, output_index=None, is_hard=True, penalty_weight=1):
+        """
+        Adds output bounds constraints. The constraints can be symmetric or asymmetric based on `limits`.
+
+        Args:
+            limits (float or tuple): If a single float, the bounds are symmetric: -limits <= y_t <= limits.
+                                     If a tuple (lb, ub), the bounds are asymmetric: lb <= y_t <= ub.
+            output_index (int or None): If None, apply the constraints to all outputs uniformly.
+                                        If an int, apply the constraint to a specific output.
+            is_hard (bool): Whether the constraint is hard or soft.
+            penalty_weight (float): The penalty weight for soft constraints.
+        """
+        # Determine the bounds
+        if isinstance(limits, (int, float)):
+            lb, ub = -limits, limits  # Symmetric bounds
+        elif isinstance(limits, tuple) and len(limits) == 2:
+            lb, ub = limits  # Asymmetric bounds
+        else:
+            raise ValueError("limits must be a single value or a tuple of two values (lb, ub).")
+
+        if output_index is None:
+            # Apply uniformly to all outputs
+            n_outputs = self.C.shape[0]
+            A = np.vstack([self.C, -self.C])  # Apply C*x for both positive and negative bounds
+            b = np.hstack([ub * np.ones(n_outputs), -lb * np.ones(n_outputs)])
+        else:
+            # Apply to a specific output
+            A = np.zeros((2, self.C.shape[1]))  # Number of columns matches state dimension
+            A[0, :] = self.C[output_index, :]  # Upper bound for the specified output
+            A[1, :] = -self.C[output_index, :]  # Lower bound for the specified output
+            b = np.array([ub, -lb])
+
+        # Create and store the constraint
+        constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
+        self.x_constraints.append(constraint)
+        
+        
     def add_state_magnitude_constraint(self, limit, state_index=None, is_hard=True, penalty_weight=1):
         """Add state magnitude constraint: -limit <= x[state_index] <= limit."""
         if state_index is None:
@@ -86,6 +160,43 @@ class MPCParameters:
         constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
         self.x_constraints.append(constraint)
 
+    def add_state_bound_constraint(self, limits, state_index=None, is_hard=True, penalty_weight=1):
+        """
+        Adds state bounds constraints. The constraints can be symmetric or asymmetric based on `limits`.
+
+        Args:
+            limits (float or tuple): If a single float, the bounds are symmetric: -limits <= x_t <= limits.
+                                     If a tuple (lb, ub), the bounds are asymmetric: lb <= x_t <= ub.
+            state_index (int or None): If None, apply the constraints to all states uniformly.
+                                       If an int, apply the constraint to a specific state.
+            is_hard (bool): Whether the constraint is hard or soft.
+            penalty_weight (float): The penalty weight for soft constraints.
+        """
+        # Determine the bounds
+        if isinstance(limits, (int, float)):
+            lb, ub = -limits, limits  # Symmetric bounds
+        elif isinstance(limits, tuple) and len(limits) == 2:
+            lb, ub = limits  # Asymmetric bounds
+        else:
+            raise ValueError("limits must be a single value or a tuple of two values (lb, ub).")
+
+        if state_index is None:
+            # Apply uniformly to all states
+            n_states = self.A.shape[0]
+            A = np.vstack([np.eye(n_states), -np.eye(n_states)])  # Identity and negative identity for constraints
+            b = np.hstack([ub * np.ones(n_states), -lb * np.ones(n_states)])
+        else:
+            # Apply to a specific state
+            A = np.zeros((2, self.A.shape[1]))  # Number of columns matches state dimension
+            A[0, state_index] = 1  # Upper bound for the specified state
+            A[1, state_index] = -1  # Lower bound for the specified state
+            b = np.array([ub, -lb])
+
+        # Create and store the constraint
+        constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
+        self.x_constraints.append(constraint)
+        
+        
     def add_general_state_constraints(self, Ax, bx, is_hard=True, penalty_weight=1):
         """Add general state constraints of the form Ax * x <= bx."""
         constraint = Constraint(Ax, bx, is_hard=is_hard, penalty_weight=penalty_weight)
