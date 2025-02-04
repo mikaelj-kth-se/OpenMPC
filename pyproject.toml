@@ -7,7 +7,7 @@ authors = [
 ]
 license = {text = "GNU GPLv3"}
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 dependencies = [
     "numpy (>=2.2.2,<3.0.0)",
     "casadi (>=3.6.7,<4.0.0)",
@@ -15,7 +15,8 @@ dependencies = [
     "matplotlib (>=3.10.0,<4.0.0)",
     "control (>=0.10.1,<0.11.0)",
     "ipykernel (>=6.29.5,<7.0.0)",
-    "pycddlib (>=3.0.2,<4.0.0)"
+    "pycddlib (>=3.0.2,<4.0.0)",
+    "mosek (>=11.0.5,<12.0.0)"
 ]
 
 

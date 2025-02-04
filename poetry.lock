@@ -861,6 +861,23 @@ files = [
 traitlets = "*"
 
 [[package]]
+name = "mosek"
+version = "11.0.5"
+description = "Python API for Mosek"
+optional = false
+python-versions = "<3.14,>=3.9"
+groups = ["main"]
+files = [
+    {file = "Mosek-11.0.5-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:fa320331967c2763eb8fe7aab09fd5934f6467e69cf9f1a2f9f6c7461b6c3fd2"},
+    {file = "Mosek-11.0.5-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:53b32cb2f06d9d4e03e3529150743488fdfdd8de7ad8c8d60922d6572f3f5f8e"},
+    {file = "Mosek-11.0.5-cp39-abi3-manylinux_2_29_aarch64.whl", hash = "sha256:38fb445d470632b8e849695e725f3ede06b4077ddf39971659230800b549a91a"},
+    {file = "Mosek-11.0.5-cp39-abi3-win_amd64.whl", hash = "sha256:90389b007e85a3768c07f924eef05425a665b8ef0502e8347b886bd00488f446"},
+]
+
+[package.dependencies]
+numpy = "*"
+
+[[package]]
 name = "nest-asyncio"
 version = "1.6.0"
 description = "Patch asyncio to allow nested event loops"
@@ -1708,5 +1725,5 @@ files = [
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.10"
-content-hash = "9f8a0947d3779030edd47376884d0a85bea5c3fd4982059bd1775e3c3e5f321a"
+python-versions = ">=3.10,<3.14"
+content-hash = "f4cca4ebaab9e86a415e8680b1063d46b3abc95c8be0488ee1e22ef7f82dc291"
