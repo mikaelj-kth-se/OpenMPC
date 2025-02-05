@@ -10,35 +10,13 @@ OpenMPC depends on the following Python packages:
 
 * numpy>=1.21.0
 * casadi>=3.6.3
-* cvxpy>=1.3.0
+* cvxpy[mosek]>=1.3.0
 * matplotlib
 * control
 * pycddlib>=3.0.0b6'
 
 
-These dependencies will be installed automatically when you run the `pip install . ` command.
-It is possible that your system does not have all the requirements for installying pycddlib. Indeed, pycddlib depends on cddlib and GMP which you should install as propsed [here](https://github.com/mcmtroffaes/pycddlib/blob/develop/INSTALL.rst)
-
-
-On Fedora
-```
-dnf install cddlib-devel gmp-devel python3-devel
-```
-
-On Ubuntu
-
-```
-apt-get install libcdd-dev libgmp-dev python3-dev
-```
-
-On Mac
-
-```
-brew install cddlib gmp
-```
-
-For Windows there is not need to for further installations.
-
+These dependencies will be installed automatically when you run the `pip install . ` command. Some of the provides example use mosek solver which requires a special acesamic license which can be freely installed. Please follow the section on [Mosek License](#mosek-license) carefully.
 
 Once the setup is complete, you can simply run:
 
@@ -46,12 +24,37 @@ Once the setup is complete, you can simply run:
 jupyter notebook index.ipynb
 ```
 
+## Mosek License
 
-**Note.** Since `pycddlib` is in pre-release, you may need to install `cddlib` separately (e.g., using Homebrew):
+You can download your mosek License [here](https://www.mosek.com/resources/getting-started/) by clicking on `Academic License` at line 3. The click on `Request Personal Academic License` and follow the instructios for copying the license file on your personal computer.
+
+DO NOT share your license file with anyone as the license is linked to your name
+
+
+### Trubleshooting
+
+Since `pycddlib` is in pre-release, you may need to install `cddlib` separately (e.g., using Homebrew):
 
 ```bash
 brew install cddlib
 ```
+
+On Fedora
+```
+dnf install cddlib-devel gmp-devel python3-devel
+```
+
+On Ubuntu
+```
+apt-get install libcdd-dev libgmp-dev python3-dev
+```
+
+On Mac
+```
+brew install cddlib gmp
+```
+
+For Windows there is not need to for further installations.
 
 
 The latest version of `pycddlib` is then built from source. If you need to specify the include paths, you can do this using:
