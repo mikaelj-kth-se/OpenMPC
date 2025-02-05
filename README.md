@@ -13,9 +13,32 @@ OpenMPC depends on the following Python packages:
 * cvxpy>=1.3.0
 * matplotlib
 * control
+* pycddlib>=3.0.0b6'
 
 
 These dependencies will be installed automatically when you run the `pip install . ` command.
+It is possible that your system does not have all the requirements for installying pycddlib. Indeed, pycddlib depends on cddlib and GMP which you should install as propsed [here](https://github.com/mcmtroffaes/pycddlib/blob/develop/INSTALL.rst)
+
+
+On Fedora
+```
+dnf install cddlib-devel gmp-devel python3-devel
+```
+
+On Ubuntu
+
+```
+apt-get install libcdd-dev libgmp-dev python3-dev
+```
+
+On Mac
+
+```
+brew install cddlib gmp
+```
+
+For Windows there is not need to for further installations.
+
 
 Once the setup is complete, you can simply run:
 
