@@ -1,0 +1,4 @@
+.vscode
+/build
+OpenMPC.egg-info
+__pycache__
