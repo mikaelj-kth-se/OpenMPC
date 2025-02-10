@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from openmpc.NonlinearMPC import NonlinearSystem, trackingMPC, EKF, create_estimator_model
 from openmpc.models.atmos_2d import Atmos2D
-
+import time as tim
 
 samplingTime = 0.1
 model = Atmos2D(dt=samplingTime)
@@ -96,6 +96,10 @@ for k in range(len(time)):
     x_current = x_sim[-1]
     x_hat = ekf.get_state()
 
+    if time[k] > 10:
+        d = np.array([0.005, 0.01, 0.0])
+        yref = np.array([0.0, 0.1, 0, 0, 0, 0, 0.0, 0.0, 0.2, 0, 0, 0])
+
     try:
         u_current = mpc.get_control_action(x_hat[0:n], yref, x_hat[n:])
     except Exception as e:
@@ -145,9 +149,9 @@ ax1.plot(t_sim, x_sim_array[:-1, 1], label='Position y', color='#004791', linewi
 ax1.plot(t_sim, x_sim_array[:-1, 2], label='Position z', color='#007D34', linewidth=2)
 
 # Plot inputs on the second subplot
-ax2.plot(t_sim, u_sim_array[:, 0], label='u1', color='#AA3939', linewidth=2)
-ax2.plot(t_sim, u_sim_array[:, 1], label='u2', color='#004791', linewidth=2)
-ax2.plot(t_sim, u_sim_array[:, 2], label='u3', color='#007D34', linewidth=2)
+ax2.step(t_sim, u_sim_array[:, 0], label='u1', color='#AA3939', linewidth=2)
+ax2.step(t_sim, u_sim_array[:, 1], label='u2', color='#004791', linewidth=2)
+ax2.step(t_sim, u_sim_array[:, 2], label='u3', color='#007D34', linewidth=2)
 
 # Toggle legend
 ax1.legend()
@@ -164,9 +168,9 @@ ax[0].plot(t_sim, x_sim_array[:-1, 7], label='q2', color='#004791', linewidth=2)
 ax[0].plot(t_sim, x_sim_array[:-1, 8], label='q3', color='#007D34', linewidth=2)
 
 # Plot torque inputs
-ax[1].plot(t_sim, u_sim_array[:, 3], label='u4', color='#AA3939', linewidth=2)
-ax[1].plot(t_sim, u_sim_array[:, 4], label='u5', color='#004791', linewidth=2)
-ax[1].plot(t_sim, u_sim_array[:, 5], label='u6', color='#007D34', linewidth=2)
+ax[1].step(t_sim, u_sim_array[:, 3], label='u4', color='#AA3939', linewidth=2)
+ax[1].step(t_sim, u_sim_array[:, 4], label='u5', color='#004791', linewidth=2)
+ax[1].step(t_sim, u_sim_array[:, 5], label='u6', color='#007D34', linewidth=2)
 
 # Toggle legend
 ax[0].legend()
