@@ -11,7 +11,7 @@ class MPC:
         Parameters:
         mpcProblemData (dict): Contains the prediction horizon (N), sampling time (dt),
                                cost matrices Q, R, Q_N, prediction model, control limits,
-                               state limits, output function, output limits, 
+                               state limits, output function, output limits,
                                baseController (feedback gain L), and slack penalty weight.
         """
         self.mpcProblemData = mpcProblemData
@@ -19,7 +19,7 @@ class MPC:
         self.previous_V = None
         self._formulate_planning_problem()
 
-    def _formulate_planning_problem(self):        
+    def _formulate_planning_problem(self):
         """
         Formulate the optimization problem and create the function for optimal control.
         """
@@ -45,10 +45,10 @@ class MPC:
         # Extract dimensions
         predictionModel = mpcProblemData['predictionModel']
         n = predictionModel.n
-        m = predictionModel.m        
+        m = predictionModel.m
         f = predictionModel.updfcn
         g = predictionModel.outfcn
-        
+
         # ---- decision variables ---------
         #X = ca.MX.sym('X', n, N + Ndm + 1)  # state trajectory
         #V = ca.MX.sym('V', m, N)  # new control signal to optimize
@@ -78,7 +78,7 @@ class MPC:
             x_k = X[:, N+k]
             u_k = -Ldm@x_k
             cost += ca.mtimes([x_k.T, Q, x_k]) + ca.mtimes([u_k.T, R, u_k])
-        
+
         # Final cost
         x_N = X[:, -1]
         cost += ca.mtimes([x_N.T, Q_N, x_N])
@@ -94,13 +94,13 @@ class MPC:
             x_current = X[:, k]
             v_current = V[:, k]
             u_current = -L @ x_current + v_current
-            opti.subject_to(X[:, k + 1] == f(x_current, u_current))  
+            opti.subject_to(X[:, k + 1] == f(x_current, u_current))
 
         for k in range(Ndm):
             x_current = X[:, N+k]
             u_current = -Ldm@x_current
             opti.subject_to(X[:, N+k+1] == f(x_current, u_current))
-        
+
         # Control constraints
         if umin is not None and umax is not None:
             U = -L @ X[:, 0:N] + V
@@ -124,8 +124,8 @@ class MPC:
                     u_k = -Ldm @ x_k
                 for i in range(y_k.size1()):
                     opti.subject_to(opti.bounded(ymin[i] - s, g(x_k, u_k), ymax[i] + s))
-                    
-        
+
+
 
         # set solver options
         opts = {'ipopt.print_level': 0,
@@ -140,12 +140,12 @@ class MPC:
             'ipopt.bound_relax_factor': 1e-9}
 
         opti.solver('ipopt', opts)
-        
+
         # Now, convert the Opti object to a function
         self.planningOptimizer=opti.to_function('MPCPlanner', [x0, X, V], [X, V], ['initial_state', 'x_guess', 'v_guess'], ['x_opt', 'u_opt'])
 
 
-        
+
     def compute_predicted_optimal_controls(self, x0):
         """
         Compute the optimal control and state trajectories for the given initial state.
@@ -166,8 +166,8 @@ class MPC:
         f = self.mpcProblemData['predictionModel'].updfcn
         n = self.mpcProblemData['predictionModel'].n
         m = self.mpcProblemData['predictionModel'].m
-        
-        
+
+
         if self.previous_X is not None and self.previous_V is not None:
             # Use the previous solution as the initial guess
             X_initial = np.hstack((self.previous_X[:, 1:], np.zeros((n, 1))))
@@ -176,8 +176,8 @@ class MPC:
             if Ndm>0:
                 uu = -Ldm @ xx
             else:
-                uu = -L @ xx    
-            X_initial[:, -1] = f(xx, uu).full().flatten()    
+                uu = -L @ xx
+            X_initial[:, -1] = f(xx, uu).full().flatten()
             V_initial = np.hstack((self.previous_V[:, 1:], np.zeros((m, 1))))
         else:
             # Initial guess for V: zero matrix
@@ -192,13 +192,13 @@ class MPC:
             (x_opt, v_opt)=self.planningOptimizer(x0, X_initial, V_initial)
         except Exception as e:
             print(f"Solver failed: {e}")
-            
+
 
         # Extract the control and state trajectories
         #v_opt = sol.value(V).reshape(m, N)
         u_opt = -L @ x_opt[:, 0:N] + v_opt
         #x_opt = sol.value(X)
-                
+
         # Store the solution for the next time step
         self.previous_X = x_opt
         self.previous_V = v_opt
@@ -239,7 +239,7 @@ class trackingMPC:
         self._formulate_planning_problem()
 
 
-    def _formulate_planning_problem(self):        
+    def _formulate_planning_problem(self):
         """
         Formulate the optimization problem and create the function for optimal control.
         """
@@ -265,9 +265,9 @@ class trackingMPC:
         # Extract dimensions
         predictionModel = mpcProblemData['predictionModel']
         n = predictionModel.n
-        m = predictionModel.m  
+        m = predictionModel.m
         nd= predictionModel.nd
-       
+
         f = predictionModel.updfcn
         g = predictionModel.outfcn
 
@@ -283,7 +283,7 @@ class trackingMPC:
         xref= opti.parameter(n)
         uref= opti.parameter(m)
         d= opti.parameter(nd)
-        
+
         #opti.set_value(x0, np.zeros(n))
         # ---- objective ---------
         cost = 0
@@ -296,7 +296,7 @@ class trackingMPC:
         # Dual mode horizon cost
         for k in range(Ndm):
             x_k = X[:, N + k]
-            u_k = -Ldm @ (x_k - xref) + uref 
+            u_k = -Ldm @ (x_k - xref) + uref
             cost += ca.mtimes([(x_k - xref).T, Q, (x_k - xref)]) + ca.mtimes([(u_k - uref).T, R, (u_k - uref)])
 
         # Final cost
@@ -308,13 +308,13 @@ class trackingMPC:
 
         opti.minimize(cost)
 
-        
+
         # Dynamic constraints
         for k in range(N):  # Loop over control intervals
             x_current = X[:, k]
             v_current = V[:, k]
             u_current = -L @ (x_current - xref) + uref + v_current
-            opti.subject_to(X[:, k + 1] == f(x_current, u_current, d))  
+            opti.subject_to(X[:, k + 1] == f(x_current, u_current, d))
 
         for k in range(Ndm):
             x_current = X[:, N + k]
@@ -347,7 +347,7 @@ class trackingMPC:
 
         # Boundary conditions
         opti.subject_to(X[:, 0] == x0)  # Initial state constraint
-        
+
 
         # set solver options
         opts = {'ipopt.print_level': 0,
@@ -362,11 +362,11 @@ class trackingMPC:
             'ipopt.bound_relax_factor': 1e-9}
 
         opti.solver('ipopt', opts)
-        
+
         # Now, convert the Opti object to a function
         self.planningOptimizer=opti.to_function('MPCPlanner', [x0, xref, uref, d, X, V], [X, V], ['initial_state', 'x_ref', 'v_ref', 'd', 'x_guess', 'v_guess'], ['x_opt', 'v_opt'])
-        
-        
+
+
     def compute_predicted_optimal_controls(self, x0, yref, d=None):
         """
         Compute the optimal control and state trajectories for the given initial state.
@@ -380,7 +380,7 @@ class trackingMPC:
         (np.array, np.array): Optimal control trajectory and optimal state trajectory.
         """
 
-        
+
         N = self.mpcProblemData['N']
         Ndm = self.mpcProblemData.get('dualModeHorizon', 0)
         Ldm = self.mpcProblemData.get('dualModeController', 0)
@@ -388,25 +388,26 @@ class trackingMPC:
         f = self.mpcProblemData['predictionModel'].updfcn
         n = self.mpcProblemData['predictionModel'].n
         m = self.mpcProblemData['predictionModel'].m
-        
+
         # Determine reference point
-        (xref, uref) = self.mpcProblemData['predictionModel'].get_target_point(yref, d) 
-        
+        (xref, uref) = self.mpcProblemData['predictionModel'].get_target_point(yref, d)
+        xref = yref
+
         if self.previous_X is not None and self.previous_V is not None:
             # Use the previous solution as the initial guess
             # Use the previous solution as the initial guess
             X_initial = np.hstack((self.previous_X[:, 1:], np.zeros((n, 1))))
             X_initial[:, 0] = x0
-            
+
             xx = self.previous_X[:, -1]
             if Ndm>0:
                 uu = -Ldm @ (xx-xref) + uref
             else:
                 uu = -L @ (xx - xref) + uref
-                
+
             X_initial[:, -1] = f(xx, uu, d).full().flatten()
             V_initial = np.hstack((self.previous_V[:, 1:], np.zeros((m, 1))))
-            
+
         else:
             X_initial = np.zeros((n, N + Ndm + 1))
             X_initial[:, 0] = x0
@@ -425,7 +426,7 @@ class trackingMPC:
         #v_opt = sol.value(V).reshape(m, N)
         #x_opt = sol.value(X)
         u_opt = -L @ (x_opt[:, 0:N] - ca.repmat(xref, 1, N)) + uref + v_opt
-                
+
         # Store the solution for the next time step
         self.previous_X = x_opt
         self.previous_V = v_opt

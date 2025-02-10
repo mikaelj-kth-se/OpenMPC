@@ -12,10 +12,10 @@ inputs = model.u
 disturbances = model.d
 
 # Create the NonlinearSystem object
-heatExchangerSystem = NonlinearSystem(updfcn=rhs, states=states, inputs=inputs, disturbances=disturbances, outfcn=states)
+system = NonlinearSystem(updfcn=rhs, states=states, inputs=inputs, disturbances=disturbances, outfcn=states)
 
 # Define discrete-time prediction model
-predictionModel = heatExchangerSystem.c2d(samplingTime)
+predictionModel = system.c2d(samplingTime)
 
 Q = np.diag([10, 10, 10, 1, 1, 1, 10, 10, 10, 1, 1, 1])
 R = np.diag([0.1, 0.1, 0.1, 0.1, 0.1, 0.1])
@@ -89,7 +89,7 @@ x_sim = [x0]
 u_sim = []
 
 x_hat = xe0
-yref = np.array([0.2, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+yref = np.array([0.0, 0.0, 0, 0, 0, 0, 0.15, 0.2, 0.1, 0, 0, 0])
 n = 12
 
 for k in range(len(time)):
@@ -139,6 +139,7 @@ t_sim = time
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
 
 # Plot position
+ax1.set_title('Position Control')
 ax1.plot(t_sim, x_sim_array[:-1, 0], label='Position x', color='#AA3939', linewidth=2)
 ax1.plot(t_sim, x_sim_array[:-1, 1], label='Position y', color='#004791', linewidth=2)
 ax1.plot(t_sim, x_sim_array[:-1, 2], label='Position z', color='#007D34', linewidth=2)
@@ -148,12 +149,16 @@ ax2.plot(t_sim, u_sim_array[:, 0], label='u1', color='#AA3939', linewidth=2)
 ax2.plot(t_sim, u_sim_array[:, 1], label='u2', color='#004791', linewidth=2)
 ax2.plot(t_sim, u_sim_array[:, 2], label='u3', color='#007D34', linewidth=2)
 
+# Toggle legend
+ax1.legend()
+ax2.legend()
 
 
 # New figure for attitude plots
-fig, ax = plt.subplots(3, 1, figsize=(12, 10))
+fig, ax = plt.subplots(2, 1, figsize=(12, 10))
 
 # Plot attitude
+ax[0].set_title('Attitude Control')
 ax[0].plot(t_sim, x_sim_array[:-1, 6], label='q1', color='#AA3939', linewidth=2)
 ax[0].plot(t_sim, x_sim_array[:-1, 7], label='q2', color='#004791', linewidth=2)
 ax[0].plot(t_sim, x_sim_array[:-1, 8], label='q3', color='#007D34', linewidth=2)
@@ -162,5 +167,9 @@ ax[0].plot(t_sim, x_sim_array[:-1, 8], label='q3', color='#007D34', linewidth=2)
 ax[1].plot(t_sim, u_sim_array[:, 3], label='u4', color='#AA3939', linewidth=2)
 ax[1].plot(t_sim, u_sim_array[:, 4], label='u5', color='#004791', linewidth=2)
 ax[1].plot(t_sim, u_sim_array[:, 5], label='u6', color='#007D34', linewidth=2)
+
+# Toggle legend
+ax[0].legend()
+ax[1].legend()
 
 plt.show()
