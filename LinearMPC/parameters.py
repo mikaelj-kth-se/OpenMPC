@@ -11,7 +11,7 @@ class LinearSystem :
     You can use the class method `c2d` obtain a discerete system from continuous time matrices
     """
 
-    def __init__(self, A, B, C, D):
+    def __init__(self, A, B, C = None, D = None):
         """
         Initialize linear system
 
@@ -24,6 +24,12 @@ class LinearSystem :
 
         self._A = A
         self._B = B
+        
+        if C is None:
+            self._C = np.eye(A.shape[0])
+        if D is None:
+            self._D = np.zeros((A.shape[0], B.shape[1]))
+
         self._C = C
         self._D = D
     
@@ -72,6 +78,44 @@ class LinearSystem :
         Adist, Bdist, Cdist, Ddist = control.ssdata(sys_disc)
         
         return LinearSystem(Adist, Bdist, Cdist, Ddist)
+
+
+    @staticmethod
+    def get_lqr_solution(A, B, Q, R):
+        """
+        Solve the discrete-time algebraic Riccati equation (DARE) for the given system.
+
+        Args:
+            A (numpy.ndarray): The state matrix.
+            B (numpy.ndarray): The input matrix.
+            Q (numpy.ndarray): The state weighting matrix.
+            R (numpy.ndarray): The input weighting matrix.
+
+        Returns:
+            L (numpy.ndarray): Optimal gain of the LQR solution.
+            P (numpy.ndarray):  symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.
+            E (numpy.ndarray): Eigenvalues of the closed-loop system (A-BL)
+        """
+
+        L, P, E = control.dlqr(A, B, Q, R)
+
+        return L,P,E
+
+    def lqr_solution(self,Q,R):
+        """
+        Solve the discrete-time algebraic Riccati equation (DARE) for the given system.
+
+        Args:
+            Q (numpy.ndarray): The state weighting matrix.
+            R (numpy.ndarray): The input weighting matrix.
+
+        Returns:
+            L (numpy.ndarray): Optimal gain of the LQR solution.
+            P (numpy.ndarray):  symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.
+            E (numpy.ndarray): Eigenvalues of the closed-loop system (A-BL)
+        """
+
+        return self.get_lqr_solution(self._A, self._B, Q, R)
 
 
 
