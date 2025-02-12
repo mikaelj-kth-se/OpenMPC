@@ -5,13 +5,13 @@ from .constraints import Constraint
 
 
 
-class LinearSystems :
+class LinearSystem :
     """
     Simple base class to define a linear system in state-space form. The system is assumed to be discrete-time.
     You can use the class method `c2d` obtain a discerete system from continuous time matrices
     """
 
-    def __init__(self, Ad, Bd, Cd, Dd):
+    def __init__(self, A, B, C, D):
         """
         Initialize linear system
 
@@ -22,17 +22,30 @@ class LinearSystems :
             Dd (numpy.ndarray): The feedforward matrix.
         """
 
-        self.A = A
-        self.B = B
-        self.C = C
-        self.D = D
+        self._A = A
+        self._B = B
+        self._C = C
+        self._D = D
     
+    @property
+    def A(self):
+        return self._A
+    @property
+    def B(self):
+        return self._B
+    @property
+    def C(self):
+        return self._C
+    @property
+    def D(self):
+        return self._D
+
     def get_system_matrices(self):
         return self.A, self.B, self.C, self.D
 
     
     @staticmethod
-    def c2d(A,B,C,D,dt):
+    def c2d(A_cont, B_cont, C_cont, D_cont,dt):
         """
         Convert continuous-time state-space model to discrete-time.
         
@@ -58,7 +71,7 @@ class LinearSystems :
         # Extract the discrete-time matrices
         Adist, Bdist, Cdist, Ddist = control.ssdata(sys_disc)
         
-        return LinearSystems(Adist, Bdist, Cdist, Ddist)
+        return LinearSystem(Adist, Bdist, Cdist, Ddist)
 
 
 
