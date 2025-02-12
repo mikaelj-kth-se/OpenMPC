@@ -3,11 +3,85 @@ import numpy as np
 from InvariantSets import Polytope, invariant_set
 from .constraints import Constraint
 
+
+
+class LinearSystems :
+    """
+    Simple base class to define a linear system in state-space form. The system is assumed to be discrete-time.
+    You can use the class method `c2d` obtain a discerete system from continuous time matrices
+    """
+
+    def __init__(self, Ad, Bd, Cd, Dd):
+        """
+        Initialize linear system
+
+        Args:
+            Ad (numpy.ndarray): The state matrix.
+            Bd (numpy.ndarray): The input matrix.
+            Cd (numpy.ndarray): The output matrix.
+            Dd (numpy.ndarray): The feedforward matrix.
+        """
+
+        self.A = A
+        self.B = B
+        self.C = C
+        self.D = D
+    
+    def get_system_matrices(self):
+        return self.A, self.B, self.C, self.D
+
+    
+    @staticmethod
+    def c2d(A,B,C,D,dt):
+        """
+        Convert continuous-time state-space model to discrete-time.
+        
+        Args:
+            A (numpy.ndarray): The state matrix.
+            B (numpy.ndarray): The input matrix.
+            C (numpy.ndarray): The output matrix.
+            D (numpy.ndarray): The feedforward matrix.
+            dt (float): The sampling time.
+
+        Returns:
+            discrete_system : LinearSystems 
+
+        """
+
+        # Create the state-space system
+        sys_cont = control.ss(A_cont, B_cont, C_cont, D_cont)
+
+        # Sample the system with a sampling time h = 0.25 seconds
+        h = 0.25
+        sys_disc = control.c2d(sys_cont, h)
+
+        # Extract the discrete-time matrices
+        Adist, Bdist, Cdist, Ddist = control.ssdata(sys_disc)
+        
+        return LinearSystems(Adist, Bdist, Cdist, Ddist)
+
+
+
 class MPCParameters:
     def __init__(self, system, horizon, Q, R, QT=None, global_penalty_weight=1.0, solver=None, slack_penalty='SQUARE'):
+
+        """
+        Initializes the MPCParameters with the given parameters.
+
+        Args:
+            system (control.StateSpace): The state-space model of the system. The state space model should be described in desceret time.
+            horizon (int): The prediction horizon for the MPC.
+            Q (numpy.ndarray): The state weighting matrix.
+            R (numpy.ndarray): The input weighting matrix.
+            QT (numpy.ndarray, optional): The terminal state weighting matrix.
+            global_penalty_weight (float): The global penalty weight for the cost function.
+            solver (optional): The solver to be used for optimization.
+            slack_penalty (str): The type of penalty for slack variables, default is 'SQUARE'.
+        """
+        
         # Store the state-space model
         self.system = system
-        self.A, self.B, self.C, self.D = control.ssdata(system)
+        self.A, self.B, self.C, self.D = system.get_system_matrices()
 
         # MPC parameters
         self.horizon = horizon
@@ -34,9 +108,6 @@ class MPCParameters:
 
         self.Bd = None
         self.Cd = None
-        
-        # Extract system matrices
-        self.A, self.B, self.C, _ = self.get_system_matrices()
 
 
     def get_system_matrices(self):
@@ -240,6 +311,7 @@ class MPCParameters:
         
         # Set the dual mode horizon
         self.dual_mode_horizon = dual_mode_horizon
+        
 
     def soften_tracking_constraint(self, penalty_weight=1):
         """Enable softening of the tracking constraint with the specified penalty weight."""
@@ -296,4 +368,7 @@ class MPCParameters:
         rank_condition_2 = np.linalg.matrix_rank(matrix_2) == (n + p)
 
         return rank_condition_1 and rank_condition_2
+
+
+
 
