@@ -1,5 +1,6 @@
 import control
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class LinearSystem :
@@ -27,8 +28,6 @@ class LinearSystem :
         if D is None:
             self._D = np.zeros((A.shape[0], B.shape[1]))
 
-        self._C = C
-        self._D = D
     
     @property
     def A(self):
@@ -122,22 +121,23 @@ class LinearSystem :
             P (numpy.ndarray):  symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.
             E (numpy.ndarray): Eigenvalues of the closed-loop system (A-BL)
         """
+        L, P, E = self.get_lqr_solution(self._A, self._B, Q, R) 
+        return L, P, E 
 
-        return self.get_lqr_solution(self._A, self._B, Q, R)
-
-    def open_loop_simulation(self, x0, u=None):
+    def open_loop_simulation(self, x0, u=None, plot=False):
         """Simulate the LinearSystem.
 
         Parameters:
             x0 (np.array): Initial state vector. Defaults to zero vector of appropriate dimension.
             u (np.array, optional): Input signal. should be an array of dimension (n_input, steps). The system will be simulated for step+1 points . Defaults to zero.
+            plot (bool): Whether to plot the state and output trajectories.
 
         Returns:
             x_trj (np.array): Simulated state trajectory.
             y_trj (np.array): Simulated output trajectory.
         """
 
-        x0    = np.array(x0).reshpe(self.size_state,1)
+        x0    = np.array(x0).reshape(self.size_state, 1)
         steps = 10
         
         if u is None: # default ten steps input
@@ -150,50 +150,108 @@ class LinearSystem :
 
 
         x_trj = np.empty((self.size_state, steps+1))
+        y_trj = np.empty((self.size_out, steps))
         x_trj[:, 0] = x0.flatten() # initial state condition
 
         for k in range(steps):
 
             x_next = self._A @ x_trj[:, k] + self._B @ u[:, k] 
-            y_next = self._C @ x_trj[:, k] + self._D @ u[:, k]
+            y = self._C @ x_trj[:, k] + self._D @ u[:, k]
 
-            x_trj[k+1] = x_next.flatten()
-            y_trj[k]   = y_next.flatten()
+            x_trj[:,k+1] = x_next.flatten()
+            y_trj[:,k]   = y.flatten()
+
+        
+        if plot:
+            self.plot_trajectories(x_trj, y_trj, "Open-Loop Simulation")
 
         return x_trj, y_trj 
     
 
-    def closed_loop_simulate(self, x0, L, steps=10):
+    def closed_loop_simulate(self, x0, L, steps=10, plot=False):
         """Simulate the LinearSystem in closed-loop with an L gain (a.k.a A-BL).
 
         Parameters:
             x0 (np.array): Initial state vector. Defaults to zero vector of appropriate dimension.
             L (np.array): L gain matrix.
             steps (int): Number of steps to simulate.
+            plot (bool): Whether to plot the state and output trajectories.
 
         Returns:
             x_trj (np.array): Simulated state trajectory.
             y_trj (np.array): Simulated output trajectory.
         """
 
-        x0    = np.array(x0).reshpe(self.size_state,1)
-        steps = 10
+        x0    = np.array(x0).reshape(self.size_state,1)
 
         if L.shape != (self.size_in, self.size_state):
             raise ValueError("L gain matrix does not match the system dimensions. Expected shape is ({}, {})".format(self.size_in, self.size_state))
 
-        u_trj = np.empty((self.size_in, steps-1))
-        x_trj = np.empty((self.size_state, steps))
+        y_trj = np.empty((self.size_out, steps))
+        x_trj = np.empty((self.size_state, steps+1))
         x_trj[:, 0] = x0.flatten() # initial state condition
 
-        for k in range(steps - 1):
-
+        for k in range(steps):
+            
             x_next = (self._A - self._B@L) @ x_trj[:, k]
-            y_next = (self._C + self._D @L) x_trj[:, k]
+            y = (self._C - self._D @L)@x_trj[:, k]
 
-            x_trj[k+1] = x_next.flatten()
-            y_trj[k]   = y_next.flatten()
+            x_trj[:,k+1] = x_next.flatten()
+            y_trj[:,k]   = y.flatten()
+
+        if plot:
+            self.plot_trajectories(x_trj, y_trj, "Closed-Loop Simulation")
+
 
         return x_trj, y_trj 
+
+    
+    def plot_trajectories(self, x_trj, y_trj, title):
+        """Function to plot state and output trajectories.
+
+        Parameters:
+            x_trj (np.array): State trajectory.
+            y_trj (np.array): Output trajectory.
+            title (str): The title of the plot.
+        """
+        
+        plt.figure(figsize=(12, 6))
+
+        # Plot state trajectory
+        plt.subplot(2, 1, 1)
+        plt.plot(x_trj.T)
+        plt.title(f'{title} - State Trajectories')
+        plt.xlabel('Time Step')
+        plt.ylabel('State Values')
+        plt.legend([f"State {i+1}" for i in range(self.size_state)])
+
+        # Plot output trajectory
+        plt.subplot(2, 1, 2)
+        plt.plot(y_trj.T)
+        plt.title(f'{title} - Output Trajectories')
+        plt.xlabel('Time Step')
+        plt.ylabel('Output Values')
+        plt.legend([f"Output {i+1}" for i in range(self.size_out)])
+
+        plt.tight_layout()
+        plt.show()
         
         
+
+
+if __name__ == "__main__" :
+
+    sys = LinearSystem(np.array([[1, 1.2], [0, 0.4]]), np.array([[1], [1]]))
+    print(sys.A)
+    print(sys.B)
+    print(sys.C)
+    print(sys.D)
+
+    u = np.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]])
+
+    L,_,_ = sys.lqr_solution(np.eye(2), np.eye(1))
+    # simulate
+    x0 = np.array([1, 1])
+    x_trj, y_trj = sys.closed_loop_simulate(x0, L, plot=True)
+
+    x_trj, y_trj = sys.open_loop_simulation(x0, u, plot=True)
