@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from openmpc.NonlinearMPC import NonlinearSystem, trackingMPC, EKF, create_estimator_model
 from openmpc.models.atmos_2d import Atmos2D
-import time as tim
 
 samplingTime = 0.1
 model = Atmos2D(dt=samplingTime)
@@ -33,8 +32,8 @@ mpcProblemData = {
     'R': R,
     'Q_N': P,
     'predictionModel': predictionModel,
-    'umin': np.array([-1.5, -1.5, -1.5, -1.5*0.12, -1.5*0.12, -1.5*0.12]),  # Control limits
-    'umax': np.array([1.5, 1.5, 1.5, 1.5*0.12, 1.5*0.12, 1.5*0.12]),  # Control limits
+    'umin': np.array([-1.5, -1.5, -1.5, -1.5 * 0.12, -1.5 * 0.12, -1.5 * 0.12]),  # Control limits
+    'umax': np.array([1.5, 1.5, 1.5, 1.5 * 0.12, 1.5 * 0.12, 1.5 * 0.12]),  # Control limits
     'slackPenaltyWeight': 1e6,  # Slack penalty weight
     'baseController': L,
     'dualModeHorizon': 5,  # Dual mode horizon
@@ -58,8 +57,8 @@ xe0 = np.array([0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])  # Initial state
 P0 = 1000 * np.eye(15)  # Initial state covariance
 
 # Define the process noise and measurement noise covariance matrices
-Qnoise = np.diag([0.001]*15)  # Process noise covariance
-Rnoise = np.diag([0.01]*12)  # Measurement noise covariance
+Qnoise = np.diag([0.001] * 15)  # Process noise covariance
+Rnoise = np.diag([0.01] * 12)  # Measurement noise covariance
 
 # Pack the EKF parameters into a struct
 ekfParameters = {
@@ -87,9 +86,10 @@ d = np.array([0.001, 0.005, 0.0])
 # Initialize state and control trajectories for simulation
 x_sim = [x0]
 u_sim = []
+d_hat = [np.array([0.0, 0.0, 0.0])]
 
 x_hat = xe0
-yref = np.array([0.0, 0.0, 0, 0, 0, 0, 0.15, 0.2, 0.1, 0, 0, 0])
+yref = np.array([0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.1, 0, 0, 0])
 n = 12
 
 for k in range(len(time)):
@@ -122,6 +122,7 @@ for k in range(len(time)):
     # Store the control action and the next state
     u_sim.append(u_current)
     x_sim.append(x_next)
+    d_hat.append(ekf.get_state()[n:])
 
     # Print status every hour of simulation time
     if (k + 1) % int(1 / dt) == 0:
@@ -131,6 +132,7 @@ for k in range(len(time)):
 # Convert simulation results to numpy arrays for easier manipulation
 x_sim_array = np.array(x_sim)
 u_sim_array = np.array(u_sim)
+d_hat = np.array(d_hat)
 
 # Ensure the simulation result arrays are numpy arrays for easier manipulation
 # x_sim_array = np.array(x_sim)
@@ -140,7 +142,7 @@ u_sim_array = np.array(u_sim)
 t_sim = time
 
 # Create the figure and subplots
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 10))
 
 # Plot position
 ax1.set_title('Position Control')
@@ -152,6 +154,11 @@ ax1.plot(t_sim, x_sim_array[:-1, 2], label='Position z', color='#007D34', linewi
 ax2.step(t_sim, u_sim_array[:, 0], label='u1', color='#AA3939', linewidth=2)
 ax2.step(t_sim, u_sim_array[:, 1], label='u2', color='#004791', linewidth=2)
 ax2.step(t_sim, u_sim_array[:, 2], label='u3', color='#007D34', linewidth=2)
+
+# Plot estimated disturbance
+ax3.plot(t_sim, d_hat[:-1, 0], label='d1', color='#AA3939', linewidth=2)
+ax3.plot(t_sim, d_hat[:-1, 1], label='d2', color='#004791', linewidth=2)
+ax3.plot(t_sim, d_hat[:-1, 2], label='d3', color='#007D34', linewidth=2)
 
 # Toggle legend
 ax1.legend()

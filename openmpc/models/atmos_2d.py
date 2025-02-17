@@ -50,7 +50,7 @@ class Atmos2D(Model):
 
         self.x = cs.vertcat(p, v, q, w)
         self.u = cs.MX.sym('u', 6)  # control input
-        self.d = cs.MX.sym('d', 3)  # disturbance
+        self.d = cs.MX.sym('d', 6)  # disturbance
 
         # parameters
         self.torque_arm_length = 0.12
@@ -90,33 +90,16 @@ class Atmos2D(Model):
         q = x[6:9]
         w = x[9:12]
 
-        # D_mat = cs.MX.zeros(2, 4)
-        # D_mat[0, 0] = 1
-        # D_mat[0, 1] = 1
-        # D_mat[1, 2] = -1
-        # D_mat[1, 3] = -1
-
-        # # L mat
-        # L_mat = cs.MX.zeros(1, 4)
-        # L_mat[0, 0] = -1
-        # L_mat[0, 1] = 1
-        # L_mat[0, 2] = -1
-        # L_mat[0, 3] = 1
-        # L_mat = L_mat * self.torque_arm_length
-
-        # F_2d = cs.mtimes(D_mat, u)
-        # tau_1d = cs.mtimes(L_mat, u)
-
-        # F = cs.vertcat(F_2d[0, 0], F_2d[1, 0], 0.0)
-        # tau = cs.vertcat(0.0, 0.0, tau_1d)
-
         F = u[:3]
         tau = u[3:]
 
+        d_trans = d[:3]
+        d_rot = d[3:]
+
         # dynamics
         xdot = cs.vertcat(v,
-                          v_dot_q(F, q)/self.mass + d,
+                          v_dot_q(F, q)/self.mass + d_trans,
                           1 / 2 * Qmat(q) @ w,
-                          np.linalg.inv(self.inertia) @ (tau - cs.cross(w, self.inertia @ w))
+                          np.linalg.inv(self.inertia) @ (tau - cs.cross(w, self.inertia @ w)) + d_rot
                           )
         return xdot

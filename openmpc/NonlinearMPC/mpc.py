@@ -390,7 +390,8 @@ class trackingMPC:
         m = self.mpcProblemData['predictionModel'].m
 
         # Determine reference point
-        (xref, uref) = self.mpcProblemData['predictionModel'].get_target_point(yref, d)
+        # (xref, uref) = self.mpcProblemData['predictionModel'].get_target_point(yref, d)
+        uref = ca.DM.zeros(m)
         xref = yref
 
         if self.previous_X is not None and self.previous_V is not None:
