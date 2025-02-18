@@ -1,6 +1,7 @@
 import cvxpy as cp
 import numpy as np
 
+
 class MPC:
     def __init__(self, mpc_params):
         # Extract MPC parameters
@@ -122,7 +123,39 @@ class MPC:
 
 
 class TrackingMPC:
+    """
+    A class to implement Model Predictive Control (MPC) for tracking a reference trajectory.
+
+    Attributes:
+        params (MPCParameters): The parameters for the MPC.
+        A (numpy.ndarray): The state transition matrix.
+        B (numpy.ndarray): The control input matrix.
+        C (numpy.ndarray): The output matrix.
+        n (int): The number of states.
+        m (int): The number of control inputs.
+        T (int): The prediction horizon.
+        Q (numpy.ndarray): The state weighting matrix.
+        R (numpy.ndarray): The input weighting matrix.
+        QT (numpy.ndarray, optional): The terminal state weighting matrix.
+        terminal_set (Polytope, optional): The terminal set for the MPC.
+        dual_mode_controller (optional, np.array): The dual mode controller.
+        dual_mode_horizon (optional,int): The horizon for the dual mode controller.
+        u_constraints (list): List of input constraints as `Constraint` objects.
+        x_constraints (list): List of state constraints as `Constraint` objects.
+        global_penalty_weight (float): The global penalty weight for the cost function.
+        solver (optional): The solver to be used for optimization.
+        slack_penalty (str): The type of penalty for slack variables.
+    """
+
     def __init__(self, mpc_params):
+
+        """
+        Initializes the TrackingMPC with the given MPC parameters.
+
+        Args:
+            mpc_params (MPCParameters): The parameters for the MPC.
+        """
+
         # Extract MPC parameters
         self.params = mpc_params
         self.A, self.B, self.C, _ = self.params.get_system_matrices()
@@ -180,7 +213,7 @@ class TrackingMPC:
         self.r.value = np.array(reference).reshape(self.C.shape[0],)  # Explicitly set to correct shape
 
     def set_disturbance(self, disturbance):
-        """Set the disturbance parameter if disturbances are defined."""
+        """Set the disturbance parameter if disturbances are defined (known distrubance enetring the model)."""
         if self.d is not None:
             self.d.value = np.array(disturbance).reshape(self.nd,)
 
@@ -307,3 +340,4 @@ class TrackingMPC:
         self.x0.value = x0
         self.problem.solve(solver=self.solver)
         return self.x.value, self.u.value
+

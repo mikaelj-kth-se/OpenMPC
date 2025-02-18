@@ -12,7 +12,7 @@ class MPCParameters:
         Initializes the MPCParameters with the given parameters.
 
         Args:
-            system (control.StateSpace): The state-space model of the system. The state space model should be described in desceret time.
+            system (LinearSystem): The state-space model of the system. The state space model should be described in desceret time.
             horizon (int): The prediction horizon for the MPC.
             Q (numpy.ndarray): The state weighting matrix.
             R (numpy.ndarray): The input weighting matrix.

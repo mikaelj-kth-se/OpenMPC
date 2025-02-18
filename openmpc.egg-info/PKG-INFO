@@ -1,3 +1,18 @@
+Metadata-Version: 2.1
+Name: openmpc
+Version: 0.1.0
+Summary: OpenMPC is a simple, flexible, and extensible MPC toolbox tailored for education and research. It builds on cvxpy, casadi, cddlib and the Python control package.
+Home-page: https://github.com/mikaelj-kth-se/OpenMPC
+Author: Mikael Johansson
+Author-email: mikaelj@kth.se
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
 
 ## OpenMPC - an open and flexible MPC toolkit for teaching and research
 
@@ -73,3 +88,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Contributing
 
 If you wish to contribute to this project, please feel free to open a pull request or an issue on the repository.
+
+
