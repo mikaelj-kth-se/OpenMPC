@@ -1,7 +1,7 @@
 import casadi as ca
 import numpy as np
-from .integrators import RK
-from .nonlinear_system import NonlinearSystem
+from openmpc.support.integrators import RK
+from openmpc.models.nonlinear_system import NonlinearSystem
 
 class EKF:
     def __init__(self, ekfParameters):

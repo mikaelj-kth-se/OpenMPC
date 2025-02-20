@@ -1,47 +1,44 @@
 import casadi as ca
 import numpy as np
-from .integrators import RK
-import control as ctrl
 
-class MPC:
-    def __init__(self, mpcProblemData):
+from  openmpc.support.integrators import RK
+from  openmpc.mpc.parameters import MPCParameters
+
+
+class NMPC:
+    def __init__(self, mpcProblemData : MPCParameters):
         """
         Initialize the MPC controller with the given problem data.
 
         Parameters:
-        mpcProblemData (dict): Contains the prediction horizon (N), sampling time (dt),
-                               cost matrices Q, R, Q_N, prediction model, control limits,
-                               state limits, output function, output limits, 
-                               baseController (feedback gain L), and slack penalty weight.
+        mpcProblemData (MPCParameters): Contains the prediction horizon (N), sampling time (dt),
+                                        cost matrices Q, R, QT, prediction model, control limits,
+                                        state limits, output function, output limits, 
+                                        baseController (feedback gain L), and slack penalty weight.
         """
-        self.mpcProblemData = mpcProblemData
+        self.mpc_parameters = mpcProblemData
         self.previous_X = None
         self.previous_V = None
-        self._formulate_planning_problem()
+        self._setup_problem()
 
-    def _formulate_planning_problem(self):        
+    
+    def _setup_problem(self):        
         """
         Formulate the optimization problem and create the function for optimal control.
         """
-        mpcProblemData = self.mpcProblemData
 
         # Extract MPC problem data
-        N = mpcProblemData['N']
-        dt = mpcProblemData['dt']
-        Q = mpcProblemData['Q']
-        R = mpcProblemData['R']
-        Q_N = mpcProblemData['Q_N']
-        umin = mpcProblemData.get('umin', None)
-        umax = mpcProblemData.get('umax', None)
-        xmin = mpcProblemData.get('xmin', None)
-        xmax = mpcProblemData.get('xmax', None)
-        ymin = mpcProblemData.get('ymin', None)
-        ymax = mpcProblemData.get('ymax', None)
-        slackPenaltyWeight = mpcProblemData.get('slackPenaltyWeight', 1e6)
-        Ndm = mpcProblemData.get('dualModeHorizon', 0)
-        Ldm = mpcProblemData.get('dualModeController', 0)
-        L = mpcProblemData.get('baseController',0)
+        N    = self.mpc_parameters.horizon
+        dt   = self.mpc_parameters.dt
+        Q    = self.mpc_parameters.Q
+        R    = self.mpc_parameters.R
+        QT   = self.mpc_parameters.QT
+    
+        Ndm   = self.mpc_parameters.dual_mode_horizon
+        Ldm   = self.mpc_parameters.dual_mode_controller
+        L     = self.mpc_parameters.reference_controller
 
+        
         # Extract dimensions
         predictionModel = mpcProblemData['predictionModel']
         n = predictionModel.n
@@ -49,14 +46,9 @@ class MPC:
         f = predictionModel.updfcn
         g = predictionModel.outfcn
         
-        # ---- decision variables ---------
-        #X = ca.MX.sym('X', n, N + Ndm + 1)  # state trajectory
-        #V = ca.MX.sym('V', m, N)  # new control signal to optimize
-        #s = ca.MX.sym('s')  # slack variable
 
         opti = ca.Opti()
         # Create an Opti instance
-
 
         # ---- decision variables and parameters ---------
         X = opti.variable(n, N + Ndm + 1)  # state trajectory
@@ -81,7 +73,7 @@ class MPC:
         
         # Final cost
         x_N = X[:, -1]
-        cost += ca.mtimes([x_N.T, Q_N, x_N])
+        cost += ca.mtimes([x_N.T, QT, x_N])
 
         # Add slack penalty
         cost += slackPenaltyWeight * s**2
@@ -223,14 +215,14 @@ class MPC:
         return uPred[:, 0]
 
 
-class trackingMPC:
+class trackingNMPC:
     def __init__(self, mpcProblemData):
         """
         Initialize the MPC controller with the given problem data.
 
         Parameters:
         mpcProblemData (dict): Contains the prediction horizon (N), sampling time (dt),
-                               cost matrices Q, R, Q_N, prediction model, control limits,
+                               cost matrices Q, R, QT, prediction model, control limits,
                                state limits, output limits, baseController (feedback gain L), and slack penalty weight.
         """
         self.mpcProblemData = mpcProblemData
@@ -250,7 +242,7 @@ class trackingMPC:
         dt = mpcProblemData['dt']
         Q = mpcProblemData['Q']
         R = mpcProblemData['R']
-        Q_N = mpcProblemData['Q_N']
+        QT = mpcProblemData['QT']
         umin = mpcProblemData.get('umin', None)
         umax = mpcProblemData.get('umax', None)
         xmin = mpcProblemData.get('xmin', None)
@@ -301,7 +293,7 @@ class trackingMPC:
 
         # Final cost
         x_T = X[:, -1]
-        cost += ca.mtimes([(x_T - xref).T, Q_N, (x_T - xref)])
+        cost += ca.mtimes([(x_T - xref).T, QT, (x_T - xref)])
 
         # Slack variable penalty
         cost += slackPenaltyWeight * s**2
