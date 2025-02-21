@@ -1,5 +1,6 @@
 .vscode
 /build
 /.venv
+openmpc.egg-info
 OpenMPC.egg-info
 __pycache__
