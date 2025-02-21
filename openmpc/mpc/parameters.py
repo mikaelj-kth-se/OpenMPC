@@ -6,6 +6,11 @@ from openmpc.models import LinearSystem, NonlinearSystem
 
 
 class MPCParameters:
+
+    """
+    Base class to define all the parameters for the MPC controller.
+    """
+
     def __init__(self, system               : LinearSystem| NonlinearSystem , 
                        horizon              : int,
                        Q                    : np.ndarray,
@@ -18,15 +23,45 @@ class MPCParameters:
         """
         Initializes the MPCParameters with the given parameters.
 
-        Args:
-            system    (LinearSystem): The state-space model of the system. The state space model should be described in desceret time.
-            horizon   (int): The prediction horizon for the MPC.
-            Q         (numpy.ndarray): The state weighting matrix.
-            R         (numpy.ndarray): The input weighting matrix.
-            QT        (numpy.ndarray, optional): The terminal state weighting matrix.
-            global_penalty_weight (float): The global penalty weight for the cost function.
-            solver (optional): The solver to be used for optimization.
-            slack_penalty (str): The type of penalty for slack variables, default is 'SQUARE'.
+       Attributes:
+        :param system: The state-space model of the system. The state space model should be described in desceret time.
+        :type system: LinearSystem| NonlinearSystem
+        :param horizon: The prediction horizon for the MPC.
+        :type horizon: int
+        :param Q: The state weighting matrix.
+        :type Q: numpy.ndarray
+        :param R: The input weighting matrix.
+        :type R: numpy.ndarray
+        :param QT: The terminal state weighting matrix.
+        :type QT: numpy.ndarray | None
+        :param global_penalty_weight: The global penalty weight for the cost function.
+        :type global_penalty_weight: float
+        :param solver: The solver to be used for optimization.
+        :type solver: str |None
+        :param slack_penalty: The type of penalty for slack variables, default is 'SQUARE'.
+        :type slack_penalty: str
+        :param u_constraints: List of input constraints.
+        :type u_constraints: list[Constraint]
+        :param x_constraints: List of state constraints.
+        :type x_constraints: list[Constraint]
+        :param y_constraints: List of output constraints.
+        :type y_constraints: list[Constraint]
+        :param terminal_constraints: List of terminal constraints.
+        :type terminal_constraints: list[Constraint]
+        :param terminal_set: The terminal set for the MPC.
+        :type terminal_set: Polytope | None
+        :param dual_mode_controller: The dual mode controller for the MPC.
+        :type dual_mode_controller: numpy.ndarray
+        :param dual_mode_horizon: The horizon for the dual mode.
+        :type dual_mode_horizon: int
+        :param reference_controller: The reference controller for the MPC.
+        :type reference_controller: numpy.ndarray
+        :param soft_tracking: Whether soft tracking is enabled.
+        :type soft_tracking: bool
+        :param tracking_penalty_weight: The penalty weight for soft tracking.
+        :type tracking_penalty_weight: float
+        :param dt: The time step for the system.
+        :type dt: float
         """
         
         # Store the state-space model
