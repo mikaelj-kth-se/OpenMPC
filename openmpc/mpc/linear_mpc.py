@@ -3,6 +3,7 @@ import numpy as np
 from openmpc.mpc.parameters import MPCParameters
 from openmpc.invariant_sets import Polytope
 from openmpc.support import Constraint
+from openmpc.models import LinearSystem
 
 
 class MPC:
@@ -11,19 +12,17 @@ class MPC:
         """
         MPC controller class for linear systems.
 
-        Args:
-            mpc_params (MPCParameters): The parameters for
-                the MPC controller.
-        
+        :param mpc_params: The parameters for the MPC controller.
+        :type mpc_params: MPCParameters
         """
 
         # Extract MPC parameters
         self.params               = mpc_params
-        self.A, self.B, self.C, _ = self.params.system.get_system_matrices()
+        self.system               : LinearSystem = self.params.system
+        self.A, self.B, self.C, _ = self.system.get_system_matrices()
 
-
-        self.n                    : int = self.params.system.size_state
-        self.m                    : int = self.params.system.size_input
+        self.n                    : int = self.system.size_state
+        self.m                    : int = self.system.size_input
         self.T                    : int = self.params.horizon
         self.Q                    : np.ndarray = self.params.Q
         self.R                    : np.ndarray = self.params.R
@@ -156,12 +155,29 @@ class MPC:
         self.problem = cp.Problem(cp.Minimize(self.cost), self.constraints)
 
     def compute(self, x0):
+        """
+        Compute the optimal control action for a given initial state.
+
+        :param x0: The initial state.
+        :type x0: np.ndarray
+        :return: The optimal state and control trajectories.
+        :rtype: tuple
+        """
+          
         self.x0.value = x0
         # Use the solver specified in the parameters; if None, cvxpy will select the default solver
         self.problem.solve(solver=self.solver)
         return self.x.value, self.u.value
 
     def get_control_action(self, x0):
+        """
+        Get the first control action for a given initial state.
+
+        :param x0: The initial state.
+        :type x0: np.ndarray
+        :return: The first control action.
+        :rtype: float
+        """
         _, u_pred = self.compute(x0)
         return np.atleast_1d(u_pred[0])[0]  # Return the first control input as a scalar
 
@@ -172,25 +188,42 @@ class TrackingMPC:
     """
     A class to implement Model Predictive Control (MPC) for tracking a reference trajectory.
 
-    Attributes:
-        params (MPCParameters): The parameters for the MPC.
-        A (numpy.ndarray): The state transition matrix.
-        B (numpy.ndarray): The control input matrix.
-        C (numpy.ndarray): The output matrix.
-        n (int): The number of states.
-        m (int): The number of control inputs.
-        T (int): The prediction horizon.
-        Q (numpy.ndarray): The state weighting matrix.
-        R (numpy.ndarray): The input weighting matrix.
-        QT (numpy.ndarray, optional): The terminal state weighting matrix.
-        terminal_set (Polytope, optional): The terminal set for the MPC.
-        dual_mode_controller (optional, np.array): The dual mode controller.
-        dual_mode_horizon (optional,int): The horizon for the dual mode controller.
-        u_constraints (list): List of input constraints as `Constraint` objects.
-        x_constraints (list): List of state constraints as `Constraint` objects.
-        global_penalty_weight (float): The global penalty weight for the cost function.
-        solver (optional): The solver to be used for optimization.
-        slack_penalty (str): The type of penalty for slack variables.
+    :param params: The parameters for the MPC.
+    :type params: MPCParameters
+    :param A: The state transition matrix.
+    :type A: numpy.ndarray
+    :param B: The control input matrix.
+    :type B: numpy.ndarray
+    :param C: The output matrix.
+    :type C: numpy.ndarray
+    :param n: The number of states.
+    :type n: int
+    :param m: The number of control inputs.
+    :type m: int
+    :param T: The prediction horizon.
+    :type T: int
+    :param Q: The state weighting matrix.
+    :type Q: numpy.ndarray
+    :param R: The input weighting matrix.
+    :type R: numpy.ndarray
+    :param QT: The terminal state weighting matrix.
+    :type QT: numpy.ndarray, optional
+    :param terminal_set: The terminal set for the MPC.
+    :type terminal_set: Polytope, optional
+    :param dual_mode_controller: The dual mode controller.
+    :type dual_mode_controller: np.array, optional
+    :param dual_mode_horizon: The horizon for the dual mode controller.
+    :type dual_mode_horizon: int, optional
+    :param u_constraints: List of input constraints as `Constraint` objects.
+    :type u_constraints: list
+    :param x_constraints: List of state constraints as `Constraint` objects.
+    :type x_constraints: list
+    :param global_penalty_weight: The global penalty weight for the cost function.
+    :type global_penalty_weight: float
+    :param solver: The solver to be used for optimization.
+    :type solver: optional
+    :param slack_penalty: The type of penalty for slack variables.
+    :type slack_penalty: str
     """
 
     def __init__(self, mpc_params : MPCParameters):
@@ -198,20 +231,18 @@ class TrackingMPC:
         """
         Initializes the TrackingMPC with the given MPC parameters.
 
-        Args:
-            mpc_params (MPCParameters): The parameters for the MPC.
-
-
-            
+        :param mpc_params: The parameters for the MPC.
+        :type mpc_params: MPCParameters
         """
 
         # Extract MPC parameters
         self.params              : MPCParameters = mpc_params
-        self.A, self.B, self.C, _ = self.params.system.get_system_matrices()
+        self.system               : LinearSystem = self.params.system
+        self.A, self.B, self.C, _ = self.system.get_system_matrices()
 
 
-        self.n                    : int = self.params.system.size_state
-        self.m                    : int = self.params.system.size_input
+        self.n                    : int = self.system.size_state
+        self.m                    : int = self.system.size_input
         self.T                    : int = self.params.horizon
         self.Q                    : np.ndarray = self.params.Q
         self.R                    : np.ndarray = self.params.R
@@ -231,15 +262,15 @@ class TrackingMPC:
 
 
         # Tracking reference and siturbance parameters
-        self.r       = cp.Parameter(shape=(self.params.system.size_output))  # Ensure r is a 1D array with appropriate shape
-        self.r.value = np.zeros(self.params.system.size_output)        # Initialize with a default value (e.g., zero)
-        self.d       = cp.Parameter(self.params.system.size_disturbance)     # Disturbance parameter
-        self.d.value = np.zeros(self.params.system.size_disturbance)
+        self.r       = cp.Parameter(shape=(self.system.size_output))  # Ensure r is a 1D array with appropriate shape
+        self.r.value = np.zeros(self.system.size_output)        # Initialize with a default value (e.g., zero)
+        self.d       = cp.Parameter(self.system.size_disturbance)     # Disturbance parameter
+        self.d.value = np.zeros(self.system.size_disturbance)
 
         # Disturbance matrices
-        self.Bd = self.params.system.Bd
-        self.Cd = self.params.system.Cd
-        self.nd = self.params.system.size_disturbance
+        self.Bd = self.system.Bd
+        self.Cd = self.system.Cd
+        self.nd = self.system.size_disturbance
         
         # Define decision variables
         self.x     = cp.Variable((self.n, self.T + 1))
@@ -254,7 +285,7 @@ class TrackingMPC:
         
         # Define the slack variable if soft tracking is enabled
         if self.soft_tracking:
-            self.slack_tracking = cp.Variable(self.params.system.size_output)  # Slack variable
+            self.slack_tracking = cp.Variable(self.system.size_output)  # Slack variable
         else:
             self.slack_tracking = None
         
@@ -265,12 +296,23 @@ class TrackingMPC:
         # Set up the MPC tracking problem
         self._setup_problem()
 
-    def set_reference(self, reference):
-        """Set the reference for tracking."""
-        self.r.value = np.array(reference).reshape(self.params.system.size_output,)  # Explicitly set to correct shape
+    def set_reference(self, reference : np.ndarray):
+        """
+        Set the reference for tracking.
 
-    def set_disturbance(self, disturbance):
-        """Set the disturbance parameter if disturbances are defined (known distrubance enetring the model)."""
+        :param reference: The reference trajectory.
+        :type reference: np.ndarray
+        """
+        self.r.value = np.array(reference).reshape(self.system.size_output,)  # Explicitly set to correct shape
+
+    def set_disturbance(self, disturbance : np.ndarray):
+        """
+        Set the disturbance parameter if disturbances are defined (known disturbance entering the model).
+
+        :param disturbance: The disturbance.
+        :type disturbance: np.ndarray
+        """
+         
         if self.d is not None:
             self.d.value = np.array(disturbance).reshape(self.nd,)
 
@@ -398,7 +440,7 @@ class TrackingMPC:
     def get_control_action(self, x0, reference, disturbance=None):
         """Compute the control action for a given state, reference, and optional disturbance."""
         self.set_reference(reference)
-        if disturbance is not None and self.params.system.has_disturbance:
+        if disturbance is not None and self.system.has_disturbance:
             self.set_disturbance(disturbance)
         _, u_pred = self.compute(x0)
 
