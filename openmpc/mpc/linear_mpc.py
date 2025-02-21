@@ -66,40 +66,40 @@ class MPC:
             self.cost += cp.quad_form(self.x[:, t], self.Q) + cp.quad_form(self.u[:, t], self.R)
             
             # System dynamics
-            self.constraints += [self.x[:, t + 1] == self.A @ self.x[:, t] + self.B @ self.u[:, t]]
+            self.constraints += [self.x[:, t + 1] == self.A @self.x[:, t] + self.B @ self.u[:, t]]
             
             # Add input constraints
             for constraint in self.u_constraints:
-                A, b = constraint.to_polytope()
+                H,b = constraint.to_polytope()
                 if constraint.is_hard:
-                    self.constraints += [A @ self.u[:, t] <= b]
+                    self.constraints += [H @self.u[:, t] <= b]
                 else:
                     # Single slack variable for all inequalities in this constraint
                     slack = cp.Variable(nonneg=True)
                     slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [A @ self.u[:, t] <= b + np.ones(A.shape[0]) * slack]
+                    self.constraints += [H @self.u[:, t] <= b + np.ones(H.shape[0]) * slack]
 
             # Add state constraints 
             for constraint in self.x_constraints:
-                A, b = constraint.to_polytope()
+                H,b = constraint.to_polytope()
                 if constraint.is_hard:
-                    self.constraints += [A @ self.x[:, t] <= b]
+                    self.constraints += [H @self.x[:, t] <= b]
                 else:
                     # Single slack variable for all inequalities in this constraint
                     slack = cp.Variable(nonneg=True)
                     slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [A @ self.x[:, t] <= b + np.ones(A.shape[0]) * slack]
+                    self.constraints += [H @self.x[:, t] <= b + np.ones(H.shape[0]) * slack]
 
             # Add output constraints
             for constraint in self.y_constraints:
-                A, b = constraint.to_polytope()
+                H,b = constraint.to_polytope()
                 if constraint.is_hard:
-                    self.constraints += [A @ self.C @ self.x[:, t] <= b]
+                    self.constraints += [H @ (self.C @ self.x[:, t] + self.D @ self.u[:, t]) <= b]
                 else:
                     # Single slack variable for all inequalities in this constraint
                     slack = cp.Variable(nonneg=True)
                     slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [A @ (self.C @ self.x[:, t] + A @ self.D @ self.u[:, t]) <= b + np.ones(A.shape[0]) * slack]
+                    self.constraints += [H @ (self.C @ self.x[:, t] + self.D @ self.u[:, t]) <= b + np.ones(H.shape[0]) * slack]
 
         
         # Dual mode implementation
@@ -112,35 +112,35 @@ class MPC:
 
                 # Add state update for the dual mode
                 x_next = cp.Variable(self.n)
-                self.constraints += [x_next == self.A @ x_dual + self.B @ u_dual]
+                self.constraints += [x_next == self.A @x_dual + self.B @ u_dual]
                 x_dual = x_next
 
                 # Add state and input constraints during dual mode
                 for constraint in self.x_constraints:
-                    A, b = constraint.to_polytope()
-                    self.constraints += [A @ x_dual <= b]
+                    H,b = constraint.to_polytope()
+                    self.constraints += [H @x_dual <= b]
 
                 for constraint in self.u_constraints:
-                    A, b = constraint.to_polytope()
-                    self.constraints += [A @ u_dual <= b]
+                    H,b = constraint.to_polytope()
+                    self.constraints += [H @u_dual <= b]
                 
                 for constraint in self.y_constraints:
-                    A, b = constraint.to_polytope()
-                    self.constraints += [A @ (self.C @ x_dual + self.D @ u_dual) <= b]
+                    H,b = constraint.to_polytope()
+                    self.constraints += [H @(self.C @ x_dual + self.D @ u_dual) <= b]
 
             # Apply terminal cost and constraints at the end of the dual mode horizon
             self.cost += cp.quad_form(x_dual, self.QT)
             
             if self.terminal_set:
-                A_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
-                self.constraints += [A_terminal @ x_dual <= b_terminal]
+                H_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
+                self.constraints += [H_terminal @ x_dual <= b_terminal]
         else:
             # Apply terminal cost and constraints at the end of the main horizon (if no dual mode is specified)
             
             self.cost += cp.quad_form(self.x[:, self.N], self.QT)
             if self.terminal_set:
-                A_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
-                self.constraints += [A_terminal @ self.x[:, self.N] <= b_terminal]
+                H_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
+                self.constraints += [H_terminal @ self.x[:, self.N] <= b_terminal]
 
         # Add slack penalties to the cost function
         for slack, penalty_weight in slack_variables:
@@ -186,44 +186,24 @@ class MPC:
 
 class SetPointTrackingMPC:
     """
-    A class to implement Model Predictive Control (MPC) for tracking a reference trajectory.
 
-    :param params: The parameters for the MPC.
-    :type params: MPCParameters
-    :param A: The state transition matrix.
-    :type A: numpy.ndarray
-    :param B: The control input matrix.
-    :type B: numpy.ndarray
-    :param C: The output matrix.
-    :type C: numpy.ndarray
-    :param n: The number of states.
-    :type n: int
-    :param m: The number of control inputs.
-    :type m: int
-    :param T: The prediction horizon.
-    :type T: int
-    :param Q: The state weighting matrix.
-    :type Q: numpy.ndarray
-    :param R: The input weighting matrix.
-    :type R: numpy.ndarray
-    :param QT: The terminal state weighting matrix.
-    :type QT: numpy.ndarray, optional
-    :param terminal_set: The terminal set for the MPC.
-    :type terminal_set: Polytope, optional
-    :param dual_mode_controller: The dual mode controller.
-    :type dual_mode_controller: np.array, optional
-    :param dual_mode_horizon: The horizon for the dual mode controller.
-    :type dual_mode_horizon: int, optional
-    :param u_constraints: List of input constraints as `Constraint` objects.
-    :type u_constraints: list
-    :param x_constraints: List of state constraints as `Constraint` objects.
-    :type x_constraints: list
-    :param global_penalty_weight: The global penalty weight for the cost function.
-    :type global_penalty_weight: float
-    :param solver: The solver to be used for optimization.
-    :type solver: optional
-    :param slack_penalty: The type of penalty for slack variables.
-    :type slack_penalty: str
+    MPC controller class for set-point tracking of linear systems.
+
+
+    Main controller :
+
+    min sum_{t=0}^{N-1} (x_t - x_ref)^T Q (x_t - x_ref) + (u_t - u_ref)^T R (u_t - u_ref)
+    s.t. x_{t+1} = A x_t + B u_t + B_d d_t
+            y_t = C x_t + C_d d_t
+            u \in U
+            x \in X
+            y \in Y
+            y_t = r + slack_tracking
+            x_0 = x0
+
+
+    The input given to the system is the absolute input u_t + u_ref, where u_ref is the reference input.
+    
     """
 
     def __init__(self, mpc_params : MPCParameters):
@@ -238,7 +218,7 @@ class SetPointTrackingMPC:
         # Extract MPC parameters
         self.params              : MPCParameters = mpc_params
         self.system               : LinearSystem = self.params.system
-        self.A, self.B, self.C, _ = self.system.get_system_matrices()
+        self.A, self.B, self.C, self.D = self.system.get_system_matrices()
 
 
         self.n                    : int = self.system.size_state
@@ -262,9 +242,10 @@ class SetPointTrackingMPC:
 
 
         # Tracking reference and siturbance parameters
-        self.r       = cp.Parameter(shape=(self.system.size_output))  # Ensure r is a 1D array with appropriate shape
-        self.r.value = np.zeros(self.system.size_output)        # Initialize with a default value (e.g., zero)
+        self.r       = cp.Parameter(self.system.size_output)  # Ensure r is a 1D array with appropriate shape
         self.d       = cp.Parameter(self.system.size_disturbance)     # Disturbance parameter
+        
+        self.r.value = np.zeros(self.system.size_output)        # Initialize with a default value (e.g., zero)
         self.d.value = np.zeros(self.system.size_disturbance)
 
         # Disturbance matrices
@@ -288,10 +269,6 @@ class SetPointTrackingMPC:
             self.slack_tracking = cp.Variable(self.system.size_output)  # Slack variable
         else:
             self.slack_tracking = None
-        
-
-        print(self.m)
-        print(self.u.shape)
                
         # Set up the MPC tracking problem
         self._setup_problem()
@@ -322,17 +299,13 @@ class SetPointTrackingMPC:
         self.constraints = [self.x[:, 0] == self.x0]
 
         # Steady-state reference constraints with or without disturbance
-        if self.d is not None:
-            self.constraints += [self.A @ self.x_ref + self.B @ self.u_ref + self.Bd @ self.d == self.x_ref]
-        else:
-            self.constraints += [self.A @ self.x_ref + self.B @ self.u_ref == self.x_ref]
-
-        
+        self.constraints += [self.A @self.x_ref + self.B @ self.u_ref + self.Bd @ self.d == self.x_ref]
+      
         # Tracking constraint with or without disturbance
         if self.soft_tracking:
-            self.constraints += [self.C @ self.x_ref + self.Cd @ self.d == self.r + self.slack_tracking]
+            self.constraints += [self.C @ self.x_ref + self.D @ self.u_ref + self.Cd @ self.d == self.r + self.slack_tracking]
         else:
-            self.constraints += [self.C @ self.x_ref + self.Cd @ self.d == self.r]
+            self.constraints += [self.C @ self.x_ref + self.D @ self.u_ref + self.Cd @ self.d == self.r]
    
 
         # Main MPC horizon loop
@@ -342,44 +315,44 @@ class SetPointTrackingMPC:
             self.cost += cp.quad_form(self.x[:, t] - self.x_ref, self.Q) + cp.quad_form(self.u[:, t] - self.u_ref, self.R)
 
             # System dynamics including disturbance if it exists
-            self.constraints += [self.x[:, t + 1] == self.A @ self.x[:, t] + self.B @ self.u[:, t] + self.Bd @ self.d]
+            self.constraints += [self.x[:, t + 1] == self.A @self.x[:, t] + self.B @ self.u[:, t] + self.Bd @ self.d]
 
             # Add input constraints
             for constraint in self.u_constraints:
-                A, b = constraint.to_polytope()
+                H,b = constraint.to_polytope()
                 if constraint.is_hard:
-                    self.constraints += [A @ self.u[:, t] <= b]
+                    self.constraints += [H @self.u[:, t] <= b]
                 else:
                     slack = cp.Variable(nonneg=True)
                     slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [A @ self.u[:, t] <= b + np.ones(A.shape[0]) * slack]
+                    self.constraints += [H @self.u[:, t] <= b + np.ones(H.shape[0]) * slack]
 
             # Add state constraints
             for constraint in self.x_constraints:
-                A, b = constraint.to_polytope()
+                H,b = constraint.to_polytope()
                 if constraint.is_hard:
-                    self.constraints += [A @ self.x[:, t] <= b]
+                    self.constraints += [H @self.x[:, t] <= b]
                 else:
                     slack = cp.Variable(nonneg=True)
                     slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [A @ self.x[:, t] <= b + np.ones(A.shape[0]) * slack]
+                    self.constraints += [H @self.x[:, t] <= b + np.ones(H.shape[0]) * slack]
 
             for constraint in self.y_constraints:
-                A, b = constraint.to_polytope()
+                H,b = constraint.to_polytope()
                 if constraint.is_hard:
-                    self.constraints += [A @ self.C @ self.x[:, t] <= b]
+                    self.constraints += [H @self.C @ self.x[:, t] <= b]
                 else:
                     slack = cp.Variable(nonneg=True)
                     slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [A @ self.C @ self.x[:, t] <= b + np.ones(A.shape[0]) * slack]
+                    self.constraints += [H @ (self.C @ self.x[:, t] + self.D @ self.u[:,t])  <= b + np.ones(H.shape[0]) * slack]
 
         # Terminal cost
         self.cost += cp.quad_form(self.x[:, self.N] - self.x_ref, self.QT)
 
         # Terminal set constraint
         if self.terminal_set:
-            A_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
-            self.constraints += [A_terminal @ self.x[:, self.N] <= b_terminal]
+            H_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
+            self.constraints += [H_terminal @ self.x[:, self.N] <= b_terminal]
 
         # Dual-mode implementation
         if self.dual_mode_horizon :
@@ -393,7 +366,7 @@ class SetPointTrackingMPC:
 
                 # Add state update for the dual mode
                 x_next = cp.Variable(self.n)
-                self.constraints += [x_next == self.A @ x_dual + self.B @ u_dual]
+                self.constraints += [x_next == self.A @x_dual + self.B @ u_dual]
         
                 # Add stage cost for the dual mode
                 self.cost += cp.quad_form(x_dual - self.x_ref, self.Q) + cp.quad_form(u_dual - self.u_ref, self.R)
@@ -403,16 +376,16 @@ class SetPointTrackingMPC:
 
                 # Add state and input constraints during dual mode
                 for constraint in self.x_constraints:
-                    A, b = constraint.to_polytope()
-                    self.constraints += [A @ x_dual <= b]
+                    H,b = constraint.to_polytope()
+                    self.constraints += [H @x_dual <= b]
 
                 for constraint in self.u_constraints:
-                    A, b = constraint.to_polytope()
-                    self.constraints += [A @ u_dual <= b]
+                    H,b = constraint.to_polytope()
+                    self.constraints += [H @u_dual <= b]
 
                 for constraint in self.y_constraints:
-                    A, b = constraint.to_polytope()
-                    self.constraints += [A @ self.C @ x_dual <= b]
+                    H,b = constraint.to_polytope()
+                    self.constraints += [H @ (self.C @ x_dual + self.D @ u_dual)  <= b]
 
         
         # Add slack penalties for other soft constraints
@@ -422,15 +395,6 @@ class SetPointTrackingMPC:
             elif self.slack_penalty == 'SQUARE':
                 self.cost += self.global_penalty_weight * penalty_weight * cp.square(slack)  # Quadratic penalty
             else :
-                raise ValueError("Invalid slack penalty type. Must be 'LINEAR' or 'SQUARE'.")
-
-        # Add slack penalty for soft tracking if applicable
-        if self.soft_tracking:
-            if self.slack_penalty == 'LINEAR':
-                self.cost += self.global_penalty_weight * self.tracking_penalty_weight * cp.norm(self.slack_tracking, 1)  # Linear penalty
-            elif self.slack_penalty == 'SQUARE':
-                self.cost += self.global_penalty_weight * self.tracking_penalty_weight * cp.norm(self.slack_tracking, 2)  # Quadratic penalty
-            else:
                 raise ValueError("Invalid slack penalty type. Must be 'LINEAR' or 'SQUARE'.")
 
         # Create the problem instance
