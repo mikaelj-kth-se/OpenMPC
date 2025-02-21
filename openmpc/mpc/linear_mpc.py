@@ -19,11 +19,11 @@ class MPC:
         # Extract MPC parameters
         self.params               = mpc_params
         self.system               : LinearSystem = self.params.system
-        self.A, self.B, self.C, _ = self.system.get_system_matrices()
+        self.A, self.B, self.C, self.D = self.system.get_system_matrices()
 
         self.n                    : int = self.system.size_state
         self.m                    : int = self.system.size_input
-        self.T                    : int = self.params.horizon
+        self.N                    : int = self.params.horizon
         self.Q                    : np.ndarray = self.params.Q
         self.R                    : np.ndarray = self.params.R
         self.QT                   : np.ndarray = self.params.QT
@@ -41,8 +41,8 @@ class MPC:
         self.dual_mode_horizon    : int        = self.params.dual_mode_horizon
 
         # Define optimization variables
-        self.x  = cp.Variable((self.n, self.T + 1))
-        self.u  = cp.Variable((self.m, self.T))
+        self.x  = cp.Variable((self.n, self.N + 1))
+        self.u  = cp.Variable((self.m, self.N))
         self.x0 = cp.Parameter(self.n)  # Initial state parameter
 
         
@@ -61,7 +61,7 @@ class MPC:
         self.constraints = [self.x[:, 0] == self.x0] # initial state constraints
         
         # Main MPC horizon loop
-        for t in range(self.T):
+        for t in range(self.N):
             # Add the stage cost
             self.cost += cp.quad_form(self.x[:, t], self.Q) + cp.quad_form(self.u[:, t], self.R)
             
@@ -99,13 +99,13 @@ class MPC:
                     # Single slack variable for all inequalities in this constraint
                     slack = cp.Variable(nonneg=True)
                     slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [A @ self.C @ self.x[:, t] <= b + np.ones(A.shape[0]) * slack]
+                    self.constraints += [A @ (self.C @ self.x[:, t] + A @ self.D @ self.u[:, t]) <= b + np.ones(A.shape[0]) * slack]
 
         
         # Dual mode implementation
         if self.dual_mode_horizon != 0 :
             # Predict states using the dual mode controller beyond the main horizon
-            x_dual = self.x[:, self.T]  # Initial state for the dual mode phase
+            x_dual = self.x[:, self.N]  # Initial state for the dual mode phase
             for t in range(self.dual_mode_horizon):
                 # Compute control using the dual mode controller
                 u_dual = -self.dual_mode_controller @ x_dual
@@ -126,7 +126,7 @@ class MPC:
                 
                 for constraint in self.y_constraints:
                     A, b = constraint.to_polytope()
-                    self.constraints += [A @ self.C @ x_dual <= b]
+                    self.constraints += [A @ (self.C @ x_dual + self.D @ u_dual) <= b]
 
             # Apply terminal cost and constraints at the end of the dual mode horizon
             self.cost += cp.quad_form(x_dual, self.QT)
@@ -137,10 +137,10 @@ class MPC:
         else:
             # Apply terminal cost and constraints at the end of the main horizon (if no dual mode is specified)
             
-            self.cost += cp.quad_form(self.x[:, self.T], self.QT)
+            self.cost += cp.quad_form(self.x[:, self.N], self.QT)
             if self.terminal_set:
                 A_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
-                self.constraints += [A_terminal @ self.x[:, self.T] <= b_terminal]
+                self.constraints += [A_terminal @ self.x[:, self.N] <= b_terminal]
 
         # Add slack penalties to the cost function
         for slack, penalty_weight in slack_variables:
@@ -184,7 +184,7 @@ class MPC:
 
 
 
-class TrackingMPC:
+class SetPointTrackingMPC:
     """
     A class to implement Model Predictive Control (MPC) for tracking a reference trajectory.
 
@@ -243,7 +243,7 @@ class TrackingMPC:
 
         self.n                    : int = self.system.size_state
         self.m                    : int = self.system.size_input
-        self.T                    : int = self.params.horizon
+        self.N                    : int = self.params.horizon
         self.Q                    : np.ndarray = self.params.Q
         self.R                    : np.ndarray = self.params.R
         self.QT                   : np.ndarray = self.params.QT
@@ -273,8 +273,8 @@ class TrackingMPC:
         self.nd = self.system.size_disturbance
         
         # Define decision variables
-        self.x     = cp.Variable((self.n, self.T + 1))
-        self.u     = cp.Variable((self.m, self.T))
+        self.x     = cp.Variable((self.n, self.N + 1))
+        self.u     = cp.Variable((self.m, self.N))
         self.x_ref = cp.Variable(self.n)
         self.u_ref = cp.Variable(self.m)
         self.x0    = cp.Parameter(self.n)  # Initial state parameter
@@ -337,7 +337,7 @@ class TrackingMPC:
 
         # Main MPC horizon loop
         slack_variables = []  # To collect slack variables for other soft constraints
-        for t in range(self.T):
+        for t in range(self.N):
             # Add the tracking cost
             self.cost += cp.quad_form(self.x[:, t] - self.x_ref, self.Q) + cp.quad_form(self.u[:, t] - self.u_ref, self.R)
 
@@ -374,18 +374,18 @@ class TrackingMPC:
                     self.constraints += [A @ self.C @ self.x[:, t] <= b + np.ones(A.shape[0]) * slack]
 
         # Terminal cost
-        self.cost += cp.quad_form(self.x[:, self.T] - self.x_ref, self.QT)
+        self.cost += cp.quad_form(self.x[:, self.N] - self.x_ref, self.QT)
 
         # Terminal set constraint
         if self.terminal_set:
             A_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
-            self.constraints += [A_terminal @ self.x[:, self.T] <= b_terminal]
+            self.constraints += [A_terminal @ self.x[:, self.N] <= b_terminal]
 
         # Dual-mode implementation
         if self.dual_mode_horizon :
             
             # Predict states using the dual-mode controller beyond the main horizon
-            x_dual = self.x[:, self.T]  # Initial state for the dual mode phase
+            x_dual = self.x[:, self.N]  # Initial state for the dual mode phase
             
             for t in range(self.dual_mode_horizon):
                 # Compute control using the dual-mode controller

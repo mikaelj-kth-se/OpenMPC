@@ -261,7 +261,7 @@ class NonlinearSystem(Model):
 
         return A,B,C,D,Bd,Dd
 
-    def get_target_point(self, yref, d=None):
+    def get_target_point(self, yref : np.ndarray, d : np.ndarray | None = None):
         """
         Given a reference output valye y_ref we want to find the the eqilubrium pair (xref, uref) that satisfies the equilibrium conditions:
 
@@ -319,8 +319,12 @@ class NonlinearSystem(Model):
 
         xref_sol = sol['x'][:n_x]
         uref_sol = sol['x'][n_x:n_x+n_u]
+        
+        x_ref = np.array(xref_sol.full()).flatten()
+        u_ref = np.array(uref_sol.full()).flatten()
 
-        return np.array(xref_sol.full()).flatten(), np.array(uref_sol.full()).flatten()
+
+        return x_ref, u_ref
     
     def compute_lqr_controller(self, Q, R, targetPoint=None):
         """
