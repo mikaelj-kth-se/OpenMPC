@@ -5,7 +5,7 @@ from openmpc.support.constraints import Constraint
 from openmpc.models import LinearSystem, NonlinearSystem
 
 
-class MPCParameters:
+class MPCProblem:
 
     """
     Base class to define all the parameters for the MPC controller.
@@ -23,7 +23,6 @@ class MPCParameters:
         """
         Initializes the MPCParameters with the given parameters.
 
-       Attributes:
         :param system: The state-space model of the system. The state space model should be described in desceret time.
         :type system: LinearSystem| NonlinearSystem
         :param horizon: The prediction horizon for the MPC.
@@ -98,16 +97,17 @@ class MPCParameters:
 
     
     def add_input_magnitude_constraint(self, limit :float , input_index : int | None = None, is_hard : bool = True, penalty_weight : float =1.):
-        """Add input magnitude constraint: -limit <= u <= limit.
+        """
+        Add input magnitude constraint: -limit <= u <= limit.
         
-        Args:
-            limits (float or tuple): If a single float, the bounds are symmetric: -limits <= u_t <= limits.
-                                    If a tuple (lb, ub), the bounds are asymmetric: lb <= u_t <= ub.
-            input_index (int or None): If None, apply the constraints to all inputs uniformly.
-                                       If an int, apply the constraint to a specific input.
-            is_hard (bool): Whether the constraint is hard or soft.
-            penalty_weight (float): The penalty weight for soft constraints.
-        
+        :param limit: The magnitude limit for the input.
+        :type limit: float
+        :param input_index: The index of the input to apply the constraint to. If None, apply to all inputs.
+        :type input_index: int | None
+        :param is_hard: Whether the constraint is hard or soft.
+        :type is_hard: bool
+        :param penalty_weight: The penalty weight for soft constraints.
+        :type penalty_weight: float
         """
 
         limit = float(limit)
@@ -133,13 +133,16 @@ class MPCParameters:
         """
         Adds input bounds constraints. The constraints can be symmetric or asymmetric based on `limits`.
 
-        Args:
-            limits (float or tuple): If a single float, the bounds are symmetric: -limits <= u_t <= limits.
-                                    If a tuple (lb, ub), the bounds are asymmetric: lb <= u_t <= ub.
-            input_index (int or None): If None, apply the constraints to all inputs uniformly.
-                                       If an int, apply the constraint to a specific input.
-            is_hard (bool): Whether the constraint is hard or soft.
-            penalty_weight (float): The penalty weight for soft constraints.
+        :param limits: If a single float, the bounds are symmetric: -limits <= u_t <= limits.
+                          If a tuple (lb, ub), the bounds are asymmetric: lb <= u_t <= ub.
+        :type limits: float or tuple
+        :param input_index: If None, apply the constraints to all inputs uniformly.
+                           If an int, apply the constraint to a specific input.
+        :type input_index: int | None
+        :param is_hard: Whether the constraint is hard or soft.
+        :type is_hard: bool
+        :param penalty_weight: The penalty weight for soft constraints.
+        :type penalty_weight: float
         """
 
         # Determine the bounds
@@ -186,13 +189,15 @@ class MPCParameters:
         """
         Adds output bounds constraints. The constraints can be symmetric or asymmetric based on `limits`.
 
-        Args:
-            limits (float or tuple): If a single float, the bounds are symmetric: -limits <= y_t <= limits.
-                                     If a tuple (lb, ub), the bounds are asymmetric: lb <= y_t <= ub.
-            output_index (int or None): If None, apply the constraints to all outputs uniformly.
-                                        If an int, apply the constraint to a specific output.
-            is_hard (bool): Whether the constraint is hard or soft.
-            penalty_weight (float): The penalty weight for soft constraints.
+        :param limits: If a single float, the bounds are symmetric: -limits <= y_t <= limits.
+                            If a tuple (lb, ub), the bounds are asymmetric: lb <= y_t <= ub.
+        :param output_index: If None, apply the constraints to all outputs uniformly.
+                            If an int, apply the constraint to a specific output.
+        :type output_index: int | None
+        :param is_hard: Whether the constraint is hard or soft.
+        :type is_hard: bool
+        :param penalty_weight: The penalty weight for soft constraints.
+        :type penalty_weight: float
         """
         # Determine the bounds
         if isinstance(limits, (int, float)):
@@ -238,14 +243,17 @@ class MPCParameters:
     def add_state_bound_constraint(self,  limits : tuple | float, state_index  : int | None = None, is_hard : bool =True, penalty_weight : float = 1.):
         """
         Adds state bounds constraints. The constraints can be symmetric or asymmetric based on `limits`.
-
-        Args:
-            limits (float or tuple): If a single float, the bounds are symmetric: -limits <= x_t <= limits.
-                                     If a tuple (lb, ub), the bounds are asymmetric: lb <= x_t <= ub.
-            state_index (int or None): If None, apply the constraints to all states uniformly.
-                                       If an int, apply the constraint to a specific state.
-            is_hard (bool): Whether the constraint is hard or soft.
-            penalty_weight (float): The penalty weight for soft constraints.
+        
+        :param limits: If a single float, the bounds are symmetric: -limits <= x_t <= limits.
+                            If a tuple (lb, ub), the bounds are asymmetric: lb <= x_t <= ub.
+        :type limits: float or tuple
+        :param state_index: If None, apply the constraints to all states uniformly.
+                            If an int, apply the constraint to a specific state.
+        :type state_index: int | None
+        :param is_hard: Whether the constraint is hard or soft.
+        :type is_hard: bool
+        :param penalty_weight: The penalty weight for soft constraints.
+        :type penalty_weight: float
         """
         # Determine the bounds
         if isinstance(limits, (int, float)):
@@ -283,7 +291,7 @@ class MPCParameters:
         constraint = Constraint(Ax, bx, is_hard=is_hard, penalty_weight=penalty_weight)
         self.x_constraints.append(constraint)
 
-    def add_terminal_ingredients(self, controller=None):
+    def add_terminal_ingredients(self, controller : np.ndarray | None = None):
         """Add terminal ingredients using a controller (defaults to LQR)."""
 
         if isinstance(self.system, NonlinearSystem): #! feature not supported for nonlinear systems
@@ -320,32 +328,43 @@ class MPCParameters:
 
 
                 
-    def add_dual_mode(self, dual_mode_horizon : int, controller : np.ndarray ) : 
+    def add_dual_mode(self, horizon : int, controller : np.ndarray ) : 
         """ 
         Add a dual mode to the MPC with an optional controller and horizon.
 
         For a linear system you will typically put an LQR controller here.
-        Example:
-        ```python
-            dual_mode_horizon = 10
-            Q = np.eye(2)
-            R = np.eye(1)
-            controller,_,_ = system.get_lqr_solution(Q,R)
-            mpd_parameters.add_dual_mode(dual_mode_horizon, controller)
-        ```
-        
+
+        :param dual_mode_horizon: The horizon for the dual mode.
+        :type dual_mode_horizon: int
+        :param controller: The controller for the dual mode.
+        :type controller: numpy.ndarray
         """
               
         # set the dual mode controller
         self.dual_mode_controller = controller
         # Set the dual mode horizon
-        self.dual_mode_horizon = int(dual_mode_horizon)
+        self.dual_mode_horizon = int(horizon)
+
+        if np.all(controller.flatten() == 0):
+            raise ValueError("The controller must be non-zero.")
 
         if self.dual_mode_controller.shape[0] != self.system.size_input or self.dual_mode_controller.shape[1] != self.system.size_state:
             raise ValueError(f"The controller shape must be {self.system.size_input,self.system.size_state}. Given {self.dual_mode_controller.shape}")
         if self.dual_mode_horizon < 0:
             raise ValueError("The horizon must be non-negative.")
-        
+    
+
+    def add_reference_controller(self, controller : np.ndarray):
+        """
+        Add a reference controller to the MPC.
+
+        :param controller: The reference controller for the MPC.
+        :type
+        """
+        self.reference_controller = controller
+
+        if self.reference_controller.shape[0] != self.system.size_input or self.reference_controller.shape[1] != self.system.size_state:
+            raise ValueError(f"The controller shape must be {self.system.size_input,self.system.size_state}. Given {self.reference_controller.shape}")
 
         
     def soften_tracking_constraint(self, penalty_weight : float = 1.):

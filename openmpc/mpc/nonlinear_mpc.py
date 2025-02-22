@@ -2,13 +2,13 @@ import casadi as ca
 import numpy as np
 
 from  openmpc.support.integrators import RK
-from  openmpc.mpc.parameters import MPCParameters
+from  openmpc.mpc.parameters import MPCProblem
 from openmpc.invariant_sets import Polytope
 from openmpc.support import Constraint
 from openmpc.models import NonlinearSystem
 
 class NMPC:
-    def __init__(self, mpc_params  : MPCParameters):
+    def __init__(self, mpc_params  : MPCProblem):
         """
         Initialize the MPC controller with the given problem data.
 
@@ -50,14 +50,14 @@ class NMPC:
         self.opti = ca.Opti()
 
         # Define optimization variables
-        self.x  = self.opti.variable((self.n, self.N + self.Ndm + 1))
-        self.v  = self.opti.variable((self.m, self.N))
+        self.x  = self.opti.variable(self.n, self.N + self.Ndm + 1)
+        self.v  = self.opti.variable(self.m, self.N)
         self.x0 = self.opti.parameter(self.n)  # Initial state parameter
 
 
-        self.previous_X     = None
-        self.previous_V     = None
-        self.mpc_controller = None
+        self.previous_X     : np.ndarray | None = None
+        self.previous_V     : np.ndarray | None = None
+        self.mpc_controller : ca.Function = None
 
         self._setup_problem()
 
@@ -225,9 +225,11 @@ class NMPC:
             X_initial  = self.previous_X[:,1:]
 
             # 2) Add a new last state guess computed from the nomial controller as x_N_guess = f(x_N-1, u_N-1) with u_N-1 = -L @ x_N-1 + v_N-1
-            xx   = self.previous_X[:, -1]                                    
-            uu   = - self.Ldm @ xx if self.Ndm>0 else -self.L @ xx
-            X_initial = np.hstack((X_initial,self.f(xx, uu).full().flatten()))     
+            xx          = self.previous_X[:, -1]                                    
+            uu          = - self.Ldm @ xx if self.Ndm>0 else -self.L @ xx
+            x_last      = self.f(xx, uu).full()
+
+            X_initial = np.hstack((X_initial,x_last))     
             
             # 3) set initial state of the guess as the one you measure
             X_initial[:,0] = x0
@@ -241,7 +243,7 @@ class NMPC:
             V_initial = np.zeros((self.m, self.N))
 
             # Initial guess for self.x: linear interpolation from x0 to the origin
-            X_initial = np.zeros((n, self.N + self.Ndm+ 1))
+            X_initial = np.zeros((self.n, self.N + self.Ndm+ 1))
             for i in range(self.n):
                 X_initial[i, :] = np.linspace(x0[i], 0, self.N + self.Ndm + 1)
 
@@ -258,7 +260,7 @@ class NMPC:
         self.previous_X = x_opt
         self.previous_V = v_opt
 
-        return u_opt, x_opt
+        return u_opt.full(), x_opt.full()
 
     def get_control_action(self, x):
         """
@@ -315,7 +317,7 @@ class SetPointTrackingNMPC:
     The disturbance acting on the system is a parameter of the optimization.
     """
 
-    def __init__(self, mpc_params : MPCParameters):
+    def __init__(self, mpc_params : MPCProblem):
 
 
         """
@@ -329,7 +331,7 @@ class SetPointTrackingNMPC:
       
 
         # Extract MPC parameters
-        self.params               : MPCParameters   = mpc_params
+        self.params               : MPCProblem   = mpc_params
         self.system               : NonlinearSystem = self.params.system
 
         self.n                    : int        = self.system.size_state
@@ -364,8 +366,8 @@ class SetPointTrackingNMPC:
         self.x0      = self.opti.parameter(self.n)                        # Initial state parameter
         
         # state and input variables
-        self.x       = self.opti.variable((self.n, self.N + self.Ndm+ 1))
-        self.v       = self.opti.variable((self.m, self.N))
+        self.x       = self.opti.variable(self.n, self.N + self.Ndm+ 1)
+        self.v       = self.opti.variable(self.m, self.N)
 
         self.reference_value   : np.ndarray = np.zeros(self.system.size_output)       # Reference output set-point
         self.disturbance_value : np.ndarray = np.zeros(self.system.size_disturbance)  # Disturbance value
@@ -381,8 +383,8 @@ class SetPointTrackingNMPC:
             self.slack_tracking = None
         
 
-        self.previous_X = None
-        self.previous_V = None
+        self.previous_X : np.ndarray | None = None
+        self.previous_V : np.ndarray | None = None
 
         self._setup_problem()
 
@@ -418,7 +420,7 @@ class SetPointTrackingNMPC:
         self.cost        = 0   # mpc cost
         slack_variables  = []  # To collect slack variables for soft constraints
 
-        self.constraints = [self.x[:, 0] == self.x0] # initial state constraints
+        self.constraints = [(self.x[:, 0] == self.x0,"initial_constraint")] # initial state constraints
 
 
         # Main MPC horizon loop
@@ -426,44 +428,44 @@ class SetPointTrackingNMPC:
             
             x_k = self.x[:, t]
             v_k = self.v[:, t]
-            u_k = - self.L @ (x_k - self.x_ref) + v_k # reference feedback input + deviation 
+            u_k = - self.L @ (x_k - self.x_ref) + self.u_ref + v_k # reference feedback input + deviation 
             self.cost += ca.mtimes([(x_k - self.x_ref).T, self.Q, (x_k - self.x_ref)]) + ca.mtimes([(u_k - self.u_ref).T, self.R, (u_k - self.u_ref)])
 
             # System dynamics
-            self.constraints += [self.x[:, t + 1] == self.f(x_k, u_k, self.d)]
+            self.constraints += [(self.x[:, t + 1] == self.f(x_k, u_k, self.d),"dynamics_constraint")]
             
             # Add input constraints
             for constraint in self.u_constraints:
                 H,b = constraint.to_polytope()
                 if constraint.is_hard:
-                    self.constraints += [H @u_k <= b]
+                    self.constraints += [(H @u_k <= b,"input_constraint")]
                 else:
                     # Single slack variable for all inequalities in this constraint
                     slack = self.opti.variable()
                     slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [H @u_k <= b + np.ones(H.shape[0]) * slack]
+                    self.constraints += [(H @u_k <= b + np.ones(H.shape[0]) * slack,"input_constraint")]
 
             # Add state constraints 
             for constraint in self.x_constraints:
                 H,b = constraint.to_polytope()
                 if constraint.is_hard:
-                    self.constraints += [H @x_k <= b]
+                    self.constraints += [(H @x_k <= b,"state_constraint")]
                 else:
                     # Single slack variable for all inequalities in this constraint
                     slack = self.opti.variable()
                     slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [H @x_k <= b + np.ones(H.shape[0]) * slack]
+                    self.constraints += [(H @x_k <= b + np.ones(H.shape[0]) * slack,"state_constraint")]
 
             # Add output constraints
             for constraint in self.y_constraints:
                 H,b = constraint.to_polytope()
                 if constraint.is_hard:
-                    self.constraints += [H @self.g(x_k,u_k,self.d)  <= b]
+                    self.constraints += [(H @self.g(x_k,u_k,self.d)  <= b,"output_constraint")]
                 else:
                     # Single slack variable for all inequalities in this constraint
                     slack = self.opti.variable()
                     slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [H @self.g(x_k,u_k,self.d) <= b + np.ones(H.shape[0]) * slack]
+                    self.constraints += [(H @self.g(x_k,u_k,self.d) <= b + np.ones(H.shape[0]) * slack,"output_constraint")]
 
 
         # Dual mode implementation
@@ -474,24 +476,24 @@ class SetPointTrackingNMPC:
             for t in range(self.Ndm):
                 # Compute control using the dual mode controller
                 u_dual = - self.Ldm @ (x_dual- self.x_ref) + self.u_ref
-
+                
                 # Add state update for the dual mode
                 x_next           = self.x[:, self.N + t + 1]
-                self.constraints += [x_next == self.f(x_dual, u_dual,self.d)]
+                self.constraints += [(x_next == self.f(x_dual, u_dual,self.d),"dual_mode_dynamics_constraint")]
                 x_dual           = x_next
 
                 # Add state and input constraints during dual mode
                 for constraint in self.x_constraints:
                     H,b = constraint.to_polytope()
-                    self.constraints += [H @x_dual <= b]
+                    self.constraints += [(H @x_dual <= b,"dual_mode_state_constraint")]
 
                 for constraint in self.u_constraints:
                     H,b = constraint.to_polytope()
-                    self.constraints += [H @u_dual <= b]
+                    self.constraints += [(H @u_dual <= b,"dual_mode_input_constraint")]
                 
                 for constraint in self.y_constraints:
                     H,b = constraint.to_polytope()
-                    self.constraints += [H @self.g(x_dual, u_dual,self.d) <= b]
+                    self.constraints += [(H @self.g(x_dual, u_dual,self.d) <= b,"dual_mode_output_constraint")]
 
             # Apply terminal cost and constraints at the end of the dual mode horizon
             self.cost += ca.mtimes([(x_dual - self.x_ref).T, self.QT, (x_dual - self.x_ref)])
@@ -517,7 +519,8 @@ class SetPointTrackingNMPC:
                 raise ValueError("Invalid slack penalty type. Must be 'LINEAR' or 'SQUARE'.")
 
         
-        for constraint in self.constraints:
+        for constraint,type in self.constraints:
+            # print(f"Adding constraint : {type}") # debugging
             self.opti.subject_to(constraint)
         
         self.opti.minimize(self.cost)
@@ -573,7 +576,8 @@ class SetPointTrackingNMPC:
             # 2) Add a new last state guess computed from the nomial controller as x_next = f(x, u) with u = -L @ (x - x_ref) + uref (L is reference or dual mode controller depending on the horizon)
             xx        = self.previous_X[:, -1]                                    
             uu        = - self.Ldm @ (xx-xref) + uref if self.Ndm>0 else -self.L @ (xx-xref) + uref
-            X_initial = np.hstack((X_initial,self.f(xx, uu,self.d).full().flatten()))     
+            x_last    = self.f(xx, uu, self.disturbance_value).full()
+            X_initial = np.hstack((X_initial,x_last))     
             
             # 3) set initial state of the guess as the one you measure
             X_initial[:,0] = x0
@@ -589,13 +593,13 @@ class SetPointTrackingNMPC:
             X_initial[:, 0] = x0
             for k in range(self.N + self.Ndm):
                 u = - self.L @ (X_initial[:, k] - xref) + uref
-                X_initial[:, k + 1] = self.f(X_initial[:, k], u, d).full().flatten()
+                X_initial[:, k + 1] = self.f(X_initial[:, k], u, self.disturbance_value).full().flatten()
 
             # Initialize V_initial to make u = uref with the proposed state trajectory
             V_initial = np.zeros((self.m, self.N))
 
         try:
-            (x_opt, v_opt) = self.mpc_controller(x0, xref, uref, d, X_initial, V_initial)
+            (x_opt, v_opt) = self.mpc_controller(x0, xref, uref, self.disturbance_value , X_initial, V_initial)
         except Exception as e:
             print(f"Solver failed: {e}")
 
@@ -603,12 +607,13 @@ class SetPointTrackingNMPC:
         #v_opt = sol.value(self.v).reshape(m, N)
         #x_opt = sol.value(self.x)
         u_opt = - self.L @ (x_opt[:, :self.N] - ca.repmat(xref, 1, self.N)) + uref + v_opt
-                
+
+
         # Store the solution for the next time step
         self.previous_X = x_opt
         self.previous_V = v_opt
 
-        return u_opt, x_opt
+        return u_opt.full(), x_opt.full()
 
 
     def get_control_action(self, x : np.ndarray , yref : np.ndarray , d : np.ndarray | None = None):
@@ -621,10 +626,9 @@ class SetPointTrackingNMPC:
         :param yref: Reference output.
         :type yref: np.array
         :param d: Disturbance (optional).
-        :type d: np.array
-
+        :type d: np.array, optional
         :return: The first control action in the predicted optimal sequence.
-        :rtype : np.array
+        :rtype: np.array
         """
         # Plan optimal controls and states over the next N samples
         uPred, xPred = self.compute_predicted_optimal_controls(x, yref, d)

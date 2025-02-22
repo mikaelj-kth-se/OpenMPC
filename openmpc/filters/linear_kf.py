@@ -1,16 +1,52 @@
 import numpy as np
 import control
+from openmpc.models.linear_system import LinearSystem
 
-class KalmanFilter:
-    def __init__(self, mpc_params, Sigma_w, Sigma_v, is_stationary=True):
+class KalmanFilter: 
+
+    """
+    Kalman filter class for output regulation for linear time-invariant systems under constant unkown input perturbations.
+
+    Extended system takes the form
+
+    x_{t+1} = A x_t + B u_t + Bd d_t + w_t
+    d_{t+1} = d_t
+    y_t     = C x_t + D u_t + Cd d_t + v_t
+
+    where 
+
+    A_ext = [A Bd]
+            [0 I ]
+    B_ext = [B]
+            [0]
+    C_ext = [C Cd]
+
+    """
+    def __init__(self, system : LinearSystem , Sigma_w : float | np.ndarray , Sigma_v : float | np.ndarray , is_stationary : bool =True):
+        """
+        Initialize the Kalman filter.
+        
+        :param system: Linear system model
+        :type system: LinearSystem
+        :param Sigma_w: Process noise covariance
+        :type Sigma_w: float | np.ndarray
+        :param Sigma_v: Measurement noise covariance
+        :type Sigma_v: float | np.ndarray
+        :param is_stationary: Flag to compute the stationary Kalman gain
+        :type is_stationary: bool
+        """
+
+
+        self.system = system
+        
         # Extract system matrices from MPC parameters
-        self.A, self.B, self.C, _ = mpc_params.get_system_matrices()
-        self.Bd = mpc_params.Bd if mpc_params.Bd is not None else np.zeros((self.A.shape[0], 0))
-        self.Cd = mpc_params.Cd if mpc_params.Cd is not None else np.zeros((self.C.shape[0], 0))
+        self.A, self.B, self.C, self.D = self.system.get_system_matrices()
+        self.Bd = self.system.Bd
+        self.Cd = self.system.Cd
         self.nd = self.Bd.shape[1]  # Number of disturbances
         
         # Determine the dimensions of the extended state
-        self.n = self.A.shape[0]  # State dimension
+        self.n  = self.A.shape[0]  # State dimension
         self.nx = self.n + self.nd  # Extended state dimension including disturbances
 
         # Construct the extended state-space matrices

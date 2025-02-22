@@ -11,47 +11,69 @@ class LinearSystem(Model) :
 
     Model of the system 
 
-    x_{k+1} = A x_k + B u_k + Bd d_k
+    .. math::
+        x_{k+1} = A x_k + B u_k + Bd d_k
+
         y_k = C x_k + D u_k + Cd d_k
     
     """
 
-    def __init__(self, A, B=None, C = None, D = None,Bd = None, Cd = None, dt = 1):
+    def __init__(self, A  : np.ndarray, 
+                       B  : np.ndarray | None  = None, 
+                       C  : np.ndarray | None  = None, 
+                       D  : np.ndarray | None  = None,
+                       Bd : np.ndarray | None  = None, 
+                       Cd : np.ndarray | None  = None,
+                       dt : float = 1):
         """
         Initialize linear system
 
-        Args:
-            A (numpy.ndarray): The state matrix.
-            B (numpy.ndarray): The input matrix.
-            C (numpy.ndarray): The output matrix.
-            D  (numpy.ndarray): The feedforward matrix.
-            Bd (numpy.ndarray): The disturbance input matrix.
-            Cd (numpy.ndarray): The disturbance output matrix.
-            dt (float): The sampling time.
+        :param A: State matrix
+        :type A: np.ndarray
+        :param B: Input matrix
+        :type B: np.ndarray
+        :param C: Output matrix
+        :type C: np.ndarray
+        :param D: Feedforward matrix
+        :type D: np.ndarray
+        :param Bd: Disturbance input matrix
+        :type Bd: np.ndarray
+        :param Cd: Disturbance output matrix
+        :type Cd: np.ndarray
+        :param dt: Sampling time
+        :type dt: float
         """
 
         self._A = A
 
+        n = A.shape[0]
+
         if B is None:
-            self._B = np.zeros((A.shape[0], 1))
+            self._B = np.zeros((n, 1))
             self.has_input = False
         else:
             self._B = B
             self.has_input = True
 
-        if self._B.shape[0] != self._A.shape[0]:
+        if self._B.shape[0] != n:
             raise ValueError("The number of rows in B must match the number of rows in A")
         
+        m = self._B.shape[1]
+
         # take all the state without feed-forward in case No oputput is given
         if C is None:
-            self._C = np.eye(A.shape[0])
+            self._C = np.eye(n)
         else:
             self._C = C
+            if self._C.shape[1] != n:
+                raise ValueError("The number of columns in C must match the number of rows in A (state dimension)")
 
         if D is None:
-            self._D = np.zeros((A.shape[0], B.shape[1]))
+            self._D = np.zeros((self._C.shape[0], m))
         else:
             self._D = D
+            if self._D.shape[1] != m:
+                raise ValueError("The number of columns in D must match the number of columns in B (input dimension)")
         
         # distrurbances assumed to be one dimension with zero effect on the output
 
@@ -61,9 +83,9 @@ class LinearSystem(Model) :
             self.has_disturbance = True
 
         if Bd is None:
-            self._Bd = np.zeros((A.shape[0], B.shape[1]))
+            self._Bd = np.zeros((self._A.shape[0], self._B.shape[1]))
         if Cd is None:
-            self._Cd = np.zeros((C.shape[0], B.shape[1]))  
+            self._Cd = np.zeros((self._C.shape[0], self._B.shape[1]))  
 
         self._dt = dt
 
@@ -72,12 +94,21 @@ class LinearSystem(Model) :
     
     @property
     def A(self):
+        """
+        State matrix
+        """
         return self._A
     @property
     def B(self):
+        """
+        Input matrix
+        """
         return self._B
     @property
     def C(self):
+        """
+        Output matrix
+        """
         return self._C
     @property
     def D(self):
@@ -116,15 +147,14 @@ class LinearSystem(Model) :
         Discrete dynamics
         x_{k+1} = f(x_k,u_k,d_k)
 
-    
-
-        Args:
-            x (np.array): state
-            u (np.array): input
-            d (np.array): disturbance
-
-        Returns:
-            x_next (np.array): next state as a row vector
+        :param x: state vector
+        :type x: np.ndarray
+        :param u: input vector
+        :type u: np.ndarray
+        :param d: disturbance vector
+        :type d: np.ndarray
+        :return: next state vector
+        :rtype: np.ndarray
         """
 
         x = super()._check_and_normalise_state(x) 
@@ -134,23 +164,47 @@ class LinearSystem(Model) :
 
         return x_next.flatten()
     
-    
+    def output(self, x, u = None, d = None):
+        """
+        Output function
+        y = g(x)
+
+        :param x: state vector
+        :type x: np.ndarray
+        :param u: input vector
+        :type u: np.ndarray
+        :param d: disturbance vector
+        :type d: np.ndarray
+        :return: output vector
+        :rtype: np.ndarray
+        """
+
+        x = super()._check_and_normalise_state(x)
+        u,d = super()._check_and_normalise_inputs(u,d)
+
+        y = self._C @ x + self._D @ u + self._Cd @ d
+
+        return y.flatten()
     
     def simulate(self, x0, u = None , d=None, steps = 10 ) :
         """
-            Simulate the discrete time system for a number of steps. Input should be an array of size (size_input,steps) and disturbance should be an array of size (disturbance_size,steps)
-            where steps is the number of steps to simulate. Note that the function will attempt to reshape your array to the given form (size_input,steps). Hence the output will not be the length you expact if you have an array with 
-            typed the wrong dimensions.
+        Simulate the discrete time system for a number of steps. Input should be an array of size (size_input,steps) and disturbance should be an array of size (disturbance_size,steps)
+        where steps is the number of steps to simulate. Note that the function will attempt to reshape your array to the given form (size_input,steps). Hence the output will not be the length you expact if you have an array with 
+        typed the wrong dimensions.
 
-            Args :
-                x0 (np.array): initial state
-                u (np.array): input array of size (size_input,stps).
-                d (np.array): disturbance of size (disturbance_size,steps)
-                steps (int): number of steps to simulation steps (only used if the input and disturbance are None)
-
-            Returns:
-                x (np.array): state trajectory
-                y (np.array): output trajectory
+        :param x0: Initial state vector
+        :type x0: np.ndarray
+        :param u: Input signal
+        :type u: np.ndarray
+        :param d: Disturbance signal
+        :type d: np.ndarray
+        :param steps: Number of steps to simulate
+        :type steps: int
+        
+        :return x_trj: State trajectory of shape (size_state, steps+1)
+        :rtype x_trj: np.ndarray
+        :return y_trj: Output trajectory of shape (size_output, steps)
+        :rtype y_trj: np.ndarray
         """
 
         
@@ -185,15 +239,19 @@ class LinearSystem(Model) :
         
         Simulate the LinearSystem in closed-loop with an L gain (a.k.a A-BL).
 
-        Args:
-            x0    (np.array): Initial state vector. Defaults to zero vector of appropriate dimension.
-            L     (np.array): L gain matrix.
-            steps (int)     : Number of steps to simulate.
+        :param x0: Initial state vector
+        :type x0: np.ndarray
+        :param L: Gain matrix
+        :type L: np.ndarray
+        :param d: Disturbance signal
+        :type d: np.ndarray
+        :param steps: Number of steps to simulate
+        :type steps: int
 
-        Returns:
-            x_trj (np.array): Simulated state trajectory.
-            y_trj (np.array): Simulated output trajectory.
-
+        :returns x_trj: State trajectory of shape (size_state, steps+1)
+        :rtype x_trj: np.ndarray
+        :returns y_trj: Output trajectory of shape (size_output, steps)
+        :rtype y_trj: np.ndarray
         """
 
         x0    = x0.reshape(self.size_state, )
@@ -235,16 +293,19 @@ class LinearSystem(Model) :
         """
         Convert continuous-time state-space model to discrete-time.
         
-        Args:
-            A (numpy.ndarray): The state matrix.
-            B (numpy.ndarray): The input matrix.
-            C (numpy.ndarray): The output matrix.
-            D (numpy.ndarray): The feedforward matrix.
-            dt (float): The sampling time.
-
-        Returns:
-            discrete_system : LinearSystems 
-
+        :param A_cont: Continuous-time state matrix
+        :type A_cont: np.ndarray
+        :param B_cont: Continuous-time input matrix
+        :type B_cont: np.ndarray
+        :param C_cont: Continuous-time output matrix
+        :type C_cont: np.ndarray
+        :param D_cont: Continuous-time feedforward matrix
+        :type D_cont: np.ndarray
+        :param dt: Sampling time
+        :type dt: float
+        
+        :returns: Discrete-time state-space model
+        :rtype: LinearSystem
         """
 
         # Create the state-space system
@@ -264,14 +325,13 @@ class LinearSystem(Model) :
         """
         Solve the discrete-time algebraic Riccati equation (DARE) for the given system.
 
-        Args:
-            Q (numpy.ndarray): The state weighting matrix.
-            R (numpy.ndarray): The input weighting matrix.
+        :param Q: The state weighting matrix.
+        :type Q: np.ndarray
+        :param R: The input weighting matrix.
+        :type R: np.ndarray
 
-        Returns:
-            L (numpy.ndarray): Optimal gain of the LQR solution.
-            P (numpy.ndarray):  symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.
-            E (numpy.ndarray): Eigenvalues of the closed-loop system (A-BL)
+        :returns: Optimal gain of the LQR solution.
+        :rtype: np.ndarray
         """
         L, _, _ = control.dlqr(self.A, self.B, Q, R) 
        
@@ -281,12 +341,13 @@ class LinearSystem(Model) :
         """
         Solve the discrete-time algebraic Riccati equation (DARE) for the given system.
 
-        Args:
-            Q (numpy.ndarray): The state weighting matrix.
-            R (numpy.ndarray): The input weighting matrix.
+        :param Q: The state weighting matrix.
+        :type Q: np.ndarray
+        :param R: The input weighting matrix.
+        :type R: np.ndarray
 
-        Returns:
-            P (numpy.ndarray):  symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.
+        :returns: symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.
+        :rtype: np.ndarray
         """
         _, P, _ = control.dlqr(self.A, self.B, Q, R) 
        
@@ -360,21 +421,24 @@ def compute_lqr_controller(A, B, Q, R):
     """
     Solve the discrete-time algebraic Riccati equation (DARE) for the given system.
 
-    Args:
-        A (numpy.ndarray): The state matrix.
-        B (numpy.ndarray): The input matrix.
-        Q (numpy.ndarray): The state weighting matrix.
-        R (numpy.ndarray): The input weighting matrix.
+    :param A: The state matrix.
+    :type A: np.ndarray
+    :param B: The input matrix.
+    :type B: np.ndarray
+    :param Q: The state weighting matrix.
+    :type Q: np.ndarray
+    :param R: The input weighting matrix.
+    :type R: np.ndarray
 
-    Returns:
-        L (numpy.ndarray): Optimal gain of the LQR solution.
-        P (numpy.ndarray):  symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.
-        E (numpy.ndarray): Eigenvalues of the closed-loop system (A-BL)
+    :returns: Optimal gain of the LQR solution.
+    :rtype: np.ndarray
+    :returns: symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.
+    :rtype np.ndarray
     """
 
     L, P, E = control.dlqr(A, B, Q, R)
 
-    return L,P,E
+    return L,P
 
 
 

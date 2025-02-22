@@ -45,51 +45,63 @@ class Model(ABC):
             
 
     @abstractmethod
-    def discrete_dynamics(self, x, u= None, d =None):
+    def discrete_dynamics(self, x : np.ndarray , u : np.ndarray | None = None, d : np.ndarray | None =None):
         """
         Discrete dynamics
         x_{k+1} = f(x_k,u_k,d_k)
 
-        Args:
-            x (np.array): state
-            u (np.array): input
-            d (np.array): disturbance
+        :param x: state at time k
+        :type x: np.ndarray
+        :param u: input at time k
+        :type u: np.ndarray
+        :param d: disturbance at time k
+        :type d: np.ndarray
+        :return: state at time k+1
+        :rtype: np.ndarray
+        """
 
-        Returns:
-            x_next (np.array): next state
+        raise NotImplementedError
     
+    @abstractmethod
+    def output(self, x:np.ndarray , u : np.ndarray| None = None, d : np.ndarray | None = None):
+        """
+        Output function
+        y = g(x)
+
+        :param x: state
+        :type x: np.ndarray
+        :param u: input
+        :type u: np.ndarray
+        :param d: disturbance
+        :type d: np.ndarray
+
+        :return: output
+        :rtype np.ndarray
         """
         raise NotImplementedError
     
     @abstractmethod
-    def simulate(self, x0, u= None , d = None, steps = 10): 
+    def simulate(self, x0 : np.ndarray, u : np.ndarray | None = None , d : np.ndarray | None = None, steps : int = 10): 
         """
         Simulate the discrete time system for a number of steps. Input should be an array of size (steps, size_input) and disturbance should be an array of size (steps, disturbance_size)
         where steps is the number of steps to simulate.
 
-        Args :
-            x0 (np.array): initial state
-            u (np.array): input array of size (size_input,steps).
-            d (np.array): disturbance of size (disturbance_size,steps)
-            steps (int): number of steps to simulation steps (only used if the input is None)
-
-        Returns:
-            x (np.array): state trajectory
-            y (np.array): output trajectory
+        :param x0: initial state
+        :type x0: np.ndarray
+        :param u: input signal
+        :type u: np.ndarray
+        :param d: disturbance signal
+        :type d: np.ndarray
+        :param steps: number of steps to simulate
+        :type steps: int
+        :return: state trajectory
+        :rtype: np.ndarray
         """
         raise NotImplementedError
     
 
     def _check_and_normalise_state(self,x) :
-        """
-        Check and normalise the state x. If x is None, then it is set to zeros of appropriate dimensions. If x is an array, then its size is checked and reshaped to the expected size.
-
-        Args:
-            x (np.array): state
-
-        Returns:
-            x (np.array): state
-        """
+        
         if x is None :
             raise ValueError("State cannot be None.")
         else :
@@ -103,14 +115,14 @@ class Model(ABC):
         """
         Check and normalise the input and disturbance signals. If u or d is None, then it is set to zeros of appropriate dimensions. If u or d is an array, then its size is checked and reshaped to the expected size.
 
-        Args:
-            u (np.array): input
-            d (np.array): disturbance
-
-        Returns:
-            u (np.array): input
-            d (np.array): disturbance
+        :param u: The input signal to be checked and normalized.
+        :type u: np.ndarray or None
+        :param d: The disturbance signal to be checked and normalized.
+        :type d: np.ndarray or None
+        :return: The normalized input and disturbance signals.
+        :rtype: tuple of np.ndarray (u, d)
         """
+        
         if u is not None:
             try :
                 u = u.reshape(self.size_input,)
@@ -131,22 +143,19 @@ class Model(ABC):
 
     def check_and_normalise_input_signals(self, u, d ):
         """
-        Check and regularize the input triplet (u,d) to the model.
- =
+        Check and regularize the input triplet (u, d) to the model.
+
         If d is not None and u is None, then u is set to zero with same length of the signal d. 
         If u is not None and d is None, then d is set to zero with the same length of the signal u.
         If u and d are not None, then they should have the same number of columns, otherwise an error is raised.
         If u and d are None, they are returned as none.
-    
-        Args:
-            x (np.array): state
-            u (np.array): input
-            d (np.array): disturbance
 
-        Returns:
-            x (np.array): state
-            u (np.array): input
-            d (np.array): disturbance
+        :param u: The input signal to be checked and regularized.
+        :type u: np.ndarray or None
+        :param d: The disturbance signal to be checked and regularized.
+        :type d: np.ndarray or None
+        :return: The regularized input and disturbance signals.
+        :rtype: tuple of np.ndarray (u, d)
         """
         
 

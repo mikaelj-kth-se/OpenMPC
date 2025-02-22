@@ -1,14 +1,26 @@
 import cvxpy as cp
 import numpy as np
-from openmpc.mpc.parameters import MPCParameters
+from openmpc.mpc.parameters import MPCProblem
 from openmpc.invariant_sets import Polytope
 from openmpc.support import Constraint
 from openmpc.models import LinearSystem
 
-
 class MPC:
-    def __init__(self, mpc_params : MPCParameters):
+    r"""
+    MPC controller class for linear systems.
 
+    The MPC class is supposed to create a controller minimizing the following optimal control problem 
+
+    .. math::
+        &\min_{x,u} \sum_{t=0}^{N-1} (x_t^T Q x_t + u_t^T R u_t) + x_N^T Q_T x_N\\
+        &\text{s.t.} \\
+        &x_{t+1} = A x_t + B u_t \\
+        &H_u u_t \leq h_u \\
+        &H_x x_t \leq h_x \\
+        &H_y (C x_t + D u_t) \leq h_y \\
+        &x_0 = x_0
+    """
+    def __init__(self, mpc_params : MPCProblem):
         """
         MPC controller class for linear systems.
 
@@ -51,8 +63,7 @@ class MPC:
 
     def _setup_problem(self):
         """
-            Set upf of the MPC constraints and cost functions.
-        
+        Set up of the MPC constraints and cost functions.
         """
 
         self.cost        = 0
@@ -185,28 +196,24 @@ class MPC:
 
 
 class SetPointTrackingMPC:
-    """
-
+    r"""
     MPC controller class for set-point tracking of linear systems.
 
 
     Main controller :
 
-    min sum_{t=0}^{N-1} (x_t - x_ref)^T Q (x_t - x_ref) + (u_t - u_ref)^T R (u_t - u_ref)
-    s.t. x_{t+1} = A x_t + B u_t + B_d d_t
-            y_t = C x_t + C_d d_t
-            u \in U
-            x \in X
-            y \in Y
-            y_t = r + slack_tracking
-            x_0 = x0
+    .. math::
 
-
-    The input given to the system is the absolute input u_t + u_ref, where u_ref is the reference input.
-    
+        &\min_{x,u} sum_{t=0}^{N-1} (x_t - x_{ref})^T Q (x_t - x_{ref}) + (u_t - u_{ref})^T R (u_t - u_{ref})\\
+        &s.t.\\
+        &x_{t+1} = A x_t + B u_t + B_d d_t\\
+        &H_u u_t \leq h_u \\
+        &H_x x_t \leq h_x \\
+        &H_y (C x_t + D u_t) \leq h_y \\
+        &x_0 = x_0
     """
 
-    def __init__(self, mpc_params : MPCParameters):
+    def __init__(self, mpc_params : MPCProblem):
 
         """
         Initializes the TrackingMPC with the given MPC parameters.
@@ -216,7 +223,7 @@ class SetPointTrackingMPC:
         """
 
         # Extract MPC parameters
-        self.params              : MPCParameters = mpc_params
+        self.params              : MPCProblem = mpc_params
         self.system               : LinearSystem = self.params.system
         self.A, self.B, self.C, self.D = self.system.get_system_matrices()
 

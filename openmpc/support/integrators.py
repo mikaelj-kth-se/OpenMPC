@@ -4,22 +4,28 @@ import numpy as np
 
 def RK(updfcn, states, inputs = None ,disturbances = None, dt = 1, order=4):
     """
-    Create a Runge-Kutta expression for the given ODE.
+    Create a Runge-Kutta expression for the given ODE. Note that the expression in the output will depend only on the given 
+    states, inputs, and disturbances. So if the input is not given , then the output expression will not contain any input. 
+    The same holds for the disturbances. The state must always be given.
 
-    Parameters:
-        updfcn (casadi.MX,casadi.SX): The function that defines the ODE.
-        states (casadi.MX,casadi.SX): The states of the system.
-        inputs (casadi.MX,casadi.SX): The inputs of the system (default is None).
-        disturbances (casadi.MX,casadi.SX): The disturbances of the system (default is None).
-        dt           (float): Time step for the integrator.
-        order        (int): Order of the Runge-Kutta method (default is 4).
-
-    Returns:
-        casadi.MX: CasADi expression for one integration step.
+    :param updfcn: The function that defines the ODE.
+    :type updfcn: casadi.MX,casadi.SX
+    :param states: The states of the system.
+    :type states: casadi.MX,casadi.SX
+    :param inputs: The inputs of the system (default is None).
+    :type inputs: casadi.MX,casadi.SX
+    :param disturbances: The disturbances of the system (default is None).
+    :type disturbances: casadi.MX,casadi.SX
+    :param dt: Time step for the integrator.
+    :type dt: float
+    :param order: Order of the Runge-Kutta method (default is 4).
+    :type order: int
+    :return: CasADi expression for one integration step.
+    :rtype: casadi.MX
     """
     x = states
-    u = inputs if inputs is not None else ca.MX.sym('u', 1)
-    d = disturbances if disturbances is not None else ca.MX.sym('d', 1)
+    u = inputs if inputs is not None else ca.MX.sym('u')
+    d = disturbances if disturbances is not None else ca.MX.sym('d')
 
     updfcn = ca.Function('updfcn', [x, u, d], [updfcn])
 
@@ -50,28 +56,41 @@ def RK(updfcn, states, inputs = None ,disturbances = None, dt = 1, order=4):
         else:
             raise ValueError("Unsupported order. Please choose 1, 2, 3, or 4.")
 
-    rk_step_expr = rk_step(x, u, d, dt)
+    if disturbances is None and inputs is None:
+        rk_step_expr = rk_step(x, ca.DM.zeros(1), ca.DM.zeros(1), dt)
+    elif disturbances is None:
+        rk_step_expr = rk_step(x, u, ca.DM.zeros(1), dt)
+    elif inputs is None:
+        rk_step_expr = rk_step(x, ca.DM.zeros(1), d, dt)
+    else:
+        rk_step_expr = rk_step(x, u, d, dt)
 
     return rk_step_expr
 
 def forward_euler(updfcn, states, inputs = None ,disturbances = None, dt = 1, steps=1):
     """
-    Create a forward-Euler expression for the given ODE.
+    Create a forward-Euler expression for the given ODE. Note that the expression in the output will depend only on the given 
+    states, inputs, and disturbances. So if the input is not given , then the output expression will not contain any input. 
+    The same holds for the disturbances. The state must always be given.
 
-    Parameters:
-        updfcn (casadi.MX,casadi.SX): The function that defines the ODE.
-        states (casadi.MX,casadi.SX): The states of the system.
-        inputs (casadi.MX,casadi.SX): The inputs of the system (default is None).
-        disturbances (casadi.MX,casadi.SX): The disturbances of the system (default is None).
-        dt           (float): Time step for the integrator.
-        order        (int): Order of the Runge-Kutta method (default is 4).
-
-    Returns:
-        casadi.MX: CasADi expression for one integration step.
+    :param updfcn: The function that defines the ODE.
+    :type updfcn: casadi.MX,casadi.SX
+    :param states: The states of the system.
+    :type states: casadi.MX,casadi.SX
+    :param inputs: The inputs of the system (default is None).
+    :type inputs: casadi.MX,casadi.SX
+    :param disturbances: The disturbances of the system (default is None).
+    :type disturbances: casadi.MX,casadi.SX
+    :param dt: Time step for the integrator.
+    :type dt: float
+    :param steps: Number of integration steps (default is 1).
+    :type steps: int
+    :return: CasADi expression for one integration step using euler method.
+    :rtype: casadi.MX
     """
     x = states
-    u = inputs if inputs is not None else ca.MX.sym('u', 1)
-    d = disturbances if disturbances is not None else ca.MX.sym('d', 1)
+    u = inputs if inputs is not None else ca.MX.sym('u')
+    d = disturbances if disturbances is not None else ca.MX.sym('d')
 
     updfcn = ca.Function('updfcn', [x, u, d], [updfcn])
 
@@ -82,8 +101,16 @@ def forward_euler(updfcn, states, inputs = None ,disturbances = None, dt = 1, st
         for _ in range(steps):
             x_current = x_current + h * updfcn(x_current, u_val, d_val)
         return x_current
+    
 
-    euler_step_expr = euler_step(x, u, d, h)
+    if disturbances is None and inputs is None:
+        euler_step_expr = euler_step(x, ca.DM.zeros(1), ca.DM.zeros(1), h)
+    elif disturbances is None:
+        euler_step_expr = euler_step(x, u, ca.DM.zeros(1), h)
+    elif inputs is None:
+        euler_step_expr = euler_step(x, ca.DM.zeros(1), d, h)
+    else:
+        euler_step_expr = euler_step(x, u, d, h)
 
     return euler_step_expr
 
