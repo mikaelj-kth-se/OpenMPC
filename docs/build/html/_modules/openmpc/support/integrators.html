@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openmpc.support.integrators &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openmpc.support.integrators</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openmpc.support.integrators</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">casadi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ca</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="RK">
+<a class="viewcode-back" href="../../../support.html#support.RK">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">RK</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">,</span><span class="n">disturbances</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a Runge-Kutta expression for the given ODE.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        updfcn (casadi.MX,casadi.SX): The function that defines the ODE.</span>
+<span class="sd">        states (casadi.MX,casadi.SX): The states of the system.</span>
+<span class="sd">        inputs (casadi.MX,casadi.SX): The inputs of the system (default is None).</span>
+<span class="sd">        disturbances (casadi.MX,casadi.SX): The disturbances of the system (default is None).</span>
+<span class="sd">        dt           (float): Time step for the integrator.</span>
+<span class="sd">        order        (int): Order of the Runge-Kutta method (default is 4).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        casadi.MX: CasADi expression for one integration step.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">states</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">inputs</span> <span class="k">if</span> <span class="n">inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">disturbances</span> <span class="k">if</span> <span class="n">disturbances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">updfcn</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;updfcn&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">],</span> <span class="p">[</span><span class="n">updfcn</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">rk_step</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+       
+        <span class="n">k1</span> <span class="o">=</span> <span class="n">updfcn</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">h</span> <span class="o">*</span> <span class="n">k1</span>
+        
+        <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">k2</span> <span class="o">=</span> <span class="n">updfcn</span><span class="p">(</span><span class="n">x0</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">k1</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">h</span> <span class="o">*</span> <span class="n">k2</span>
+        
+        <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">k2</span> <span class="o">=</span> <span class="n">updfcn</span><span class="p">(</span><span class="n">x0</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">k1</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">)</span>
+            <span class="n">k3</span> <span class="o">=</span> <span class="n">updfcn</span><span class="p">(</span><span class="n">x0</span> <span class="o">-</span> <span class="n">h</span> <span class="o">*</span> <span class="n">k1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">k2</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">)</span>
+            
+            <span class="k">return</span> <span class="n">x0</span> <span class="o">+</span> <span class="p">(</span><span class="n">h</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">k1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">k2</span> <span class="o">+</span> <span class="n">k3</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+           
+            <span class="n">k2</span> <span class="o">=</span> <span class="n">updfcn</span><span class="p">(</span><span class="n">x0</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">k1</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">)</span>
+            <span class="n">k3</span> <span class="o">=</span> <span class="n">updfcn</span><span class="p">(</span><span class="n">x0</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">k2</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">)</span>
+            <span class="n">k4</span> <span class="o">=</span> <span class="n">updfcn</span><span class="p">(</span><span class="n">x0</span> <span class="o">+</span> <span class="n">h</span> <span class="o">*</span> <span class="n">k3</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">x0</span> <span class="o">+</span> <span class="p">(</span><span class="n">h</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">k1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">k2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">k3</span> <span class="o">+</span> <span class="n">k4</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported order. Please choose 1, 2, 3, or 4.&quot;</span><span class="p">)</span>
+
+    <span class="n">rk_step_expr</span> <span class="o">=</span> <span class="n">rk_step</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rk_step_expr</span></div>
+
+
+<div class="viewcode-block" id="forward_euler">
+<a class="viewcode-back" href="../../../support.html#support.forward_euler">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">forward_euler</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">,</span><span class="n">disturbances</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a forward-Euler expression for the given ODE.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        updfcn (casadi.MX,casadi.SX): The function that defines the ODE.</span>
+<span class="sd">        states (casadi.MX,casadi.SX): The states of the system.</span>
+<span class="sd">        inputs (casadi.MX,casadi.SX): The inputs of the system (default is None).</span>
+<span class="sd">        disturbances (casadi.MX,casadi.SX): The disturbances of the system (default is None).</span>
+<span class="sd">        dt           (float): Time step for the integrator.</span>
+<span class="sd">        order        (int): Order of the Runge-Kutta method (default is 4).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        casadi.MX: CasADi expression for one integration step.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">states</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">inputs</span> <span class="k">if</span> <span class="n">inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">disturbances</span> <span class="k">if</span> <span class="n">disturbances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">updfcn</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;updfcn&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">],</span> <span class="p">[</span><span class="n">updfcn</span><span class="p">])</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">steps</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">euler_step</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="n">x_current</span> <span class="o">=</span> <span class="n">x0</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+            <span class="n">x_current</span> <span class="o">=</span> <span class="n">x_current</span> <span class="o">+</span> <span class="n">h</span> <span class="o">*</span> <span class="n">updfcn</span><span class="p">(</span><span class="n">x_current</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x_current</span>
+
+    <span class="n">euler_step_expr</span> <span class="o">=</span> <span class="n">euler_step</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">euler_step_expr</span></div>
+
+
+
+<div class="viewcode-block" id="Integrator">
+<a class="viewcode-back" href="../../../support.html#support.Integrator">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">Integrator</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">,</span><span class="n">disturbances</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">integratorType</span><span class="o">=</span><span class="s1">&#39;RK4&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">integratorType</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;RK&#39;</span><span class="p">):</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">integratorType</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">integratorType</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="mi">4</span>
+        <span class="n">step_expr</span> <span class="o">=</span> <span class="n">RK</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span> <span class="p">,</span><span class="n">disturbances</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">integratorType</span> <span class="o">==</span> <span class="s1">&#39;Euler&#39;</span><span class="p">:</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;steps&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">step_expr</span> <span class="o">=</span> <span class="n">forward_euler</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">disturbances</span> <span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported integrator type. Please choose &#39;RK&#39;, &#39;RK2&#39;, &#39;RK3&#39;, &#39;RK4&#39;, or &#39;Euler&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">states</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">inputs</span> <span class="k">if</span> <span class="n">inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">disturbances</span> <span class="k">if</span> <span class="n">disturbances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+    <span class="n">integrator_func</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;integrator_func&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="n">d</span><span class="p">],</span> <span class="p">[</span><span class="n">step_expr</span><span class="p">])</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrator</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u_val</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">d_val</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">u_val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">u_val</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">DM</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">d_val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d_val</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">DM</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">integrator_func</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">d_val</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">integrator</span></div>
+
+
+
+<span class="c1"># def simulate_system(integrator, initial_state, N_steps, u_val=None, d_val=None):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Simulate the system using a given integrator.</span>
+
+<span class="c1">#     Parameters:</span>
+<span class="c1">#     integrator (Function): CasADi function that performs one integration step.</span>
+<span class="c1">#     initial_state (np.array): Initial state of the system.</span>
+<span class="c1">#     N_steps (int): Number of simulation steps.</span>
+<span class="c1">#     u_val (np.array or None): Control input signal. Can be:</span>
+<span class="c1">#         - None (default): No control input, assumed to be zero.</span>
+<span class="c1">#         - 1D array (shape: (m,)): Constant control input across the simulation horizon.</span>
+<span class="c1">#         - 2D array (shape: (m, N_steps)): Time-varying control input, with each column representing the control input at each step.</span>
+<span class="c1">#     d_val (np.array or None): Disturbance signal. Can be:</span>
+<span class="c1">#         - None (default): No disturbance, assumed to be zero.</span>
+<span class="c1">#         - 1D array (shape: (nd,)): Constant disturbance across the simulation horizon.</span>
+<span class="c1">#         - 2D array (shape: (nd, N_steps)): Time-varying disturbance, with each column representing the disturbance at each step.</span>
+
+<span class="c1">#     Returns:</span>
+<span class="c1">#     np.array: Simulated state trajectory (shape: (n, N_steps+1)).</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     x_sim = [initial_state]</span>
+
+<span class="c1">#     # Ensure u_val and d_val are in correct format</span>
+<span class="c1">#     if u_val is None:</span>
+<span class="c1">#         u_val = np.zeros((1, N_steps))</span>
+<span class="c1">#     elif u_val.ndim == 1:</span>
+<span class="c1">#         u_val = np.tile(u_val[:, np.newaxis], (1, N_steps))</span>
+<span class="c1">#     if d_val is None:</span>
+<span class="c1">#         d_val = np.zeros((1, N_steps))</span>
+<span class="c1">#     elif d_val.ndim == 1:</span>
+<span class="c1">#         d_val = np.tile(d_val[:, np.newaxis], (1, N_steps))</span>
+
+<span class="c1">#     num_args = len(inspect.signature(integrator).parameters)</span>
+
+<span class="c1">#     for k in range(N_steps):</span>
+<span class="c1">#         x_current = x_sim[-1]</span>
+<span class="c1">#         u_current = u_val[:, k]</span>
+<span class="c1">#         d_current = d_val[:, k]</span>
+<span class="c1">#         if num_args == 3:</span>
+<span class="c1">#             x_next = integrator(x_current, u_current, d_current).full().flatten()</span>
+<span class="c1">#         elif num_args == 2:</span>
+<span class="c1">#             x_next = integrator(x_current, u_current).full().flatten()</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             x_next = integrator(x_current).full().flatten()</span>
+<span class="c1">#         x_sim.append(x_next)</span>
+<span class="c1">#     return np.array(x_sim).T</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,827 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A few notes on control invariant sets &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Open-loop optimal control of a simple pendulum using multiple-shooting" href="multiple_shooting_pendulum_swingup.html" />
+    <link rel="prev" title="Basic Model Predictive Control in Python" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cessna_descent.html">Cessna aircraft descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="constraint_softening.html">Constraint softening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="discretization_notebook.html">Comparison of Discretization Schemes for a Simple Pendulum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="double_integrator.html">Double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helicopter.html">Helicopter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html">Basic Model Predictive Control in Python</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">A few notes on control invariant sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#A-basic-example">A basic example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#A-useful-control-invariant-set:-the-invariant-set-of-the-LQR-controller">A useful control invariant set: the invariant set of the LQR controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#The-maximal-control-invariant-set">The maximal control invariant set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#The-initial-feasible-set-of-the-MPC-controller">The initial feasible set of the MPC controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple_shooting_pendulum_swingup.html">Open-loop optimal control of a simple pendulum using multiple-shooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nonlinear_tracking_heat_exchanger.html">Non-linear Tracking MPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Offsetfree_advanced.html">offset free NMPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="offset_free_mpc_heat_exchanger.html">Non-linear offset-free MPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="offset_free_simple.html">Simple offset-free MPC example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_tracking_aircraft.html">Reference tracking NMPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simpleMPC_invPend.html">Pendulum on Cart System with MPC Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single_shooting_pendulum_swingup.html">Open-loop optimal control of a simple pendulum using single-shooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="swingup_pendcart_nlmpc.html">Swingup of a pendulum on a cart using nonlinear MPC</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">A few notes on control invariant sets</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/invariant_sets.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="A-few-notes-on-control-invariant-sets">
+<h1>A few notes on control invariant sets<a class="headerlink" href="#A-few-notes-on-control-invariant-sets" title="Link to this heading"></a></h1>
+<p>This is a small notebook aimed to demonstrating some basic concepts for invariant sets, control invariant sets and N-step controllable sets. It uses the polytope package for convenience. As you can see from the code listings below, the computations are conceptually simple, and follow the recipes in the lecture notes.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.InvariantSets</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.LinearMPC</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="A-basic-example">
+<h1>A basic example<a class="headerlink" href="#A-basic-example" title="Link to this heading"></a></h1>
+<dl class="simple">
+<dt>We will consider the double integrator dynamics :nbsphinx-math:<a href="#id1"><span class="problematic" id="id2">`</span></a>begin{align*}</dt><dd><p>x_{t+1} &amp;= begin{pmatrix}
+1 &amp; 1\ 0 &amp; 1
+end{pmatrix}x_t + begin{pmatrix}
+1/2\ 1
+end{pmatrix}u_t</p>
+</dd>
+</dl>
+<p>end{align*}` with a simple magnitude constraint on the control input, i.e. <span class="math notranslate nohighlight">\(\vert u_t\vert\leq 1\)</span>, and we would like all states to be less than 10 in magnitude. That is, we use the admissible set <span class="math notranslate nohighlight">\(X=\{ x \;\vert\; \Vert x\Vert_{\infty}\leq 10\}\)</span>. We will refer to the set of states that satisfy the state constraints as the admissible set.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultipleLocator</span>
+
+<span class="c1"># Colors from the KTH palette</span>
+<span class="n">KTH_sand</span><span class="o">=</span><span class="s1">&#39;#EBE5E0&#39;</span>
+<span class="n">KTH_blue</span><span class="o">=</span><span class="s1">&#39;#004791&#39;</span>
+<span class="n">KTH_skyblue</span><span class="o">=</span><span class="s1">&#39;#6298D2&#39;</span>
+<span class="n">KTH_lightblue</span><span class="o">=</span><span class="s1">&#39;#DEF0FF&#39;</span>
+<span class="n">KTH_lightgray</span><span class="o">=</span><span class="s1">&#39;#E6E6E6&#39;</span>
+<span class="n">KTH_green</span><span class="o">=</span><span class="s1">&#39;#4DA060&#39;</span>
+<span class="n">KTH_yellow</span><span class="o">=</span><span class="s1">&#39;#FFBE00&#39;</span>
+<span class="n">KTH_brick</span><span class="o">=</span><span class="s1">&#39;#E86A58&#39;</span>
+<span class="n">KTH_darkbrick</span><span class="o">=</span><span class="s1">&#39;#78001A&#39;</span>
+
+<span class="c1"># Define the A matrix</span>
+<span class="n">A_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="p">])</span>
+
+<span class="c1"># Define the b vector</span>
+<span class="n">b_inf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># Create the polytope</span>
+<span class="n">admissible_set_polytope</span> <span class="o">=</span> <span class="n">Polytope</span><span class="p">(</span><span class="n">A_inf</span><span class="p">,</span> <span class="n">b_inf</span><span class="p">)</span>
+
+<span class="c1"># Create figure and axes</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>  <span class="c1"># Create the figure and axes</span>
+
+
+<span class="c1"># Plot the polytope with customized color, line style, and opacity</span>
+<span class="n">patch</span> <span class="o">=</span> <span class="n">admissible_set_polytope</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_sand</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+<span class="c1"># Set the limits of the axes to encompass the full polytope</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+
+<span class="c1"># Customize the x and y axis ticks</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>  <span class="c1"># Get the current axis</span>
+
+<span class="c1"># Set major ticks at -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># Set minor ticks at every integer between -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Add labels and title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Position&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Velocity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Admissible set&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the plot</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_invariant_sets_3_0.png" src="../_images/examples_invariant_sets_3_0.png" />
+</div>
+</div>
+</section>
+<section id="A-useful-control-invariant-set:-the-invariant-set-of-the-LQR-controller">
+<h1>A useful control invariant set: the invariant set of the LQR controller<a class="headerlink" href="#A-useful-control-invariant-set:-the-invariant-set-of-the-LQR-controller" title="Link to this heading"></a></h1>
+<dl class="simple">
+<dt>Note that the double integrator is not stable, so the only invariant set is the origin itself. We will therefore focus on control invariant sets. A useful control invariant set is the invariant set of some linear controller :nbsphinx-math:<a href="#id3"><span class="problematic" id="id4">`</span></a>begin{align*}</dt><dd><p>u_t &amp;= -Lx_t</p>
+</dd>
+<dt>end{align*}` Since the controller is linear, it will only be able to operate in a restricted region without exceeding the saturation constraints. Hence, when we look for an invariant set for the closed loop dynamics :nbsphinx-math:<a href="#id5"><span class="problematic" id="id6">`</span></a>begin{align*}</dt><dd><p>x_{t+1} &amp;= (A-BL)x_t</p>
+</dd>
+<dt>end{align*}` we need to require that the states remains in intersection between the admissible set and the set where the controller does not saturate, i.e. :nbsphinx-math:<a href="#id7"><span class="problematic" id="id8">`</span></a>begin{align*}</dt><dd><p>X cap { x ;vert; vert Lxvertleq 1}</p>
+</dd>
+</dl>
+<p>end{align*}` Let’s plot this set.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the system matrices</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+
+<span class="n">system</span> <span class="o">=</span> <span class="n">LinearSystem</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+
+<span class="c1"># Define the cost matrices</span>
+<span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># State cost matrix (2x2 identity matrix)</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">]])</span>  <span class="c1"># Control cost (scalar as a 1x1 matrix)</span>
+
+<span class="c1"># Solve the discrete-time LQR problem</span>
+<span class="n">L</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">E</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">lqr_solution</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+<span class="n">L</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+
+<span class="c1"># Define the infinity norm ball polytope: ||x||_∞ &lt;= 12 for bounding the strip</span>
+<span class="n">b_background</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span>
+<span class="n">background_polytope</span> <span class="o">=</span> <span class="n">Polytope</span><span class="p">(</span><span class="n">A_inf</span><span class="p">,</span> <span class="n">b_background</span><span class="p">)</span>
+
+<span class="c1"># Define the polyhedron |Kx| &lt;= 1</span>
+<span class="n">A_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">L</span><span class="p">,</span> <span class="o">-</span><span class="n">L</span><span class="p">])</span>  <span class="c1"># Stack K and -K to handle the |Kx| &lt;= 1</span>
+<span class="n">b_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># Right-hand side of the inequality</span>
+<span class="n">L_polytope</span> <span class="o">=</span> <span class="n">Polytope</span><span class="p">(</span><span class="n">A_l</span><span class="p">,</span> <span class="n">b_l</span><span class="p">)</span>
+
+<span class="c1"># Intersect the strip |Kx| &lt;= 1 with the infinity norm ball ||x||_∞ &lt;= 12 to get a bounded region</span>
+<span class="n">LQR_not_saturated_polytope</span> <span class="o">=</span> <span class="n">L_polytope</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">background_polytope</span><span class="p">)</span>
+
+<span class="c1"># Intersect this result with the original infinity norm ball ||x||_∞ &lt;= 10</span>
+<span class="n">xadmissible_and_uadmissible_polytope</span> <span class="o">=</span> <span class="n">LQR_not_saturated_polytope</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">admissible_set_polytope</span><span class="p">)</span>
+
+<span class="c1"># Plotting</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+<span class="c1"># Plot the infinity-norm ball (||x||_∞ &lt;= 10) first (bottom layer)</span>
+<span class="n">admissible_set_polytope</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">KTH_sand</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot the bounded |Kx| &lt;= 1 strip intersected with the ball ||x||_∞ &lt;= 12 (middle layer)</span>
+<span class="n">LQR_not_saturated_polytope</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">KTH_lightblue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot the final intersection (top layer)</span>
+<span class="n">xadmissible_and_uadmissible_polytope</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">KTH_skyblue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+
+<span class="c1"># Set major ticks at -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">])</span>
+
+<span class="c1"># Set minor ticks at every integer between -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Add labels and title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Position&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Velocity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Region where LQR controller does not saturate&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_invariant_sets_5_0.png" src="../_images/examples_invariant_sets_5_0.png" />
+</div>
+</div>
+<p>We can now compute the invariant set of the closed-loop dynamics <span class="math notranslate nohighlight">\(x_{t+1}=(A-BL)x_t\)</span> in this region (the one shown in the darker blue color)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reuse the figure and axes created in the previous block</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>  <span class="c1"># Ensure you are referencing the correct figure</span>
+
+<span class="c1"># Add the new set</span>
+<span class="n">myLQRSet</span> <span class="o">=</span> <span class="n">invariant_set</span><span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">B</span> <span class="o">@</span> <span class="n">L</span><span class="p">,</span> <span class="n">xadmissible_and_uadmissible_polytope</span><span class="p">)</span>  <span class="c1"># Generate the new set</span>
+<span class="n">myLQRSet</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_blue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Invariant set of LQR controller&#39;</span><span class="p">)</span>
+<span class="c1"># Render the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Converged with determinedness index 1.
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_invariant_sets_7_1.png" src="../_images/examples_invariant_sets_7_1.png" />
+</div>
+</div>
+<p>Initial states that belong to the dark blue region in this plot will remain in this region and satisfy the state constraints for all future times, and the linear state feedback <span class="math notranslate nohighlight">\(u_t=-Lx_t\)</span> will make it happen. Since the set is invariant for one possible control policy, it is control invariant. But it is typically not the largest possible control invariant set. We will compute the maximal one shortly.</p>
+<p>But first, it is useful to reflect on what happens to state outside of this region. First, if states are outside the yellow strip, the control policy that we consider violates the control constraints. There may be other control policies that can deal with these initial states, but the one that we have considered cannot do it. Inside the strip but outside the computed invariant set, the control law cannot keep the states inside the strip and inside the feasible set.</p>
+<p>The code below allows you to simulate different initial states, and see if it is the state or control constraints that break first.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="c1"># Simulation parameters</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">5.5</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.5</span><span class="p">]])</span>  <span class="c1"># Initial state as a column vector (2D array) - change to verify invariance</span>
+
+<span class="k">if</span> <span class="n">myLQRSet</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">x0</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial state in invariant set.&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial state outside of invariant set.&quot;</span><span class="p">)</span>
+
+<span class="n">num_steps</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># Number of time steps to simulate</span>
+<span class="n">ulim</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Control limit</span>
+
+<span class="c1"># Initialize arrays to store state and control inputs</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">))</span>  <span class="c1"># State history (2D array)</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_steps</span><span class="p">)</span>       <span class="c1"># Control input history</span>
+
+<span class="c1"># Set the initial state</span>
+<span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># Flatten x0 to 1D for compatibility with x[:, 0]</span>
+
+<span class="c1"># Simulate the closed-loop system</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_steps</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># Calculate control input using the feedback law u = -Lx</span>
+    <span class="n">u</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">L</span> <span class="o">@</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Extract the scalar value</span>
+
+    <span class="c1"># Update state using the system dynamics x_{t+1} = Ax_t + Bu_t</span>
+    <span class="n">x</span><span class="p">[:,</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+
+<span class="c1"># Calculate the final control input for the last state</span>
+<span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">L</span> <span class="o">@</span> <span class="n">x</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Extract the scalar value for the final step</span>
+
+<span class="c1"># Define constraints</span>
+<span class="n">state_constraint</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Infinity-norm constraint for the state</span>
+<span class="n">control_constraint</span> <span class="o">=</span> <span class="n">ulim</span>  <span class="c1"># Control constraint</span>
+
+<span class="c1"># Plot state trajectories and control signals</span>
+<span class="n">fig_sim</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="c1"># Plot state trajectories</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_steps</span><span class="p">),</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$x_1(k)$&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_green</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_steps</span><span class="p">),</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$x_2(k)$&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_yellow</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">state_constraint</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_brick</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;State bound $||x_t||_∞ \leq 10$&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="o">-</span><span class="n">state_constraint</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_brick</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;State Trajectories&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time step&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;State&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Highlight violations of the state constraint</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_steps</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="n">state_constraint</span><span class="p">:</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="p">],</span> <span class="s1">&#39;ro&#39;</span><span class="p">)</span>  <span class="c1"># Mark violation for x1</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">],</span> <span class="s1">&#39;ro&#39;</span><span class="p">)</span>  <span class="c1"># Mark violation for x2</span>
+
+<span class="c1"># Plot control signal</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_steps</span><span class="p">),</span> <span class="n">u</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$u(k)$&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_skyblue</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">control_constraint</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_brick</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Control bound $|u_t| \leq 1$&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="o">-</span><span class="n">control_constraint</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_brick</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Control Input&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time step&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Control input&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Highlight violations of the control constraint</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_steps</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">t</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">control_constraint</span><span class="p">:</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="s1">&#39;ro&#39;</span><span class="p">)</span>  <span class="c1"># Mark control violation</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Initial state in invariant set.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_invariant_sets_9_1.png" src="../_images/examples_invariant_sets_9_1.png" />
+</div>
+</div>
+</section>
+<section id="The-maximal-control-invariant-set">
+<h1>The maximal control invariant set<a class="headerlink" href="#The-maximal-control-invariant-set" title="Link to this heading"></a></h1>
+<p>Let us now compute the maximal control invariant sets for the given system and control constraint, contained in the admissible set.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1"># Create figure and axes</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>  <span class="c1"># Create the figure and axes</span>
+
+<span class="n">Cu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">cu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">uCstrSet</span><span class="o">=</span><span class="n">Polytope</span><span class="p">(</span><span class="n">Cu</span><span class="p">,</span><span class="n">cu</span><span class="p">)</span>
+<span class="n">Cinf</span><span class="o">=</span><span class="n">control_invariant_set</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span> <span class="n">admissible_set_polytope</span><span class="p">,</span> <span class="n">uCstrSet</span><span class="p">)</span>
+
+<span class="c1"># Plot the polytope with customized color, line style, and opacity</span>
+<span class="n">patch</span> <span class="o">=</span> <span class="n">admissible_set_polytope</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_sand</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">Cinf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_green</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">myLQRSet</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_blue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+<span class="c1"># Set the limits of the axes to encompass the full polytope</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+
+<span class="c1"># Customize the x and y axis ticks</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>  <span class="c1"># Get the current axis</span>
+
+<span class="c1"># Set major ticks at -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># Set minor ticks at every integer between -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Add labels and title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Position&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Velocity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Admissible set&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the plot</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Converged with determinedness index 6.
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_invariant_sets_11_1.png" src="../_images/examples_invariant_sets_11_1.png" />
+</div>
+</div>
+<p>As we can see, the maximal control invariant set is substantially larger than the invariant set of the LQR controller for the given control constraints. One advantage of the invariant set of the LQR controller is that it is defined by relatively few inequalities for this system. This simplifies the implementation (a slightly smaller memory footping, and easier to solve quadratric program). Let us print out the inequalities of the maximal control invariant set and the invariant set of the LQR
+controller to see how many inequalities are involved.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">Cinf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Hyperplane representation of polytope
+  [[ 0.10000   0.00000] |    [1.00000]
+   [-0.10000   0.00000] |    [1.00000]
+   [-0.09524  -0.09524] |    [1.00000]
+   [-0.05556  -0.22222] |    [1.00000]
+   [ 0.06897   0.20690] |    [1.00000]
+   [ 0.09524   0.09524] |    [1.00000]
+   [-0.08333  -0.16667] |    [1.00000]
+   [-0.04444  -0.22222] |    [1.00000]
+   [ 0.04444   0.22222] |    [1.00000]
+   [ 0.05556   0.22222] |    [1.00000]
+   [ 0.08333   0.16667] |    [1.00000]
+   [-0.06897  -0.20690] |    [1.00000]
+   [-0.03571  -0.21429] |    [1.00000]
+   [ 0.03571   0.21429] x &lt;= [1.00000]
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">myLQRSet</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Hyperplane representation of polytope
+  [[ 0.43448   1.02847] |    [1.00000]
+   [-0.43448  -1.02847] |    [1.00000]
+   [ 0.10676  -0.18178] |    [1.00000]
+   [-0.10676   0.18178] x &lt;= [1.00000]
+
+</pre></div></div>
+</div>
+</section>
+<section id="The-initial-feasible-set-of-the-MPC-controller">
+<h1>The initial feasible set of the MPC controller<a class="headerlink" href="#The-initial-feasible-set-of-the-MPC-controller" title="Link to this heading"></a></h1>
+<p>If we use the control invariant sets that we have computed in an MPC controller, then we require that the predicted states <span class="math notranslate nohighlight">\(T\)</span> steps in the future belongs to this set. A smaller set will be more difficult to reach than a large one, resulting in a smaller set of states for which we can solve the planning problem.</p>
+<p>The set of states that can reach <span class="math notranslate nohighlight">\(X_T\)</span> in <span class="math notranslate nohighlight">\(T\)</span> steps is called the <span class="math notranslate nohighlight">\(T\)</span>-step reachable set of <span class="math notranslate nohighlight">\(X_T\)</span> (under the given dynamics and constraints). We can compute using a technique that is quite similar to the one we used for the control invariant set. Let us see how the <span class="math notranslate nohighlight">\(T\)</span> reachable set of the invariant set of the LQR controller depends on <span class="math notranslate nohighlight">\(T\)</span>. We begin by plotting the terminal set and the maximal control invariant set.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create figure and axes</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>  <span class="c1"># Create the figure and axes</span>
+
+
+<span class="c1"># Plot the polytope with customized color, line style, and opacity</span>
+<span class="n">patch</span> <span class="o">=</span> <span class="n">admissible_set_polytope</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">Cu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">cu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">uCstrSet</span><span class="o">=</span><span class="n">Polytope</span><span class="p">(</span><span class="n">Cu</span><span class="p">,</span><span class="n">cu</span><span class="p">)</span>
+<span class="n">Cinf</span><span class="o">=</span><span class="n">control_invariant_set</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span> <span class="n">admissible_set_polytope</span><span class="p">,</span> <span class="n">uCstrSet</span><span class="p">)</span>
+
+<span class="n">Cinf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_green</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+<span class="n">myLQRSet</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_blue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+<span class="c1"># Set the limits of the axes to encompass the full polytope</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+
+<span class="c1"># Customize the x and y axis ticks</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>  <span class="c1"># Get the current axis</span>
+
+<span class="c1"># Set major ticks at -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># Set minor ticks at every integer between -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Add labels and title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Position&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Velocity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Maximal control invariant set&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the plot</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Converged with determinedness index 6.
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_invariant_sets_16_1.png" src="../_images/examples_invariant_sets_16_1.png" />
+</div>
+</div>
+<p>We now plot the <span class="math notranslate nohighlight">\(T\)</span>-step reachable sets for <span class="math notranslate nohighlight">\(T=1, \dots, 5\)</span>. As you can see, the set of initially feasible states increases as <span class="math notranslate nohighlight">\(T\)</span> increases (“we have more time to reach the terminal set”)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reuse the figure and axes created in the previous block</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>  <span class="c1"># Ensure you are referencing the correct figure</span>
+<span class="n">ctrlbSetsLQR</span><span class="o">=</span><span class="n">get_n_step_controllable_set</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">admissible_set_polytope</span><span class="p">,</span> <span class="n">uCstrSet</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">myLQRSet</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">ctrlbSetsLQR</span><span class="p">:</span>
+    <span class="n">S</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_blue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;N-step controllable set for terminal set defined by LQR controller&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_invariant_sets_18_0.png" src="../_images/examples_invariant_sets_18_0.png" />
+</div>
+</div>
+<p>Let us repeat this exercise for <span class="math notranslate nohighlight">\(X_T=\{0\}\)</span>, i.e. when we drive the terminal state to the origin at the end of the planning horizon.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create figure and axes</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>  <span class="c1"># Create the figure and axes</span>
+
+
+<span class="c1"># Plot the polytope with customized color, line style, and opacity</span>
+<span class="n">patch</span> <span class="o">=</span> <span class="n">admissible_set_polytope</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_sand</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+<span class="n">Cu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">cu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">uCstrSet</span><span class="o">=</span><span class="n">Polytope</span><span class="p">(</span><span class="n">Cu</span><span class="p">,</span><span class="n">cu</span><span class="p">)</span>
+<span class="n">Cinf</span><span class="o">=</span><span class="n">control_invariant_set</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span> <span class="n">admissible_set_polytope</span><span class="p">,</span> <span class="n">uCstrSet</span><span class="p">)</span>
+
+<span class="n">Cinf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_green</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+<span class="c1"># Set the limits of the axes to encompass the full polytope</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+
+<span class="c1"># Customize the x and y axis ticks</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>  <span class="c1"># Get the current axis</span>
+
+<span class="c1"># Set major ticks at -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># Set minor ticks at every integer between -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Add labels and title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Position&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Velocity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Admissible set&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the plot</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+
+<span class="c1"># Add the new set</span>
+<span class="n">zero_set</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="c1"># Reuse the figure and axes created in the previous block</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>  <span class="c1"># Ensure you are referencing the correct figure</span>
+<span class="n">ctrlbSetsOrigin</span><span class="o">=</span><span class="n">get_n_step_controllable_set</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">admissible_set_polytope</span><span class="p">,</span> <span class="n">uCstrSet</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">zero_set</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">ctrlbSetsOrigin</span><span class="p">:</span>
+    <span class="n">S</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_brick</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;N-step controllable set for terminal set $\{0\}$ (the origin)&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Converged with determinedness index 6.
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_invariant_sets_20_1.png" src="../_images/examples_invariant_sets_20_1.png" />
+</div>
+</div>
+<p>This set is much smaller. It is not easy to see, so we will put the <span class="math notranslate nohighlight">\(5\)</span>-step controllable sets for the two terminal sets in the same figure.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create figure and axes</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>  <span class="c1"># Create the figure and axes</span>
+
+
+<span class="c1"># Plot the polytope with customized color, line style, and opacity</span>
+<span class="n">patch</span> <span class="o">=</span> <span class="n">admissible_set_polytope</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_sand</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+
+<span class="c1"># Set the limits of the axes to encompass the full polytope</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+
+<span class="c1"># Customize the x and y axis ticks</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>  <span class="c1"># Get the current axis</span>
+
+<span class="c1"># Set major ticks at -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># Set minor ticks at every integer between -10 and 10</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Add labels and title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Position&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Velocity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Set of initially feasible states for MPC with different $X_T$&#39;</span><span class="p">)</span>
+
+<span class="n">ctrlbSetsLQR</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_blue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ctrlbSetsOrigin</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">KTH_brick</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Display the plot</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_invariant_sets_22_0.png" src="../_images/examples_invariant_sets_22_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rSetsLQR</span><span class="o">=</span><span class="n">get_n_step_controllable_set</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">admissible_set_polytope</span><span class="p">,</span> <span class="n">uCstrSet</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">myLQRSet</span><span class="p">)</span>
+<span class="n">rSetsZero</span><span class="o">=</span><span class="n">get_n_step_controllable_set</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">admissible_set_polytope</span><span class="p">,</span> <span class="n">uCstrSet</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">zero_set</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute the volumes for each polytope in the array</span>
+<span class="n">volumesLQR</span> <span class="o">=</span> <span class="p">[</span><span class="n">polytope</span><span class="o">.</span><span class="n">volume</span><span class="p">()</span><span class="o">/</span><span class="n">Cinf</span><span class="o">.</span><span class="n">volume</span><span class="p">()</span> <span class="k">for</span> <span class="n">polytope</span> <span class="ow">in</span> <span class="n">rSetsLQR</span><span class="p">]</span>
+<span class="n">volumesZero</span> <span class="o">=</span> <span class="p">[</span><span class="n">polytope</span><span class="o">.</span><span class="n">volume</span><span class="p">()</span><span class="o">/</span><span class="n">Cinf</span><span class="o">.</span><span class="n">volume</span><span class="p">()</span> <span class="k">for</span> <span class="n">polytope</span> <span class="ow">in</span> <span class="n">rSetsZero</span><span class="p">]</span>
+
+<span class="c1"># Create an array of indices (corresponding to polytope positions in the list)</span>
+<span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rSetsLQR</span><span class="p">)))</span>
+
+<span class="c1"># Plot volumes against indices</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">volumesLQR</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">volumesZero</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Volume of Polytopes vs. Index&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Index in Array&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Volume&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_invariant_sets_24_0.png" src="../_images/examples_invariant_sets_24_0.png" />
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Basic Model Predictive Control in Python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="multiple_shooting_pendulum_swingup.html" class="btn btn-neutral float-right" title="Open-loop optimal control of a simple pendulum using multiple-shooting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

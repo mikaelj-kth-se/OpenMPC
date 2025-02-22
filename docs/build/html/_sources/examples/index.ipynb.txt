@@ -1,0 +1,78 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "c79cfcb1",
+   "metadata": {},
+   "source": [
+    "# Basic Model Predictive Control in Python\n",
+    "\n",
+    "This is the index file for the jupyter notebooks on MPC in Python, developed for EL2700 at KTH. \n",
+    "\n",
+    "Use the links below to navigate to the different notebooks in the project.\n",
+    "\n",
+    "## Notebooks on invariant sets\n",
+    "\n",
+    "7. [Invariant sets - definitions and calculations](invariant_sets.ipynb)\n",
+    "\n",
+    "\n",
+    "## Notebooks on linear MPC\n",
+    "\n",
+    "1. [Basic MPC on the double integrator](double_integrator.ipynb )\n",
+    "2. [MPC for altitude control of Cessna aircraft](cessna_descent.ipynb)\n",
+    "3. [The effect of constraint softening](constraint_softening.ipynb)\n",
+    "4. [Reference tracking on simple aircraft model](reference_tracking_aircraft.ipynb)\n",
+    "5. [Simple offset-free control](offset_free_simple.ipynb)\n",
+    "\n",
+    "## Notebooks on nonlinear MPC\n",
+    "\n",
+    "1. [Comparison of numerical integration techniques for system discretization](discretization_notebook.ipynb)\n",
+    "2. [Multiple Shooting Pendulum Swing-Up](multiple_shooting_pendulum_swingup.ipynb)\n",
+    "3. [Single Shooting Pendulum Swing-Up](single_shooting_pendulum_swingup.ipynb)\n",
+    "4. [Simple nonlinear MPC of simple inverted pendulum](simpleMPC_invPend.ipynb)\n",
+    "5. [Nonlinear MPC for Swing-up of a pendulum on a cart](swingup_pendcart_nlmpc.ipynb)\n",
+    "6. [Nonlinear Tracking MPC for Heat Exchanger](nonlinear_tracking_heat_exchanger.ipynb)\n",
+    "7. [Offset-Free MPC for Heat Exchanger](offset_free_mpc_heat_exchanger.ipynb)\n",
+    "\n",
+    "\n",
+    "## Instructions\n",
+    "\n",
+    "- Click on the notebook links above to open the corresponding notebook.\n",
+    "- Each notebook contains detailed explanations and code for specific topics and applications.\n",
+    "\n",
+    "## Contact\n",
+    "\n",
+    "Initial version by Mikael Johansson (mikaelj@kth.se)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0e67dd92",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

@@ -1,0 +1,541 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Open-loop optimal control of a simple pendulum using multiple-shooting &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Non-linear Tracking MPC" href="nonlinear_tracking_heat_exchanger.html" />
+    <link rel="prev" title="A few notes on control invariant sets" href="invariant_sets.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cessna_descent.html">Cessna aircraft descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="constraint_softening.html">Constraint softening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="discretization_notebook.html">Comparison of Discretization Schemes for a Simple Pendulum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="double_integrator.html">Double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helicopter.html">Helicopter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html">Basic Model Predictive Control in Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invariant_sets.html">A few notes on control invariant sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invariant_sets.html#A-basic-example">A basic example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invariant_sets.html#A-useful-control-invariant-set:-the-invariant-set-of-the-LQR-controller">A useful control invariant set: the invariant set of the LQR controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invariant_sets.html#The-maximal-control-invariant-set">The maximal control invariant set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invariant_sets.html#The-initial-feasible-set-of-the-MPC-controller">The initial feasible set of the MPC controller</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Open-loop optimal control of a simple pendulum using multiple-shooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Pendulum-Model">Pendulum Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Multiple-Shooting-Approach">Multiple Shooting Approach</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CasADi's-Opti-Object">CasADi’s <code class="docutils literal notranslate"><span class="pre">Opti</span></code> Object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Define-Decision-Variables">Define Decision Variables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Objective-Function">Objective Function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Discretizing-the-dynamics">Discretizing the dynamics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Constraints">Constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Initial-Guesses">Initial Guesses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Solver-Options">Solver Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Solve-the-Problem">Solve the Problem</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Plot-the-Results">Plot the Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="nonlinear_tracking_heat_exchanger.html">Non-linear Tracking MPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Offsetfree_advanced.html">offset free NMPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="offset_free_mpc_heat_exchanger.html">Non-linear offset-free MPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="offset_free_simple.html">Simple offset-free MPC example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_tracking_aircraft.html">Reference tracking NMPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simpleMPC_invPend.html">Pendulum on Cart System with MPC Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single_shooting_pendulum_swingup.html">Open-loop optimal control of a simple pendulum using single-shooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="swingup_pendcart_nlmpc.html">Swingup of a pendulum on a cart using nonlinear MPC</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Open-loop optimal control of a simple pendulum using multiple-shooting</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/multiple_shooting_pendulum_swingup.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Open-loop-optimal-control-of-a-simple-pendulum-using-multiple-shooting">
+<h1>Open-loop optimal control of a simple pendulum using multiple-shooting<a class="headerlink" href="#Open-loop-optimal-control-of-a-simple-pendulum-using-multiple-shooting" title="Link to this heading"></a></h1>
+<p>In this notebook, we will perform open-loop optimal control of a simple pendulum using the multiple-shooting method in CasADi. The multiple-shooting method divides the time horizon into smaller intervals, and solves for the control inputs and states in each interval simultaneously.</p>
+<p>First, we will define the pendulum model and the necessary functions for integration and simulation. We will then set up the optimal control problem using CasADi’s <code class="docutils literal notranslate"><span class="pre">Opti</span></code> object, define the objective and constraints, choose a solver, and solve the problem. Finally, we will plot the results.</p>
+<section id="Pendulum-Model">
+<h2>Pendulum Model<a class="headerlink" href="#Pendulum-Model" title="Link to this heading"></a></h2>
+<p>The dynamics of the simple pendulum can be described using the following differential equations:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{align*}
+\dot{\theta} &amp;= \theta_{dot} \\
+\dot{\theta_{dot}} &amp;= \frac{m \cdot g \cdot l \cdot \sin(\theta) + m \cdot l \cdot \cos(\theta) \cdot u}{I + m \cdot l^2}
+\end{align*}\end{split}\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p>$ :nbsphinx-math:<a href="#id1"><span class="problematic" id="id2">`</span></a>theta <a href="#id3"><span class="problematic" id="id4">`</span></a>$ is the angle of the pendulum.</p></li>
+<li><p>$ <span class="math">\theta</span>_{dot} $ is the angular velocity.</p></li>
+<li><p>$ u $ is the control input (torque).</p></li>
+<li><p>$ m $ is the mass.</p></li>
+<li><p>$ l $ is the length of the pendulum.</p></li>
+<li><p>$ I $ is the moment of inertia.</p></li>
+<li><p>$ g $ is the acceleration due to gravity.</p></li>
+</ul>
+<p>Let’s define the pendulum model in CasADi.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">casadi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ca</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ticker</span>
+
+<span class="c1"># Pendulum parameters</span>
+<span class="n">m</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">l</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">I</span> <span class="o">=</span> <span class="mf">0.006</span>
+<span class="n">g</span> <span class="o">=</span> <span class="mf">9.81</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">m</span> <span class="o">*</span> <span class="n">g</span> <span class="o">*</span> <span class="n">l</span> <span class="o">/</span> <span class="p">(</span><span class="n">I</span> <span class="o">+</span> <span class="n">m</span> <span class="o">*</span> <span class="n">l</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">m</span> <span class="o">*</span> <span class="n">l</span> <span class="o">/</span> <span class="p">(</span><span class="n">I</span> <span class="o">+</span> <span class="n">m</span> <span class="o">*</span> <span class="n">l</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Define the ODE right-hand side function for the pendulum model</span>
+<span class="n">th</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s2">&quot;th&quot;</span><span class="p">)</span>
+<span class="n">thDot</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s2">&quot;thDot&quot;</span><span class="p">)</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>  <span class="c1"># Control input</span>
+
+<span class="n">rhs</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">vertcat</span><span class="p">(</span>
+    <span class="n">thDot</span><span class="p">,</span>            <span class="c1"># dth/dt</span>
+    <span class="n">a</span> <span class="o">*</span> <span class="n">ca</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">ca</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span>  <span class="c1"># dth_dot/dt</span>
+<span class="p">)</span>
+
+<span class="c1"># Pack the ODE system into a dictionary</span>
+<span class="n">pendulumModel</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">ca</span><span class="o">.</span><span class="n">vertcat</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">thDot</span><span class="p">),</span> <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">u</span><span class="p">,</span> <span class="s1">&#39;ode&#39;</span><span class="p">:</span> <span class="n">rhs</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Multiple-Shooting-Approach">
+<h2>Multiple Shooting Approach<a class="headerlink" href="#Multiple-Shooting-Approach" title="Link to this heading"></a></h2>
+<p>In direct optimal control, we optimize directly over the states and controls of the system. Multiple shooting is a specific disrect optimal control technique that parameterizes the control input and the states, and solves the optimal control problem by optimizing the free parameters of the input and state trajectories. In this case, we will assume that the control signal is held constant between sample instances, and only consider the state vector at the sample points. We thus divide the time
+horizon into smaller intervals and optimize the states and controls at these collocation points (the sampling times).</p>
+<section id="Simulation-Parameters">
+<h3>Simulation Parameters<a class="headerlink" href="#Simulation-Parameters" title="Link to this heading"></a></h3>
+<p>Let’s define the simulation parameters including the total time horizon, number of control intervals, length of a control interval, and control limits.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Multiple Shooting Approach</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Total time horizon</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">T</span>  <span class="c1"># number of control intervals</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">T</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># Length of a control interval</span>
+<span class="n">ulim</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Control limits</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="CasADi's-Opti-Object">
+<h3>CasADi’s <code class="docutils literal notranslate"><span class="pre">Opti</span></code> Object<a class="headerlink" href="#CasADi's-Opti-Object" title="Link to this heading"></a></h3>
+<p>CasADi provides the <code class="docutils literal notranslate"><span class="pre">Opti</span></code> object to define and solve optimization problems. The <code class="docutils literal notranslate"><span class="pre">Opti</span></code> object allows a convenient mechanism to define nonlinear programming problems by specifying variables, objectives, constraints, and solvers. We use <code class="docutils literal notranslate"><span class="pre">Opti</span></code> to set up our optimal control problem.</p>
+</section>
+<section id="Define-Decision-Variables">
+<h3>Define Decision Variables<a class="headerlink" href="#Define-Decision-Variables" title="Link to this heading"></a></h3>
+<p>We define the state and control trajectories as decision variables in the optimization problem.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define decision variables</span>
+<span class="n">opti</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Opti</span><span class="p">()</span>           <span class="c1"># Instantiate on Opti object</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">opti</span><span class="o">.</span><span class="n">variable</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># State trajectory</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">opti</span><span class="o">.</span><span class="n">variable</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>    <span class="c1"># Control trajectory</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Objective-Function">
+<h3>Objective Function<a class="headerlink" href="#Objective-Function" title="Link to this heading"></a></h3>
+<p>The objective function defines the cost we want to minimize. In this case, we will use a quadratic cost function for the state and control trajectories. The cost function is given by:</p>
+<div class="math notranslate nohighlight">
+\[J = \sum_{k=0}^{N-1} \left( x_k^T Q x_k + u_k^T R u_k \right) + x_N^T Q_N x_N\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p>$ x_k $ is the state at time step $ k $.</p></li>
+<li><p>$ u_k $ is the control input at time step $ k $.</p></li>
+<li><p>$ Q $ and $ R $ are the state and control weight matrices, respectively.</p></li>
+<li><p>$ Q_N $ is the terminal state weight matrix.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Objective</span>
+<span class="n">Q</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">Q_N</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">x_k</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+    <span class="n">u_k</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+    <span class="n">cost</span> <span class="o">+=</span> <span class="n">ca</span><span class="o">.</span><span class="n">mtimes</span><span class="p">([</span><span class="n">x_k</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">x_k</span><span class="p">])</span> <span class="o">+</span> <span class="n">ca</span><span class="o">.</span><span class="n">mtimes</span><span class="p">([</span><span class="n">u_k</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">u_k</span><span class="p">])</span>
+
+<span class="c1"># Terminal cost</span>
+<span class="n">x_N</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">cost</span> <span class="o">+=</span> <span class="n">ca</span><span class="o">.</span><span class="n">mtimes</span><span class="p">([</span><span class="n">x_N</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Q_N</span><span class="p">,</span> <span class="n">x_N</span><span class="p">])</span>
+
+<span class="n">opti</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Discretizing-the-dynamics">
+<h3>Discretizing the dynamics<a class="headerlink" href="#Discretizing-the-dynamics" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>We will use the Ruge-Kutta method to transform the continuous-time model :nbsphinx-math:<a href="#id5"><span class="problematic" id="id6">`</span></a>begin{align*}</dt><dd><p>dot{x}(t) &amp;= f_c(x(t), u(t))</p>
+</dd>
+<dt>end{align*}` into a discrete-time model :nbsphinx-math:<a href="#id7"><span class="problematic" id="id8">`</span></a>begin{align*}</dt><dd><p>x_{k+1}&amp;= f(x_k, u_k)</p>
+</dd>
+</dl>
+<p>end{align*}` under the assumption that <span class="math notranslate nohighlight">\(u(t)\)</span> is constant across sampling periods of length dt. Later, we will use a convenience class for this integration. But now, we define it ourselves.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Function to perform one step of RK4 integration</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rk4_step</span><span class="p">(</span><span class="n">ode</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="n">k1</span> <span class="o">=</span> <span class="n">ode</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">k2</span> <span class="o">=</span> <span class="n">ode</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k1</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">k3</span> <span class="o">=</span> <span class="n">ode</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k2</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">k4</span> <span class="o">=</span> <span class="n">ode</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">k3</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">k1</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">k2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">k3</span> <span class="o">+</span> <span class="n">k4</span><span class="p">)</span>
+
+
+<span class="n">f_c</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;f_c&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]],</span> <span class="p">[</span><span class="n">rhs</span><span class="p">])</span>
+
+<span class="c1"># Define the RK4 integrator</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># time step</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]],</span> <span class="p">[</span><span class="n">rk4_step</span><span class="p">(</span><span class="n">f_c</span><span class="p">,</span> <span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">],</span> <span class="n">dt</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Constraints">
+<h3>Constraints<a class="headerlink" href="#Constraints" title="Link to this heading"></a></h3>
+<p>We will define the following constraints:</p>
+<ul class="simple">
+<li><p>Dynamic constraints: Ensure the state trajectory follows the system dynamics.</p></li>
+<li><p>Control constraints: Ensure the control inputs are within the specified limits.</p></li>
+<li><p>Boundary conditions: Specify the initial and final states of the pendulum.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Dynamic constraints</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">x_k</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+    <span class="n">u_k</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+    <span class="n">x_next</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x_k</span><span class="p">,</span> <span class="n">u_k</span><span class="p">)</span>
+    <span class="n">opti</span><span class="o">.</span><span class="n">subject_to</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">x_next</span><span class="p">)</span>
+
+<span class="c1"># Control constraints</span>
+<span class="n">opti</span><span class="o">.</span><span class="n">subject_to</span><span class="p">(</span><span class="n">opti</span><span class="o">.</span><span class="n">bounded</span><span class="p">(</span><span class="o">-</span><span class="n">ulim</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">ulim</span><span class="p">))</span>
+
+<span class="c1"># Boundary conditions</span>
+<span class="n">opti</span><span class="o">.</span><span class="n">subject_to</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>  <span class="c1"># Initial state</span>
+<span class="n">opti</span><span class="o">.</span><span class="n">subject_to</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>    <span class="c1"># Final state</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Initial-Guesses">
+<h3>Initial Guesses<a class="headerlink" href="#Initial-Guesses" title="Link to this heading"></a></h3>
+<p>Providing good initial guesses can help the solver converge more quickly. For the state trajectory, we will use linear interpolation from the initial state to the final state over the horizon, while for the control input we will just set it to zero. Note that this initialization is not consistent, and better initializations can be provided, as described in the lecture notes.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initial guesses</span>
+<span class="n">theta_init</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">theta_dot_init</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">opti</span><span class="o">.</span><span class="n">set_initial</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">theta_init</span><span class="p">)</span>
+<span class="n">opti</span><span class="o">.</span><span class="n">set_initial</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">theta_dot_init</span><span class="p">)</span>
+<span class="n">opti</span><span class="o">.</span><span class="n">set_initial</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Solver-Options">
+<h3>Solver Options<a class="headerlink" href="#Solver-Options" title="Link to this heading"></a></h3>
+<p>We will use the IPOPT solver and set its options to enable printing and increase the number of iterations.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Solver options to enable printing and increase iterations</span>
+<span class="n">p_opts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;print_time&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="n">s_opts</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;print_level&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;max_iter&#39;</span><span class="p">:</span> <span class="mi">5000</span>
+<span class="p">}</span>
+<span class="n">opti</span><span class="o">.</span><span class="n">solver</span><span class="p">(</span><span class="s1">&#39;ipopt&#39;</span><span class="p">,</span> <span class="n">p_opts</span><span class="p">,</span> <span class="n">s_opts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Solve-the-Problem">
+<h3>Solve the Problem<a class="headerlink" href="#Solve-the-Problem" title="Link to this heading"></a></h3>
+<p>We can now solve the optimization problem and extract the solution.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Solve the problem</span>
+<span class="n">sol</span> <span class="o">=</span> <span class="n">opti</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+<span class="c1"># Extract the solution</span>
+<span class="n">x_sol</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">u_sol</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit https://github.com/coin-or/Ipopt
+******************************************************************************
+
+Total number of variables............................:       92
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:        0
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:       64
+Total number of inequality constraints...............:       30
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:       30
+        inequality constraints with only upper bounds:        0
+
+
+Number of Iterations....: 44
+
+                                   (scaled)                 (unscaled)
+Objective...............:   7.1912709294040906e+02    7.1912709294040906e+02
+Dual infeasibility......:   2.2453150450019166e-11    2.2453150450019166e-11
+Constraint violation....:   2.7267077484793845e-13    2.7267077484793845e-13
+Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
+Complementarity.........:   2.5111846392001838e-09    2.5111846392001838e-09
+Overall NLP error.......:   2.5111846392001838e-09    2.5111846392001838e-09
+
+
+Number of objective function evaluations             = 160
+Number of objective gradient evaluations             = 45
+Number of equality constraint evaluations            = 160
+Number of inequality constraint evaluations          = 160
+Number of equality constraint Jacobian evaluations   = 45
+Number of inequality constraint Jacobian evaluations = 45
+Number of Lagrangian Hessian evaluations             = 44
+Total seconds in IPOPT                               = 0.083
+
+EXIT: Optimal Solution Found.
+      solver  :   t_proc      (avg)   t_wall      (avg)    n_eval
+       nlp_f  | 849.00us (  5.31us) 861.16us (  5.38us)       160
+       nlp_g  |   7.63ms ( 47.69us)   7.67ms ( 47.95us)       160
+  nlp_grad_f  | 403.00us (  8.76us) 378.08us (  8.22us)        46
+  nlp_hess_l  |  19.21ms (436.61us)  19.21ms (436.54us)        44
+   nlp_jac_g  |  10.34ms (224.83us)  10.25ms (222.84us)        46
+       total  |  83.65ms ( 83.65ms)  83.35ms ( 83.35ms)         1
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Plot-the-Results">
+<h2>Plot the Results<a class="headerlink" href="#Plot-the-Results" title="Link to this heading"></a></h2>
+<p>Finally, we will plot the state and control trajectories.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Time grid for plotting</span>
+<span class="n">t_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Extend the control signal for plotting</span>
+<span class="n">u_sol_extended</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u_sol</span><span class="p">,</span> <span class="n">u_sol</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Create the figure and subplots</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+<span class="c1"># Plot the state trajectories on the first subplot</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_grid</span><span class="p">,</span> <span class="n">x_sol</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;theta&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_grid</span><span class="p">,</span> <span class="n">x_sol</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;theta_dot&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1">#ax1.set_xlabel(&#39;Time [s]&#39;)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;State&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">])</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;State Trajectories&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+<span class="c1"># Set grid steps</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mf">0.2</span><span class="p">))</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Plot the control trajectory on the second subplot</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">t_grid</span><span class="p">,</span> <span class="n">u_sol_extended</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time [s]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Control&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">])</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Control&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+<span class="c1"># Set grid steps</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mf">0.2</span><span class="p">))</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Set tick font size</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+<span class="c1"># Adjust layout</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;Figures/pendulum_swingup_multiple_shooting.pdf&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">)</span>
+
+<span class="c1"># Show the plots</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_multiple_shooting_pendulum_swingup_19_0.png" src="../_images/examples_multiple_shooting_pendulum_swingup_19_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="invariant_sets.html" class="btn btn-neutral float-left" title="A few notes on control invariant sets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nonlinear_tracking_heat_exchanger.html" class="btn btn-neutral float-right" title="Non-linear Tracking MPC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

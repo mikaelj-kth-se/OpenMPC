@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mpc.linear_mpc &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">mpc.linear_mpc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mpc.linear_mpc</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cvxpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.mpc.parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPCParameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.invariant_sets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Polytope</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.support</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constraint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearSystem</span>
+
+<div class="viewcode-block" id="MPC">
+<a class="viewcode-back" href="../../mpc.html#mpc.linear_mpc.MPC">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MPC</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MPC controller class for linear systems.</span>
+
+<span class="sd">    The MPC class is supposed to create a controller minimizing the following optimal control problem </span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        &amp;\min_{x,u} \sum_{t=0}^{N-1} (x_t^T Q x_t + u_t^T R u_t) + x_N^T Q_T x_N\\</span>
+<span class="sd">        &amp;\text{s.t.} \\</span>
+<span class="sd">        &amp;x_{t+1} = A x_t + B u_t \\</span>
+<span class="sd">        &amp;H_u u_t \leq h_u \\</span>
+<span class="sd">        &amp;H_x x_t \leq h_x \\</span>
+<span class="sd">        &amp;H_y (C x_t + D u_t) \leq h_y \\</span>
+<span class="sd">        &amp;x_0 = x_0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpc_params</span> <span class="p">:</span> <span class="n">MPCParameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        MPC controller class for linear systems.</span>
+
+<span class="sd">        :param mpc_params: The parameters for the MPC controller.</span>
+<span class="sd">        :type mpc_params: MPCParameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Extract MPC parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span>               <span class="o">=</span> <span class="n">mpc_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span>               <span class="p">:</span> <span class="n">LinearSystem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">get_system_matrices</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span>                    <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span>                    <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span>                    <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">horizon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span>                    <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span>                    <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">R</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QT</span>                   <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QT</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_constraints</span>         <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u_constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span>         <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">x_constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span>         <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">y_constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_constraints</span>  <span class="p">:</span> <span class="n">Constraint</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">terminal_constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_penalty_weight</span> <span class="p">:</span> <span class="nb">float</span>            <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">global_penalty_weight</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver</span>               <span class="p">:</span> <span class="nb">str</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">solver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span>        <span class="p">:</span> <span class="nb">float</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">slack_penalty</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span>         <span class="p">:</span> <span class="n">Polytope</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">terminal_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_controller</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dual_mode_controller</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span>    <span class="p">:</span> <span class="nb">int</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dual_mode_horizon</span>
+
+        <span class="c1"># Define optimization variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span>  <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u</span>  <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x0</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Initial state parameter</span>
+
+        
+        <span class="c1"># Set up the MPC problem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_problem</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up of the MPC constraints and cost functions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost</span>        <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">slack_variables</span>  <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># To collect slack variables for soft constraints</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">]</span> <span class="c1"># initial state constraints</span>
+        
+        <span class="c1"># Main MPC horizon loop</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">):</span>
+            <span class="c1"># Add the stage cost</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">)</span> <span class="o">+</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span> <span class="n">t</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>
+            
+            <span class="c1"># System dynamics</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="nd">@self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]]</span>
+            
+            <span class="c1"># Add input constraints</span>
+            <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_constraints</span><span class="p">:</span>
+                <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">constraint</span><span class="o">.</span><span class="n">is_hard</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Single slack variable for all inequalities in this constraint</span>
+                    <span class="n">slack</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">nonneg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">slack_variables</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">slack</span><span class="p">,</span> <span class="n">constraint</span><span class="o">.</span><span class="n">penalty_weight</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">slack</span><span class="p">]</span>
+
+            <span class="c1"># Add state constraints </span>
+            <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span><span class="p">:</span>
+                <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">constraint</span><span class="o">.</span><span class="n">is_hard</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Single slack variable for all inequalities in this constraint</span>
+                    <span class="n">slack</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">nonneg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">slack_variables</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">slack</span><span class="p">,</span> <span class="n">constraint</span><span class="o">.</span><span class="n">penalty_weight</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">slack</span><span class="p">]</span>
+
+            <span class="c1"># Add output constraints</span>
+            <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span><span class="p">:</span>
+                <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">constraint</span><span class="o">.</span><span class="n">is_hard</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="o">@</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span> <span class="n">t</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Single slack variable for all inequalities in this constraint</span>
+                    <span class="n">slack</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">nonneg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">slack_variables</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">slack</span><span class="p">,</span> <span class="n">constraint</span><span class="o">.</span><span class="n">penalty_weight</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="o">@</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span> <span class="n">t</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">slack</span><span class="p">]</span>
+
+        
+        <span class="c1"># Dual mode implementation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">:</span>
+            <span class="c1"># Predict states using the dual mode controller beyond the main horizon</span>
+            <span class="n">x_dual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span>  <span class="c1"># Initial state for the dual mode phase</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span><span class="p">):</span>
+                <span class="c1"># Compute control using the dual mode controller</span>
+                <span class="n">u_dual</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_controller</span> <span class="o">@</span> <span class="n">x_dual</span>
+
+                <span class="c1"># Add state update for the dual mode</span>
+                <span class="n">x_next</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x_next</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="nd">@x_dual</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">@</span> <span class="n">u_dual</span><span class="p">]</span>
+                <span class="n">x_dual</span> <span class="o">=</span> <span class="n">x_next</span>
+
+                <span class="c1"># Add state and input constraints during dual mode</span>
+                <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span><span class="p">:</span>
+                    <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@x_dual</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_constraints</span><span class="p">:</span>
+                    <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@u_dual</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+                
+                <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span><span class="p">:</span>
+                    <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="o">@</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">@</span> <span class="n">x_dual</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">@</span> <span class="n">u_dual</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+
+            <span class="c1"># Apply terminal cost and constraints at the end of the dual mode horizon</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="n">x_dual</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">QT</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="p">:</span>
+                <span class="n">H_terminal</span><span class="p">,</span> <span class="n">b_terminal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="o">.</span><span class="n">b</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H_terminal</span> <span class="o">@</span> <span class="n">x_dual</span> <span class="o">&lt;=</span> <span class="n">b_terminal</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Apply terminal cost and constraints at the end of the main horizon (if no dual mode is specified)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">QT</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="p">:</span>
+                <span class="n">H_terminal</span><span class="p">,</span> <span class="n">b_terminal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="o">.</span><span class="n">b</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H_terminal</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b_terminal</span><span class="p">]</span>
+
+        <span class="c1"># Add slack penalties to the cost function</span>
+        <span class="k">for</span> <span class="n">slack</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="ow">in</span> <span class="n">slack_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span> <span class="o">==</span> <span class="s1">&#39;LINEAR&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_penalty_weight</span> <span class="o">*</span> <span class="n">penalty_weight</span> <span class="o">*</span> <span class="n">slack</span>  <span class="c1"># Linear penalty</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span> <span class="o">==</span> <span class="s1">&#39;SQUARE&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_penalty_weight</span> <span class="o">*</span> <span class="n">penalty_weight</span> <span class="o">*</span> <span class="n">cp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">slack</span><span class="p">)</span>  <span class="c1"># Quadratic penalty</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid slack penalty type. Must be &#39;LINEAR&#39; or &#39;SQUARE&#39;.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create the problem instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">problem</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">Minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cost</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MPC.compute">
+<a class="viewcode-back" href="../../mpc.html#mpc.linear_mpc.MPC.compute">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the optimal control action for a given initial state.</span>
+
+<span class="sd">        :param x0: The initial state.</span>
+<span class="sd">        :type x0: np.ndarray</span>
+<span class="sd">        :return: The optimal state and control trajectories.</span>
+<span class="sd">        :rtype: tuple</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+          
+        <span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">x0</span>
+        <span class="c1"># Use the solver specified in the parameters; if None, cvxpy will select the default solver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">problem</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="MPC.get_control_action">
+<a class="viewcode-back" href="../../mpc.html#mpc.linear_mpc.MPC.get_control_action">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_control_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the first control action for a given initial state.</span>
+
+<span class="sd">        :param x0: The initial state.</span>
+<span class="sd">        :type x0: np.ndarray</span>
+<span class="sd">        :return: The first control action.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">u_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">u_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Return the first control input as a scalar</span></div>
+</div>
+
+
+
+
+
+<div class="viewcode-block" id="SetPointTrackingMPC">
+<a class="viewcode-back" href="../../mpc.html#mpc.linear_mpc.SetPointTrackingMPC">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SetPointTrackingMPC</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MPC controller class for set-point tracking of linear systems.</span>
+
+
+<span class="sd">    Main controller :</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        &amp;\min_{x,u} sum_{t=0}^{N-1} (x_t - x_{ref})^T Q (x_t - x_{ref}) + (u_t - u_{ref})^T R (u_t - u_{ref})\\</span>
+<span class="sd">        &amp;s.t.\\</span>
+<span class="sd">        &amp;x_{t+1} = A x_t + B u_t + B_d d_t\\</span>
+<span class="sd">        &amp;H_u u_t \leq h_u \\</span>
+<span class="sd">        &amp;H_x x_t \leq h_x \\</span>
+<span class="sd">        &amp;H_y (C x_t + D u_t) \leq h_y \\</span>
+<span class="sd">        &amp;x_0 = x_0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpc_params</span> <span class="p">:</span> <span class="n">MPCParameters</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the TrackingMPC with the given MPC parameters.</span>
+
+<span class="sd">        :param mpc_params: The parameters for the MPC.</span>
+<span class="sd">        :type mpc_params: MPCParameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Extract MPC parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span>              <span class="p">:</span> <span class="n">MPCParameters</span> <span class="o">=</span> <span class="n">mpc_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span>               <span class="p">:</span> <span class="n">LinearSystem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">get_system_matrices</span><span class="p">()</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span>                    <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span>                    <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span>                    <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">horizon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span>                    <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span>                    <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">R</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QT</span>                   <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QT</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_constraints</span>         <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u_constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span>         <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">x_constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span>         <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">y_constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_constraints</span>  <span class="p">:</span> <span class="n">Constraint</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">terminal_constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_penalty_weight</span> <span class="p">:</span> <span class="nb">float</span>            <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">global_penalty_weight</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver</span>               <span class="p">:</span> <span class="nb">str</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">solver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span>        <span class="p">:</span> <span class="nb">float</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">slack_penalty</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span>         <span class="p">:</span> <span class="n">Polytope</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">terminal_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_controller</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dual_mode_controller</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span>    <span class="p">:</span> <span class="nb">int</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dual_mode_horizon</span>
+
+
+        <span class="c1"># Tracking reference and siturbance parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span>       <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_output</span><span class="p">)</span>  <span class="c1"># Ensure r is a 1D array with appropriate shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span>       <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span>     <span class="c1"># Disturbance parameter</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_output</span><span class="p">)</span>        <span class="c1"># Initialize with a default value (e.g., zero)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span>
+
+        <span class="c1"># Disturbance matrices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Bd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">Bd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Cd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">Cd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span>
+        
+        <span class="c1"># Define decision variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span>     <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u</span>     <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_ref</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_ref</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x0</span>    <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Initial state parameter</span>
+
+        <span class="c1"># Option for soft tracking constraint from mpc_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soft_tracking</span>           <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">soft_tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tracking_penalty_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">tracking_penalty_weight</span>
+        
+        <span class="c1"># Define the slack variable if soft tracking is enabled</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">soft_tracking</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slack_tracking</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_output</span><span class="p">)</span>  <span class="c1"># Slack variable</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slack_tracking</span> <span class="o">=</span> <span class="kc">None</span>
+               
+        <span class="c1"># Set up the MPC tracking problem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_problem</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SetPointTrackingMPC.set_reference">
+<a class="viewcode-back" href="../../mpc.html#mpc.linear_mpc.SetPointTrackingMPC.set_reference">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_reference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the reference for tracking.</span>
+
+<span class="sd">        :param reference: The reference trajectory.</span>
+<span class="sd">        :type reference: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_output</span><span class="p">,)</span>  <span class="c1"># Explicitly set to correct shape</span></div>
+
+
+<div class="viewcode-block" id="SetPointTrackingMPC.set_disturbance">
+<a class="viewcode-back" href="../../mpc.html#mpc.linear_mpc.SetPointTrackingMPC.set_disturbance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_disturbance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disturbance</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the disturbance parameter if disturbances are defined (known disturbance entering the model).</span>
+
+<span class="sd">        :param disturbance: The disturbance.</span>
+<span class="sd">        :type disturbance: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+         
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">disturbance</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">]</span>
+
+        <span class="c1"># Steady-state reference constraints with or without disturbance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="nd">@self</span><span class="o">.</span><span class="n">x_ref</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_ref</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Bd</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_ref</span><span class="p">]</span>
+      
+        <span class="c1"># Tracking constraint with or without disturbance</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">soft_tracking</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_ref</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_ref</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cd</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack_tracking</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_ref</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_ref</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cd</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">]</span>
+   
+
+        <span class="c1"># Main MPC horizon loop</span>
+        <span class="n">slack_variables</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># To collect slack variables for other soft constraints</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">):</span>
+            <span class="c1"># Add the tracking cost</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_ref</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">)</span> <span class="o">+</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_ref</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>
+
+            <span class="c1"># System dynamics including disturbance if it exists</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="nd">@self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Bd</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">]</span>
+
+            <span class="c1"># Add input constraints</span>
+            <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_constraints</span><span class="p">:</span>
+                <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">constraint</span><span class="o">.</span><span class="n">is_hard</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">slack</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">nonneg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">slack_variables</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">slack</span><span class="p">,</span> <span class="n">constraint</span><span class="o">.</span><span class="n">penalty_weight</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">slack</span><span class="p">]</span>
+
+            <span class="c1"># Add state constraints</span>
+            <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span><span class="p">:</span>
+                <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">constraint</span><span class="o">.</span><span class="n">is_hard</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">slack</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">nonneg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">slack_variables</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">slack</span><span class="p">,</span> <span class="n">constraint</span><span class="o">.</span><span class="n">penalty_weight</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">slack</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span><span class="p">:</span>
+                <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">constraint</span><span class="o">.</span><span class="n">is_hard</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@self</span><span class="o">.</span><span class="n">C</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">slack</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">nonneg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">slack_variables</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">slack</span><span class="p">,</span> <span class="n">constraint</span><span class="o">.</span><span class="n">penalty_weight</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="o">@</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[:,</span><span class="n">t</span><span class="p">])</span>  <span class="o">&lt;=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">slack</span><span class="p">]</span>
+
+        <span class="c1"># Terminal cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_ref</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">QT</span><span class="p">)</span>
+
+        <span class="c1"># Terminal set constraint</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="p">:</span>
+            <span class="n">H_terminal</span><span class="p">,</span> <span class="n">b_terminal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="o">.</span><span class="n">b</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H_terminal</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b_terminal</span><span class="p">]</span>
+
+        <span class="c1"># Dual-mode implementation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span> <span class="p">:</span>
+            
+            <span class="c1"># Predict states using the dual-mode controller beyond the main horizon</span>
+            <span class="n">x_dual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span>  <span class="c1"># Initial state for the dual mode phase</span>
+            
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span><span class="p">):</span>
+                <span class="c1"># Compute control using the dual-mode controller</span>
+                <span class="n">u_dual</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_controller</span> <span class="o">@</span> <span class="p">(</span><span class="n">x_dual</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_ref</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_ref</span>
+
+                <span class="c1"># Add state update for the dual mode</span>
+                <span class="n">x_next</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x_next</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="nd">@x_dual</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">@</span> <span class="n">u_dual</span><span class="p">]</span>
+        
+                <span class="c1"># Add stage cost for the dual mode</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="n">x_dual</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_ref</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">)</span> <span class="o">+</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="n">u_dual</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_ref</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span>
+        
+                <span class="c1"># Update for the next iteration</span>
+                <span class="n">x_dual</span> <span class="o">=</span> <span class="n">x_next</span>
+
+                <span class="c1"># Add state and input constraints during dual mode</span>
+                <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span><span class="p">:</span>
+                    <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@x_dual</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_constraints</span><span class="p">:</span>
+                    <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="nd">@u_dual</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span><span class="p">:</span>
+                    <span class="n">H</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">to_polytope</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">H</span> <span class="o">@</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">@</span> <span class="n">x_dual</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">@</span> <span class="n">u_dual</span><span class="p">)</span>  <span class="o">&lt;=</span> <span class="n">b</span><span class="p">]</span>
+
+        
+        <span class="c1"># Add slack penalties for other soft constraints</span>
+        <span class="k">for</span> <span class="n">slack</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="ow">in</span> <span class="n">slack_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span> <span class="o">==</span> <span class="s1">&#39;LINEAR&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_penalty_weight</span> <span class="o">*</span> <span class="n">penalty_weight</span> <span class="o">*</span> <span class="n">slack</span>  <span class="c1"># Linear penalty</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span> <span class="o">==</span> <span class="s1">&#39;SQUARE&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_penalty_weight</span> <span class="o">*</span> <span class="n">penalty_weight</span> <span class="o">*</span> <span class="n">cp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">slack</span><span class="p">)</span>  <span class="c1"># Quadratic penalty</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid slack penalty type. Must be &#39;LINEAR&#39; or &#39;SQUARE&#39;.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create the problem instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">problem</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">Minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cost</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
+        
+
+<div class="viewcode-block" id="SetPointTrackingMPC.get_control_action">
+<a class="viewcode-back" href="../../mpc.html#mpc.linear_mpc.SetPointTrackingMPC.get_control_action">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_control_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">disturbance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the control action for a given state, reference, and optional disturbance.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_reference</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">disturbance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">has_disturbance</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_disturbance</span><span class="p">(</span><span class="n">disturbance</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">u_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">u_pred</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># Return the entire vector for the first control input</span></div>
+
+
+
+<div class="viewcode-block" id="SetPointTrackingMPC.compute">
+<a class="viewcode-back" href="../../mpc.html#mpc.linear_mpc.SetPointTrackingMPC.compute">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">x0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">problem</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">value</span></div>
+</div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,932 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Open-loop optimal control of a simple pendulum using single-shooting &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Swingup of a pendulum on a cart using nonlinear MPC" href="swingup_pendcart_nlmpc.html" />
+    <link rel="prev" title="Pendulum on Cart System with MPC Control" href="simpleMPC_invPend.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cessna_descent.html">Cessna aircraft descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="constraint_softening.html">Constraint softening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="discretization_notebook.html">Comparison of Discretization Schemes for a Simple Pendulum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="double_integrator.html">Double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helicopter.html">Helicopter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html">Basic Model Predictive Control in Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invariant_sets.html">A few notes on control invariant sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invariant_sets.html#A-basic-example">A basic example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invariant_sets.html#A-useful-control-invariant-set:-the-invariant-set-of-the-LQR-controller">A useful control invariant set: the invariant set of the LQR controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invariant_sets.html#The-maximal-control-invariant-set">The maximal control invariant set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="invariant_sets.html#The-initial-feasible-set-of-the-MPC-controller">The initial feasible set of the MPC controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple_shooting_pendulum_swingup.html">Open-loop optimal control of a simple pendulum using multiple-shooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nonlinear_tracking_heat_exchanger.html">Non-linear Tracking MPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Offsetfree_advanced.html">offset free NMPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="offset_free_mpc_heat_exchanger.html">Non-linear offset-free MPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="offset_free_simple.html">Simple offset-free MPC example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_tracking_aircraft.html">Reference tracking NMPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simpleMPC_invPend.html">Pendulum on Cart System with MPC Control</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Open-loop optimal control of a simple pendulum using single-shooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Pendulum-Model">Pendulum Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Single-Shooting-Approach">Single Shooting Approach</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Setting-up-the-single-shooting-formulation-using-CasADi's-Opti-Object">Setting up the single-shooting formulation using CasADi’s <code class="docutils literal notranslate"><span class="pre">Opti</span></code> Object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Define-Decision-Variables">Define Decision Variables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Objective-Function">Objective Function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Constraints">Constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Initial-Guesses">Initial Guesses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Solver-Options">Solver Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Solve-the-Problem">Solve the Problem</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Plot-the-Results">Plot the Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="swingup_pendcart_nlmpc.html">Swingup of a pendulum on a cart using nonlinear MPC</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">Open-loop optimal control of a simple pendulum using single-shooting</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/single_shooting_pendulum_swingup.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Open-loop-optimal-control-of-a-simple-pendulum-using-single-shooting">
+<h1>Open-loop optimal control of a simple pendulum using single-shooting<a class="headerlink" href="#Open-loop-optimal-control-of-a-simple-pendulum-using-single-shooting" title="Link to this heading"></a></h1>
+<p>In this notebook, we will perform open-loop optimal control of a simple pendulum using the single-shooting method in CasADi. The single-shooting method involves integrating the entire system dynamics over the time horizon using the control inputs as optimization variables.</p>
+<p>First, we will define the pendulum model and the necessary functions for integration and simulation. We will then set up the optimal control problem using CasADi’s <code class="docutils literal notranslate"><span class="pre">Opti</span></code> object, define the objective and constraints, choose a solver, and solve the problem. Finally, we will plot the results.</p>
+<section id="Pendulum-Model">
+<h2>Pendulum Model<a class="headerlink" href="#Pendulum-Model" title="Link to this heading"></a></h2>
+<p>The dynamics of the simple pendulum can be described using the following differential equations:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{align*}
+\dot{\theta} &amp;= \theta_{dot} \\
+\dot{\theta}_{dot} &amp;= \frac{m \cdot g \cdot l \cdot \sin(\theta) + m \cdot l \cdot \cos(\theta) \cdot u}{I + m \cdot l^2}
+\end{align*}\end{split}\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p>$ :nbsphinx-math:<a href="#id1"><span class="problematic" id="id2">`</span></a>theta <a href="#id3"><span class="problematic" id="id4">`</span></a>$ is the angle of the pendulum.</p></li>
+<li><p>$ <span class="math">\theta</span>_{dot} $ is the angular velocity.</p></li>
+<li><p>$ u $ is the control input (torque).</p></li>
+<li><p>$ m $ is the mass.</p></li>
+<li><p>$ l $ is the length of the pendulum.</p></li>
+<li><p>$ I $ is the moment of inertia.</p></li>
+<li><p>$ g $ is the acceleration due to gravity.</p></li>
+</ul>
+<p>Let’s define the pendulum model in CasADi.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">casadi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ca</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ticker</span>
+
+<span class="c1"># Pendulum parameters</span>
+<span class="n">m</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">l</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">I</span> <span class="o">=</span> <span class="mf">0.006</span>
+<span class="n">g</span> <span class="o">=</span> <span class="mf">9.81</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">m</span> <span class="o">*</span> <span class="n">g</span> <span class="o">*</span> <span class="n">l</span> <span class="o">/</span> <span class="p">(</span><span class="n">I</span> <span class="o">+</span> <span class="n">m</span> <span class="o">*</span> <span class="n">l</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">m</span> <span class="o">*</span> <span class="n">l</span> <span class="o">/</span> <span class="p">(</span><span class="n">I</span> <span class="o">+</span> <span class="n">m</span> <span class="o">*</span> <span class="n">l</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Define the ODE right-hand side function for the pendulum model</span>
+<span class="n">th</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s2">&quot;th&quot;</span><span class="p">)</span>
+<span class="n">thDot</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s2">&quot;thDot&quot;</span><span class="p">)</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>  <span class="c1"># Control input</span>
+
+<span class="n">rhs</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">vertcat</span><span class="p">(</span>
+    <span class="n">thDot</span><span class="p">,</span>            <span class="c1"># dth/dt</span>
+    <span class="n">a</span> <span class="o">*</span> <span class="n">ca</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">ca</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span>  <span class="c1"># dth_dot/dt</span>
+<span class="p">)</span>
+
+<span class="c1"># Pack the ODE system into a dictionary</span>
+<span class="n">pendulumModel</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">ca</span><span class="o">.</span><span class="n">vertcat</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">thDot</span><span class="p">),</span> <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">u</span><span class="p">,</span> <span class="s1">&#39;ode&#39;</span><span class="p">:</span> <span class="n">rhs</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Single-Shooting-Approach">
+<h2>Single Shooting Approach<a class="headerlink" href="#Single-Shooting-Approach" title="Link to this heading"></a></h2>
+<p>In single shooting, we optimize directly over the control inputs by integrating the entire system dynamics over the time horizon. Unlike multiple shooting, where the time horizon is divided into smaller intervals with states and controls optimized at each interval, single shooting integrates the dynamics in one go. This approach can be simpler to implement but may lead to more challenging optimization problems due to sensitivity to initial guesses and potential numerical instability.</p>
+<section id="Simulation-Parameters">
+<h3>Simulation Parameters<a class="headerlink" href="#Simulation-Parameters" title="Link to this heading"></a></h3>
+<p>Let’s define the simulation parameters including the total time horizon, number of control intervals, length of a control interval, and control limits.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Multiple Shooting Approach</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Total time horizon</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">T</span>  <span class="c1"># number of control intervals</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">T</span> <span class="o">/</span> <span class="n">N</span>  <span class="c1"># Length of a control interval</span>
+<span class="n">ulim</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Control limits</span>
+</pre></div>
+</div>
+</div>
+<p>We will also need to discretize the dynamics, just as before</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Function to perform one step of RK4 integration</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rk4_step</span><span class="p">(</span><span class="n">ode</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="n">k1</span> <span class="o">=</span> <span class="n">ode</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">k2</span> <span class="o">=</span> <span class="n">ode</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k1</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">k3</span> <span class="o">=</span> <span class="n">ode</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k2</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">k4</span> <span class="o">=</span> <span class="n">ode</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">k3</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">k1</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">k2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">k3</span> <span class="o">+</span> <span class="n">k4</span><span class="p">)</span>
+
+
+<span class="n">f_c</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;f_c&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]],</span> <span class="p">[</span><span class="n">rhs</span><span class="p">])</span>
+
+<span class="c1"># Define the RK4 integrator</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># time step</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]],</span> <span class="p">[</span><span class="n">rk4_step</span><span class="p">(</span><span class="n">f_c</span><span class="p">,</span> <span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">pendulumModel</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">],</span> <span class="n">dt</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Setting-up-the-single-shooting-formulation-using-CasADi's-Opti-Object">
+<h3>Setting up the single-shooting formulation using CasADi’s <code class="docutils literal notranslate"><span class="pre">Opti</span></code> Object<a class="headerlink" href="#Setting-up-the-single-shooting-formulation-using-CasADi's-Opti-Object" title="Link to this heading"></a></h3>
+<p>Just like we did for multiple-shooting, we will use <code class="docutils literal notranslate"><span class="pre">Opti</span></code> to set up our optimal control problem.</p>
+</section>
+<section id="Define-Decision-Variables">
+<h3>Define Decision Variables<a class="headerlink" href="#Define-Decision-Variables" title="Link to this heading"></a></h3>
+<p>We define the control trajectory as decision variables in the optimization problem.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define decision variables</span>
+<span class="n">opti_ss</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Opti</span><span class="p">()</span>            <span class="c1"># Instantiate an Opti object</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">opti_ss</span><span class="o">.</span><span class="n">variable</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>  <span class="c1"># Control trajectory</span>
+
+<span class="c1"># Initial state</span>
+<span class="n">X0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Objective-Function">
+<h3>Objective Function<a class="headerlink" href="#Objective-Function" title="Link to this heading"></a></h3>
+<p>We will use the same quadratic cost as in the multiple-shooting formulation. We use a CasADi MX variable to store the current state so that we can form the stage cost, but note that x_current is not an optimizion variable.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Objective</span>
+<span class="n">Q</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">Q_N</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">ulim</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Simulate the system using the control inputs and compute the cost</span>
+<span class="n">cost_ss</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">x_current</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">u_current</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+    <span class="n">x_next</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x_current</span><span class="p">,</span> <span class="n">u_current</span><span class="p">)</span>
+
+    <span class="n">cost_ss</span> <span class="o">+=</span> <span class="n">ca</span><span class="o">.</span><span class="n">mtimes</span><span class="p">([</span><span class="n">x_current</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">x_current</span><span class="p">])</span> <span class="o">+</span> <span class="n">ca</span><span class="o">.</span><span class="n">mtimes</span><span class="p">([</span><span class="n">u_current</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">u_current</span><span class="p">])</span>
+    <span class="n">x_current</span> <span class="o">=</span> <span class="n">x_next</span>
+
+<span class="c1"># Terminal cost</span>
+<span class="n">cost_ss</span> <span class="o">+=</span> <span class="n">ca</span><span class="o">.</span><span class="n">mtimes</span><span class="p">([</span><span class="n">x_current</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Q_N</span><span class="p">,</span> <span class="n">x_current</span><span class="p">])</span>
+
+<span class="n">opti_ss</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">cost_ss</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Constraints">
+<h3>Constraints<a class="headerlink" href="#Constraints" title="Link to this heading"></a></h3>
+<p>We will define the following constraints:</p>
+<ul class="simple">
+<li><p>Control constraints: ensure the control inputs are within the specified limits.</p></li>
+<li><p>Final state constraint: ensure the pendulum reaches the desired final state.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Control constraints</span>
+<span class="n">opti_ss</span><span class="o">.</span><span class="n">subject_to</span><span class="p">(</span><span class="n">opti_ss</span><span class="o">.</span><span class="n">bounded</span><span class="p">(</span><span class="o">-</span><span class="n">ulim</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">ulim</span><span class="p">))</span>
+
+<span class="c1"># Final state constraint</span>
+<span class="n">opti_ss</span><span class="o">.</span><span class="n">subject_to</span><span class="p">(</span><span class="n">x_current</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Initial-Guesses">
+<h3>Initial Guesses<a class="headerlink" href="#Initial-Guesses" title="Link to this heading"></a></h3>
+<p>Providing good initial guesses can help the solver converge more quickly. However, for single shooting, it can often be difficult to specify a good initial guess, so we will just use zero controls.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initial guesses</span>
+<span class="n">u_initial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">opti_ss</span><span class="o">.</span><span class="n">set_initial</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">u_initial</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Solver-Options">
+<h3>Solver Options<a class="headerlink" href="#Solver-Options" title="Link to this heading"></a></h3>
+<p>We will use the IPOPT solver and set its options to enable printing and increase the number of iterations.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Solver options to enable printing and increase iterations</span>
+<span class="n">p_opts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;print_time&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="n">s_opts</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;print_level&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s1">&#39;max_iter&#39;</span><span class="p">:</span> <span class="mi">10000</span>
+<span class="p">}</span>
+<span class="n">opti_ss</span><span class="o">.</span><span class="n">solver</span><span class="p">(</span><span class="s1">&#39;ipopt&#39;</span><span class="p">,</span> <span class="n">p_opts</span><span class="p">,</span> <span class="n">s_opts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Solve-the-Problem">
+<h3>Solve the Problem<a class="headerlink" href="#Solve-the-Problem" title="Link to this heading"></a></h3>
+<p>We can now solve the optimization problem and extract the solution.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sol</span> <span class="o">=</span> <span class="n">opti_ss</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+<span class="c1"># Extract the solution</span>
+<span class="n">u_sol</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+<span class="n">u_sol_reshaped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">u_sol</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># Ensure u_sol is correctly shaped as a 1-by-N array</span>
+
+<span class="c1"># The states are not decision variables, so we will have to simulate then on the dynamics</span>
+
+<span class="n">x_sol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">x_sol</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">X0</span>
+
+<span class="c1"># Simulate the state trajectory</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">xk</span> <span class="o">=</span> <span class="n">x_sol</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+    <span class="n">uk</span> <span class="o">=</span> <span class="n">u_sol_reshaped</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+    <span class="n">x_next</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xk</span><span class="p">,</span> <span class="n">uk</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># Compute the next state using the RK4 integrator</span>
+    <span class="n">x_sol</span><span class="p">[:,</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_next</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit https://github.com/coin-or/Ipopt
+******************************************************************************
+
+This is Ipopt version 3.14.11, running with linear solver MUMPS 5.4.1.
+
+Number of nonzeros in equality constraint Jacobian...:       60
+Number of nonzeros in inequality constraint Jacobian.:       30
+Number of nonzeros in Lagrangian Hessian.............:      465
+
+Total number of variables............................:       30
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:        0
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:        2
+Total number of inequality constraints...............:       30
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:       30
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  3.0595774e+02 3.14e+00 3.95e-01  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  4.9587161e+02 1.75e+00 3.94e+00  -1.0 1.09e+01    -  4.75e-01 4.53e-01h  2
+   2  5.6947246e+02 1.48e+00 3.80e+00  -1.0 9.09e+00    -  6.12e-01 1.44e-01h  3
+   3  6.2917070e+02 1.28e+00 3.56e+00  -1.0 7.76e+00    -  7.24e-01 1.27e-01h  3
+   4  6.8436246e+02 1.08e+00 3.21e+00  -1.0 9.65e+00    -  4.81e-01 1.31e-01h  3
+   5  7.1699135e+02 1.13e+00 2.89e+00  -1.0 1.11e+01    -  9.23e-01 9.78e-02h  3
+   6  7.4687938e+02 1.22e+00 4.87e+00  -1.0 1.41e+01    -  4.86e-01 1.03e-01h  3
+   7  7.5865436e+02 1.22e+00 6.11e+00  -1.0 1.49e+01    -  2.71e-01 5.77e-02h  4
+   8  7.6680017e+02 1.22e+00 1.14e+01  -1.0 1.48e+01    -  1.00e+00 4.64e-02h  4
+   9  7.7328645e+02 1.21e+00 1.09e+01  -1.0 1.45e+01    -  1.00e+00 4.18e-02h  4
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  10  7.8010232e+02 1.22e+00 9.93e+00  -1.0 1.59e+01    -  2.22e-01 4.67e-02h  4
+  11  1.0861003e+03 7.03e+00 2.36e+01  -1.0 1.87e+01    -  1.00e+00 3.83e-01w  1
+  12  9.2620912e+02 3.76e+00 6.28e+01  -1.0 8.56e+00    -  6.60e-01 1.00e+00w  1
+  13  9.5308023e+02 8.46e-01 7.03e+02  -1.0 1.34e+00   2.0 1.00e+00 1.00e+00h  1
+  14  9.7871190e+02 5.60e-01 3.41e+02  -1.0 1.71e+00   2.4 1.00e+00 4.49e-01h  1
+  15  1.0189069e+03 2.69e-01 9.04e+01  -1.0 1.01e+00   1.9 3.34e-01 1.00e+00h  1
+  16  1.0058255e+03 1.26e-03 1.52e+01  -1.0 2.77e-01   1.5 1.00e+00 1.00e+00f  1
+  17  9.3357131e+02 1.57e-01 9.77e+00  -1.0 8.11e+00    -  3.04e-01 1.00e+00f  1
+  18  9.2682430e+02 7.30e-01 1.01e+01  -1.0 1.74e+00    -  3.12e-01 1.00e+00f  1
+  19  8.9872873e+02 1.08e+00 2.66e+01  -1.0 6.47e+00    -  2.39e-01 1.00e+00F  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  20  8.5458890e+02 2.80e-01 8.95e+00  -1.0 1.11e+00    -  1.00e+00 1.00e+00f  1
+  21  8.5832348e+02 1.13e-02 2.83e+00  -1.0 2.70e-01   1.0 1.00e+00 1.00e+00h  1
+  22  8.5550063e+02 9.10e-02 3.32e+00  -1.0 6.86e+00    -  9.97e-02 7.60e-02f  4
+  23  8.5264120e+02 2.50e-01 4.05e+00  -1.0 6.98e+00    -  1.00e+00 1.02e-01f  4
+  24  8.5128785e+02 7.18e-01 8.91e+00  -1.0 5.28e+00    -  3.19e-01 2.50e-01f  3
+  25  8.1418209e+02 1.04e+00 1.18e+01  -1.0 3.07e+00    -  9.49e-01 1.00e+00F  1
+  26  8.3180454e+02 9.26e-01 8.07e+00  -1.0 1.13e+00    -  1.00e+00 1.00e+00h  1
+  27  8.0747494e+02 4.85e-01 8.70e+00  -1.0 1.93e+00    -  5.01e-01 1.00e+00F  1
+  28  8.0591107e+02 2.98e-01 1.09e+01  -1.0 1.22e+00    -  1.00e+00 1.00e+00H  1
+  29  8.0285871e+02 1.51e-01 8.46e+00  -1.0 9.27e-01    -  1.00e+00 1.00e+00F  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  30  7.9615153e+02 4.39e-01 1.36e+01  -1.0 1.41e+00    -  1.00e+00 1.00e+00F  1
+  31  7.9632555e+02 7.39e-02 6.49e+00  -1.0 8.16e-01    -  1.00e+00 1.00e+00H  1
+  32  7.8687784e+02 9.01e-01 1.57e+01  -1.0 1.75e+00    -  7.32e-01 1.00e+00F  1
+  33  7.9328531e+02 2.77e-01 3.18e+00  -1.0 4.37e-01    -  1.00e+00 1.00e+00h  1
+  34  7.9277227e+02 3.19e-01 4.01e+00  -1.0 2.53e+00    -  5.42e-01 1.25e-01f  4
+  35  7.9250602e+02 4.41e-01 6.51e+00  -1.0 1.95e+00    -  1.00e+00 2.50e-01f  3
+  36  7.8306587e+02 4.44e-01 1.50e+01  -1.0 1.14e+00    -  1.00e+00 1.00e+00F  1
+  37  7.8679458e+02 2.61e-01 4.52e+00  -1.0 3.93e-01    -  1.00e+00 1.00e+00h  1
+  38  7.7716057e+02 8.55e-01 2.61e+01  -1.0 1.54e+00    -  1.00e+00 1.00e+00F  1
+  39  7.8147926e+02 5.16e-02 1.61e+00  -1.0 2.27e-01    -  1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  40  7.8106094e+02 2.12e-02 8.75e-01  -1.0 1.95e-01   0.5 1.00e+00 1.00e+00f  1
+  41  7.8098191e+02 1.14e-01 2.92e+00  -1.7 1.05e+01    -  3.03e-01 3.01e-02f  5
+  42  7.8086553e+02 2.08e-01 5.21e+00  -1.7 2.83e+00    -  9.44e-01 1.25e-01f  4
+  43  7.7164767e+02 1.38e+00 2.12e+01  -1.7 1.64e+00    -  1.00e+00 1.00e+00F  1
+  44  7.7674878e+02 1.30e-01 9.21e-01  -1.7 2.33e-01    -  1.00e+00 1.00e+00h  1
+  45  7.7548802e+02 2.38e-02 5.24e+00  -1.7 4.46e-01   0.0 1.00e+00 1.00e+00F  1
+  46  7.7046221e+02 7.90e-01 2.41e+01  -1.7 1.27e+00    -  1.00e+00 1.00e+00F  1
+  47  7.7354334e+02 4.68e-02 9.41e-01  -1.7 1.69e-01    -  1.00e+00 1.00e+00h  1
+  48  7.6814404e+02 1.01e+00 2.26e+01  -1.7 1.08e+00  -0.4 1.00e+00 1.00e+00F  1
+  49  7.7171838e+02 1.01e-01 1.25e+00  -1.7 2.49e-01    -  1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  50  7.7171107e+02 1.74e-01 3.41e+00  -1.7 4.00e+00    -  5.40e-01 5.14e-02f  4
+  51  7.7156676e+02 2.09e-01 4.63e+00  -1.7 1.36e+00    -  1.00e+00 1.25e-01f  4
+  52  7.6563278e+02 1.11e+00 2.98e+01  -1.7 9.63e-01    -  1.00e+00 1.00e+00F  1
+  53  7.6873369e+02 4.11e-03 3.84e+00  -1.7 1.66e-01    -  1.00e+00 1.00e+00h  1
+  54  7.6778946e+02 6.16e-02 1.08e+01  -1.7 5.30e-01  -0.0 1.00e+00 1.00e+00F  1
+  55  7.6688995e+02 6.10e-02 1.38e+01  -1.7 6.05e-01    -  1.00e+00 1.00e+00F  1
+  56  7.6634058e+02 2.34e-02 9.52e+00  -1.7 3.69e-01    -  1.00e+00 1.00e+00F  1
+  57  7.6502360e+02 1.13e-01 2.02e+01  -1.7 6.57e-01    -  1.00e+00 1.00e+00F  1
+  58  7.6499026e+02 5.11e-03 4.76e+00  -1.7 2.48e-01    -  1.00e+00 1.00e+00H  1
+  59  7.6108890e+02 1.50e+00 3.87e+01  -1.7 1.26e+00    -  9.43e-01 1.00e+00F  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  60  7.6340234e+02 4.37e-02 4.12e+00  -1.7 1.05e-01   0.4 1.00e+00 1.00e+00h  1
+  61  7.6214280e+02 1.76e-01 2.16e+01  -1.7 5.73e-01  -0.1 1.00e+00 1.00e+00F  1
+  62  7.6271517e+02 7.41e-02 3.14e+00  -1.7 3.18e-01    -  1.00e+00 1.00e+00h  1
+  63  7.6268345e+02 1.41e-01 5.91e+00  -1.7 1.56e+00    -  1.00e+00 1.25e-01f  4
+  64  7.5963800e+02 4.77e-01 3.93e+01  -1.7 7.81e-01    -  1.00e+00 1.00e+00F  1
+  65  7.6096842e+02 8.64e-03 6.58e-01  -1.7 4.06e-02   0.4 1.00e+00 1.00e+00h  1
+  66  7.6016362e+02 5.76e-02 1.63e+01  -1.7 3.83e-01  -0.1 1.00e+00 1.00e+00F  1
+  67  7.5991085e+02 9.07e-03 7.57e+00  -1.7 3.14e-01    -  1.00e+00 1.00e+00H  1
+  68  7.5862395e+02 1.72e-01 3.27e+01  -1.7 5.14e-01    -  1.00e+00 1.00e+00F  1
+  69  7.5908293e+02 2.34e-02 1.17e+00  -1.7 8.22e-02  -0.6 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  70  7.5902262e+02 4.98e-02 2.14e+00  -1.7 5.44e+00    -  4.21e-01 1.70e-02f  5
+  71  7.5895681e+02 7.75e-02 3.58e+00  -1.7 1.96e+00    -  1.00e+00 5.14e-02f  5
+  72  7.5891243e+02 1.30e-01 6.49e+00  -1.7 1.19e+00    -  1.00e+00 1.25e-01f  4
+  73  7.5647360e+02 4.09e-01 4.98e+01  -1.7 7.02e-01    -  1.00e+00 1.00e+00F  1
+  74  7.5744237e+02 6.99e-03 1.50e+00  -1.7 3.14e-02   0.7 1.00e+00 1.00e+00h  1
+  75  7.5720011e+02 3.31e-03 4.83e+00  -1.7 1.76e-01   0.3 1.00e+00 1.00e+00F  1
+  76  7.5512256e+02 1.57e+00 6.76e+01  -1.7 1.02e+00    -  1.00e+00 1.00e+00F  1
+  77  7.5604986e+02 3.64e-02 1.06e+01  -1.7 3.53e-02   1.6 1.00e+00 1.00e+00h  1
+  78  7.5617128e+02 1.90e-03 7.90e-01  -1.7 6.07e-02   1.1 1.00e+00 1.00e+00h  1
+  79  7.5606827e+02 1.67e-02 1.00e+00  -1.7 5.74e-02   0.6 1.00e+00 1.00e+00f  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  80  7.5604158e+02 7.74e-02 4.71e+00  -1.7 5.76e+00    -  7.45e-01 2.67e-02f  6
+  81  7.5327512e+02 8.36e-01 1.05e+02  -1.7 1.11e+00    -  1.00e+00 1.00e+00F  1
+  82  7.5458367e+02 7.18e-03 5.72e+00  -1.7 1.99e-02   2.0 1.00e+00 1.00e+00h  1
+  83  7.5458966e+02 2.81e-04 3.14e-01  -1.7 1.02e-02   1.5 1.00e+00 1.00e+00h  1
+  84  7.5454137e+02 4.58e-02 2.94e+00  -1.7 1.22e+02    -  1.33e-02 1.09e-03f  6
+  85  7.5446735e+02 7.44e-02 4.78e+00  -1.7 1.72e+00    -  1.00e+00 6.25e-02f  5
+  86  7.5305989e+02 1.77e+00 8.34e+01  -1.7 1.05e+00    -  1.00e+00 1.00e+00F  1
+  87  7.5298842e+02 1.57e-02 8.44e+00  -1.7 3.52e-02   1.0 1.00e+00 1.00e+00f  1
+  88  7.5299437e+02 1.24e-03 3.02e+00  -1.7 8.36e-02   0.5 1.00e+00 1.00e+00H  1
+  89  7.5292670e+02 2.57e-02 4.57e+00  -1.7 1.54e+00    -  1.00e+00 6.25e-02f  5
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  90  7.5189695e+02 1.74e+00 9.10e+01  -1.7 1.01e+00    -  1.00e+00 1.00e+00F  1
+  91  7.5171833e+02 4.47e-02 7.16e+00  -1.7 1.03e-02   1.9 1.00e+00 1.00e+00f  1
+  92  7.5188058e+02 5.54e-04 2.04e+00  -1.7 8.38e-02   1.4 1.00e+00 1.00e+00h  1
+  93  7.5182441e+02 2.40e-02 2.04e+00  -1.7 2.84e+01    -  6.02e-02 2.99e-03f  6
+  94  7.5177931e+02 2.84e-02 2.02e+00  -1.7 2.41e+00    -  1.00e+00 1.56e-02f  7
+  95  7.5171762e+02 4.11e-02 2.91e+00  -1.7 2.03e+00    -  8.85e-01 3.12e-02f  6
+  96  7.5164779e+02 6.57e-02 4.68e+00  -1.7 1.42e+00    -  1.00e+00 6.25e-02f  5
+  97  7.5006725e+02 1.44e+00 1.09e+02  -1.7 8.82e-01    -  1.00e+00 1.00e+00F  1
+  98  7.5043556e+02 2.68e-02 1.48e+00  -1.7 1.10e-02   1.8 1.00e+00 1.00e+00h  1
+  99  7.5051434e+02 6.64e-04 1.01e+00  -1.7 4.65e-02   1.3 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 100  7.5046237e+02 1.70e-02 1.28e+00  -1.7 3.02e+01    -  6.54e-02 2.11e-03f  6
+ 101  7.5040713e+02 3.24e-02 2.43e+00  -1.7 2.93e+00    -  1.00e+00 2.10e-02f  6
+ 102  7.5035270e+02 7.00e-02 5.35e+00  -1.7 1.55e+00    -  1.00e+00 6.25e-02f  5
+ 103  7.4837472e+02 9.70e-01 1.14e+02  -1.7 7.17e-01    -  1.00e+00 1.00e+00F  1
+ 104  7.4924883e+02 9.75e-03 1.10e+00  -1.7 1.08e-02   1.8 1.00e+00 1.00e+00h  1
+ 105  7.4925269e+02 9.99e-04 2.68e-01  -1.7 1.39e-02   1.3 1.00e+00 1.00e+00h  1
+ 106  7.4921874e+02 4.96e-02 4.06e+00  -1.7 5.75e+01    -  3.82e-02 1.68e-03f  5
+ 107  7.4918847e+02 1.14e-01 9.52e+00  -1.7 9.12e-01    -  1.00e+00 1.25e-01f  4
+ 108  7.4796574e+02 1.36e-01 6.42e+01  -1.7 3.89e-01    -  1.00e+00 1.00e+00F  1
+ 109  7.4819167e+02 6.88e-03 1.24e+00  -1.7 2.19e-02   0.8 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 110  7.4799536e+02 2.49e-03 7.53e+00  -1.7 1.40e-01   0.3 1.00e+00 1.00e+00F  1
+ 111  7.4659340e+02 4.12e-01 1.06e+02  -1.7 5.94e-01    -  1.00e+00 1.00e+00F  1
+ 112  7.4723283e+02 1.62e-03 8.20e-01  -1.7 4.79e-03   1.7 1.00e+00 1.00e+00h  1
+ 113  7.4719811e+02 2.00e-03 3.18e-01  -1.7 1.38e-02   1.2 1.00e+00 1.00e+00h  1
+ 114  7.4717683e+02 7.12e-02 6.64e+00  -1.7 3.18e+02    -  1.06e-02 3.89e-04f  5
+ 115  7.4540715e+02 8.16e-01 1.45e+02  -1.7 6.95e-01    -  1.00e+00 1.00e+00F  1
+ 116  7.4614115e+02 6.41e-03 7.97e-01  -1.7 1.97e-02   1.6 1.00e+00 1.00e+00h  1
+ 117  7.4611346e+02 2.92e-03 3.77e-01  -1.7 1.69e-02   1.1 1.00e+00 1.00e+00h  1
+ 118  7.4605786e+02 2.93e-02 2.87e+00  -1.7 5.08e+01    -  8.11e-02 1.55e-03f  7
+ 119  7.4601214e+02 8.47e-02 8.34e+00  -1.7 1.84e+00    -  1.00e+00 6.25e-02f  5
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 120  7.4442196e+02 3.98e-01 1.27e+02  -1.7 6.06e-01    -  1.00e+00 1.00e+00F  1
+ 121  7.4498949e+02 1.62e-03 7.07e-01  -1.7 5.27e-03   1.6 1.00e+00 1.00e+00h  1
+ 122  7.4494693e+02 4.39e-03 4.94e-01  -1.7 2.22e-02   1.1 1.00e+00 1.00e+00f  1
+ 123  7.4493035e+02 8.93e-02 9.16e+00  -1.7 1.34e+01    -  1.47e-01 1.06e-02f  6
+ 124  7.4353697e+02 2.85e-01 1.19e+02  -1.7 5.79e-01    -  1.00e+00 1.00e+00F  1
+ 125  7.4396372e+02 9.95e-04 6.11e-01  -1.7 5.43e-03   1.5 1.00e+00 1.00e+00h  1
+ 126  7.4391704e+02 5.81e-03 6.79e-01  -1.7 2.56e-02   1.0 1.00e+00 1.00e+00f  1
+ 127  7.4388087e+02 7.37e-02 7.76e+00  -1.7 7.73e+00    -  1.82e-01 1.62e-02f  6
+ 128  7.4232267e+02 5.17e-01 1.54e+02  -1.7 6.74e-01    -  1.00e+00 1.00e+00F  1
+ 129  7.4290277e+02 2.56e-03 9.16e-01  -1.7 1.30e-02   1.5 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 130  7.4285284e+02 7.56e-03 9.07e-01  -1.7 2.75e-02   1.0 1.00e+00 1.00e+00f  1
+ 131  7.4280593e+02 6.02e-02 6.49e+00  -1.7 5.12e+00    -  2.80e-01 2.07e-02f  6
+ 132  7.4137717e+02 9.00e-01 1.93e+02  -1.7 7.50e-01    -  1.00e+00 1.00e+00F  1
+ 133  7.4182610e+02 7.48e-04 1.18e+00  -1.7 4.65e-02   1.4 1.00e+00 1.00e+00h  1
+ 134  7.4177596e+02 4.10e-02 4.97e+00  -1.7 1.52e+01    -  1.11e-01 5.78e-03f  6
+ 135  7.4071094e+02 1.07e+00 3.27e+02  -1.7 9.08e-01    -  1.00e+00 1.00e+00F  1
+ 136  7.4073786e+02 8.99e-03 1.18e+01  -1.7 1.81e-02   1.8 1.00e+00 1.00e+00h  1
+ 137  7.4073204e+02 1.39e-03 3.88e-01  -1.7 1.72e-02   1.4 1.00e+00 1.00e+00h  1
+ 138  7.4068227e+02 3.13e-02 3.73e+00  -1.7 1.30e+01    -  1.45e-01 5.34e-03f  6
+ 139  7.4067573e+02 1.45e-01 1.77e+01  -1.7 1.07e+00    -  1.00e+00 1.25e-01f  4
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 140  7.3988669e+02 1.60e-02 4.30e+01  -1.7 2.11e-01    -  1.00e+00 1.00e+00F  1
+ 141  7.3988001e+02 5.92e-03 8.23e-01  -1.7 2.27e-02   0.9 1.00e+00 1.00e+00h  1
+ 142  7.3983111e+02 3.06e-02 3.68e+00  -1.7 5.30e+00    -  3.69e-01 1.12e-02f  6
+ 143  7.3978104e+02 6.01e-02 7.46e+00  -1.7 1.08e+00    -  1.00e+00 6.25e-02f  5
+ 144  7.3851561e+02 5.48e-01 2.11e+02  -1.7 5.57e-01    -  1.00e+00 1.00e+00F  1
+ 145  7.3898566e+02 2.10e-03 4.45e+00  -1.7 2.59e-02   2.2 1.00e+00 1.00e+00h  1
+ 146  7.3893180e+02 2.90e-02 8.00e+00  -1.7 8.91e-01    -  1.00e+00 6.25e-02f  5
+ 147  7.3771723e+02 5.37e-01 2.41e+02  -1.7 4.81e-01    -  1.00e+00 1.00e+00F  1
+ 148  7.3815861e+02 2.15e-03 1.40e+00  -1.7 2.62e-02   1.7 1.00e+00 1.00e+00h  1
+ 149  7.3813079e+02 7.23e-02 1.07e+01  -1.7 8.89e+00    -  2.87e-01 1.03e-02f  5
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 150  7.3715218e+02 1.84e-01 1.64e+02  -1.7 3.71e-01    -  1.00e+00 1.00e+00F  1
+ 151  7.3730023e+02 6.99e-02 1.19e+01  -1.7 5.03e-02   1.2 1.00e+00 1.00e+00h  1
+ 152  7.3732380e+02 1.86e-02 2.85e+00  -1.7 6.81e-02   0.8 1.00e+00 1.00e+00h  1
+ 153  7.3563667e+02 6.08e-02 1.08e+03  -1.7 1.67e+00    -  1.00e+00 1.00e+00F  1
+ 154  7.3634855e+02 1.73e-04 5.92e+02  -1.7 5.84e-01   3.0 1.00e+00 1.00e+00h  1
+ 155  7.3634225e+02 3.41e-06 5.03e-01  -1.7 1.49e-03   2.5 1.00e+00 1.00e+00h  1
+ 156  7.3632496e+02 4.62e-05 3.84e-01  -1.7 3.42e-03   2.1 1.00e+00 1.00e+00f  1
+ 157  7.3627648e+02 4.84e-04 3.73e-01  -1.7 9.98e-03   1.6 1.00e+00 1.00e+00f  1
+ 158  7.3615608e+02 5.21e-03 8.23e-01  -1.7 2.76e-02   1.1 1.00e+00 1.00e+00f  1
+ 159  7.3610295e+02 4.87e-02 7.81e+00  -1.7 6.88e+00    -  6.03e-01 1.14e-02f  7
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 160  7.3468350e+02 8.63e-01 3.49e+02  -1.7 6.13e-01    -  1.00e+00 1.00e+00F  1
+ 161  7.3485235e+02 5.88e-03 8.97e+01  -1.7 1.00e-01   2.4 1.00e+00 1.00e+00h  1
+ 162  7.3485667e+02 1.00e-04 8.28e-01  -1.7 9.33e-03   1.9 1.00e+00 1.00e+00h  1
+ 163  7.3480752e+02 3.63e-02 6.16e+00  -1.7 7.11e+01    -  3.36e-02 1.02e-03f  7
+ 164  7.3358167e+02 5.89e-01 5.68e+02  -1.7 8.24e-01    -  1.00e+00 1.00e+00F  1
+ 165  7.3383731e+02 2.22e-03 6.15e+00  -1.7 3.73e-03   2.4 1.00e+00 1.00e+00h  1
+ 166  7.3382946e+02 1.56e-04 3.20e-01  -1.7 4.06e-03   1.9 1.00e+00 1.00e+00h  1
+ 167  7.3378134e+02 2.86e-02 4.92e+00  -1.7 2.98e+01    -  4.97e-02 2.12e-03f  7
+ 168  7.3374586e+02 1.40e-01 2.41e+01  -1.7 9.91e-01    -  1.00e+00 1.25e-01f  4
+ 169  7.3358240e+02 2.79e-01 4.78e+01  -1.7 1.87e-01    -  1.00e+00 1.00e+00f  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 170  7.3307777e+02 9.50e-04 3.88e-01  -1.7 1.22e-02   1.4 1.00e+00 1.00e+00f  1
+ 171  7.3306122e+02 1.02e-01 1.75e+01  -1.7 1.24e+01    -  9.85e-02 9.43e-03f  6
+ 172  7.3251512e+02 2.85e-02 7.87e+01  -1.7 3.45e-01    -  1.00e+00 1.00e+00F  1
+ 173  7.3234611e+02 1.50e-01 2.75e+01  -1.7 5.97e-02   0.9 1.00e+00 1.00e+00h  1
+ 174  7.3187701e+02 2.34e-01 1.62e+02  -1.7 3.25e-01   0.5 1.00e+00 1.00e+00H  1
+ 175  7.3206936e+02 2.39e-04 5.12e-01  -1.7 6.79e-03   1.8 1.00e+00 1.00e+00h  1
+ 176  7.3204539e+02 3.26e-04 3.92e-01  -1.7 1.81e-02   1.3 1.00e+00 1.00e+00f  1
+ 177  7.3202046e+02 8.25e-02 1.47e+01  -1.7 1.47e+01    -  1.02e-01 6.82e-03f  6
+ 178  7.3140453e+02 4.99e-02 1.07e+02  -1.7 4.19e-01    -  1.00e+00 1.00e+00F  1
+ 179  7.3144773e+02 1.38e-04 3.43e-01  -1.7 4.14e-03   1.7 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 180  7.3140824e+02 1.63e-02 2.81e+00  -1.7 5.17e+01    -  3.27e-02 8.49e-04f  7
+ 181  7.3137734e+02 8.41e-02 1.52e+01  -1.7 1.40e+00    -  1.00e+00 6.25e-02f  5
+ 182  7.3084285e+02 3.80e-02 1.08e+02  -1.7 2.38e-01    -  1.00e+00 1.00e+00F  1
+ 183  7.3086851e+02 1.16e-04 2.55e-01  -1.7 1.38e-02   1.3 1.00e+00 1.00e+00h  1
+ 184  7.3083454e+02 5.62e-02 1.06e+01  -1.7 1.17e+01    -  1.43e-01 6.61e-03f  6
+ 185  7.3012815e+02 1.70e-01 2.30e+02  -1.7 4.03e-01    -  1.00e+00 1.00e+00F  1
+ 186  7.3028361e+02 1.09e-04 4.85e-01  -1.7 5.11e-03   1.7 1.00e+00 1.00e+00h  1
+ 187  7.3025711e+02 3.31e-03 7.12e-01  -1.7 1.12e-02   1.2 1.00e+00 1.00e+00f  1
+ 188  7.3022293e+02 4.98e-02 9.79e+00  -1.7 4.17e+00    -  4.57e-01 1.60e-02f  6
+ 189  7.2947170e+02 2.36e-01 2.84e+02  -1.7 3.88e-01    -  1.00e+00 1.00e+00F  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 190  7.2966718e+02 4.33e-04 4.95e-01  -1.7 1.13e-02   1.6 1.00e+00 1.00e+00h  1
+ 191  7.2964123e+02 4.30e-03 9.08e-01  -1.7 1.27e-02   1.2 1.00e+00 1.00e+00f  1
+ 192  7.2960710e+02 4.27e-02 8.84e+00  -1.7 3.21e+00    -  6.30e-01 1.78e-02f  6
+ 193  7.2881732e+02 3.59e-01 3.55e+02  -1.7 4.14e-01    -  1.00e+00 1.00e+00F  1
+ 194  7.2905462e+02 6.32e-04 8.87e+00  -1.7 2.84e-02   2.5 1.00e+00 1.00e+00h  1
+ 195  7.2830876e+02 4.57e-01 4.50e+02  -1.7 4.01e-01    -  1.00e+00 1.00e+00F  1
+ 196  7.2853402e+02 1.13e-03 5.52e+00  -1.7 4.34e-02   2.0 1.00e+00 1.00e+00h  1
+ 197  7.2788969e+02 6.15e-01 8.68e+02  -1.7 5.88e-01    -  1.00e+00 1.00e+00F  1
+ 198  7.2796334e+02 2.21e-03 7.62e+00  -1.7 1.81e-03   2.4 1.00e+00 1.00e+00h  1
+ 199  7.2795853e+02 1.00e-04 3.60e-01  -1.7 3.91e-03   2.0 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 200  7.2792877e+02 2.76e-02 6.58e+00  -1.7 2.56e+01    -  1.12e-01 1.80e-03f  6
+ 201  7.2704537e+02 1.61e-01 7.25e+02  -1.7 5.14e-01    -  1.00e+00 1.00e+00F  1
+ 202  7.2717396e+02 1.12e-04 9.69e-01  -1.7 1.20e-03   2.4 1.00e+00 1.00e+00h  1
+ 203  7.2716672e+02 1.29e-04 1.96e-01  -1.7 2.16e-03   1.9 1.00e+00 1.00e+00h  1
+ 204  7.2714110e+02 4.34e-02 1.08e+01  -2.5 3.31e+01    -  9.46e-02 1.81e-03f  6
+ 205  7.2643206e+02 2.02e-01 3.43e+02  -2.5 3.43e-01    -  1.00e+00 1.00e+00F  1
+ 206  7.2658582e+02 1.81e-04 2.70e+00  -2.5 1.23e-02   2.3 1.00e+00 1.00e+00h  1
+ 207  7.2656741e+02 6.46e-02 1.78e+01  -2.5 3.96e+00    -  9.60e-01 1.88e-02f  6
+ 208  7.2617832e+02 2.99e-02 1.48e+02  -2.5 2.21e-01    -  1.00e+00 1.00e+00F  1
+ 209  7.2620234e+02 1.40e-04 2.26e-01  -2.5 2.28e-03   1.9 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 210  7.2617396e+02 1.76e-02 4.54e+00  -2.5 3.73e+01    -  1.10e-01 1.05e-03f  8
+ 211  7.2614508e+02 5.01e-02 1.30e+01  -2.5 8.73e-01    -  1.00e+00 6.25e-02f  5
+ 212  7.2567283e+02 1.01e-01 2.63e+02  -2.5 3.11e-01    -  1.00e+00 1.00e+00F  1
+ 213  7.2575750e+02 6.34e-05 6.35e-01  -2.5 3.27e-03   2.3 1.00e+00 1.00e+00h  1
+ 214  7.2573946e+02 6.20e-02 1.66e+01  -2.5 3.58e+01    -  9.80e-02 2.08e-03f  7
+ 215  7.2536100e+02 3.80e-02 1.71e+02  -2.5 2.34e-01    -  1.00e+00 1.00e+00F  1
+ 216  7.2539095e+02 1.63e-04 2.31e-01  -2.5 2.43e-03   1.8 1.00e+00 1.00e+00h  1
+ 217  7.2536521e+02 1.42e-02 3.80e+00  -2.5 2.14e+01    -  7.89e-02 1.66e-03f  8
+ 218  7.2534126e+02 5.87e-02 1.58e+01  -2.5 1.02e+00    -  1.00e+00 6.25e-02f  5
+ 219  7.2497432e+02 4.39e-02 1.84e+02  -2.5 2.56e-01    -  1.00e+00 1.00e+00F  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 220  7.2499609e+02 6.06e-03 2.24e+00  -2.5 1.12e-02   1.3 1.00e+00 1.00e+00h  1
+ 221  7.2497619e+02 1.67e-02 4.64e+00  -2.5 3.34e-02   0.9 1.00e+00 1.00e+00h  1
+ 222  7.2494919e+02 4.47e-02 1.23e+01  -2.5 8.31e-01    -  1.00e+00 6.25e-02f  5
+ 223  7.2450874e+02 1.08e-01 2.80e+02  -2.5 3.37e-01    -  1.00e+00 1.00e+00F  1
+ 224  7.2459198e+02 7.47e-05 5.64e-01  -2.5 3.68e-03   2.2 1.00e+00 1.00e+00h  1
+ 225  7.2457054e+02 4.37e-02 1.22e+01  -2.5 1.57e+01    -  7.99e-02 3.93e-03f  7
+ 226  7.2414165e+02 1.01e-01 2.79e+02  -2.5 2.92e-01    -  1.00e+00 1.00e+00F  1
+ 227  7.2421696e+02 2.05e-04 2.56e-01  -2.5 2.84e-03   1.7 1.00e+00 1.00e+00h  1
+ 228  7.2419595e+02 3.88e-02 1.08e+01  -2.5 1.47e+01    -  8.24e-02 3.89e-03f  7
+ 229  7.2375040e+02 1.43e-01 3.25e+02  -2.5 3.34e-01    -  1.00e+00 1.00e+00F  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 230  7.2385098e+02 1.10e-04 9.03e-01  -2.5 6.62e-03   2.1 1.00e+00 1.00e+00h  1
+ 231  7.2383086e+02 3.36e-02 9.66e+00  -2.5 7.94e+00    -  1.67e-01 6.61e-03f  7
+ 232  7.2337393e+02 1.86e-01 3.66e+02  -2.5 3.37e-01    -  1.00e+00 1.00e+00F  1
+ 233  7.2348734e+02 1.16e-03 1.11e+00  -2.5 9.44e-03   1.7 1.00e+00 1.00e+00h  1
+ 234  7.2347380e+02 3.05e-03 9.67e-01  -2.5 1.19e-02   1.2 1.00e+00 1.00e+00h  1
+ 235  7.2347278e+02 7.38e-02 2.12e+01  -2.5 2.39e+00    -  5.93e-01 3.12e-02f  6
+ 236  7.2323949e+02 7.15e-03 7.28e+01  -2.5 1.67e-01    -  1.00e+00 1.00e+00H  1
+ 237  7.2323900e+02 9.41e-05 1.51e-01  -2.5 3.21e-03   1.6 1.00e+00 1.00e+00h  1
+ 238  7.2322078e+02 2.62e-02 7.54e+00  -2.5 7.27e+00    -  2.12e-01 6.14e-03f  7
+ 239  7.2279462e+02 3.44e-01 4.77e+02  -2.5 3.71e-01    -  1.00e+00 1.00e+00F  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 240  7.2292483e+02 4.83e-04 3.11e+00  -2.5 2.88e-02   2.0 1.00e+00 1.00e+00h  1
+ 241  7.2291017e+02 4.36e-02 1.57e+01  -2.5 8.81e-01    -  1.00e+00 6.25e-02f  5
+ 242  7.2266729e+02 1.81e-02 1.28e+02  -2.5 1.70e-01    -  1.00e+00 1.00e+00F  1
+ 243  7.2267761e+02 2.34e-04 1.79e-01  -2.5 2.50e-03   1.6 1.00e+00 1.00e+00h  1
+ 244  7.2266252e+02 2.01e-02 6.01e+00  -2.5 5.58e+00    -  3.06e-01 6.59e-03f  7
+ 245  7.2246460e+02 6.18e-01 6.10e+02  -2.5 4.16e-01    -  1.00e+00 1.00e+00F  1
+ 246  7.2241582e+02 1.47e-03 1.85e+01  -2.5 6.98e-02   2.0 1.00e+00 1.00e+00h  1
+ 247  7.2222773e+02 6.72e-03 8.53e+01  -2.5 1.34e-01    -  1.00e+00 1.00e+00F  1
+ 248  7.2222944e+02 3.04e-04 2.07e-01  -2.5 3.93e-03   1.5 1.00e+00 1.00e+00h  1
+ 249  7.2221681e+02 1.54e-02 4.92e+00  -2.5 4.26e+00    -  4.38e-01 7.11e-03f  7
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 250  7.2190133e+02 1.30e-01 8.29e+02  -2.5 4.54e-01    -  1.00e+00 1.00e+00F  1
+ 251  7.2198064e+02 4.98e-05 8.25e-01  -2.5 5.12e-04   2.8 1.00e+00 1.00e+00h  1
+ 252  7.2197933e+02 7.21e-06 1.37e-01  -2.5 6.04e-04   2.4 1.00e+00 1.00e+00h  1
+ 253  7.2196841e+02 1.19e-02 3.98e+00  -2.5 5.09e+00    -  4.02e-01 5.00e-03f  7
+ 254  7.2172552e+02 5.12e-01 1.04e+03  -2.5 4.81e-01    -  1.00e+00 1.00e+00F  1
+ 255  7.2171832e+02 1.24e-03 5.53e+00  -2.5 6.87e-04   2.8 1.00e+00 1.00e+00h  1
+ 256  7.2171793e+02 8.52e-06 3.92e-01  -2.5 1.94e-03   2.3 1.00e+00 1.00e+00h  1
+ 257  7.2171566e+02 3.59e-02 1.28e+01  -2.5 5.19e+00    -  4.20e-01 8.00e-03f  6
+ 258  7.2141272e+02 2.40e-02 1.57e+02  -2.5 1.86e-01    -  1.00e+00 1.00e+00F  1
+ 259  7.2142859e+02 6.23e-05 1.06e-01  -2.5 1.22e-03   1.8 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 260  7.2142024e+02 7.75e-03 2.73e+00  -2.5 5.44e+00    -  4.07e-01 3.43e-03f  7
+ 261  7.2141179e+02 1.52e-02 5.43e+00  -2.5 6.00e-01    -  1.00e+00 3.12e-02h  6
+ 262  7.2133923e+02 5.94e-01 6.27e+02  -2.5 3.22e-01    -  1.00e+00 1.00e+00F  1
+ 263  7.2125605e+02 1.70e-03 2.77e+01  -2.5 4.93e-02   2.3 1.00e+00 1.00e+00h  1
+ 264  7.2119362e+02 4.78e-02 1.79e+01  -2.5 1.20e-01    -  1.00e+00 1.00e+00f  1
+ 265  7.2114741e+02 6.86e-02 2.58e+01  -2.5 1.64e-01    -  1.00e+00 1.00e+00h  1
+ 266  7.2122255e+02 1.34e-02 3.51e+02  -2.5 1.13e-01    -  1.00e+00 1.00e+00H  1
+ 267  7.2121059e+02 7.53e-04 7.15e-01  -2.5 6.03e-03   1.8 1.00e+00 1.00e+00h  1
+ 268  7.2120281e+02 1.17e-02 4.64e+00  -2.5 2.32e+01    -  1.08e-01 1.05e-03f  6
+ 269  7.2113945e+02 2.67e-01 6.48e+02  -2.5 5.31e-01    -  1.00e+00 1.00e+00F  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 270  7.2081999e+02 1.77e-04 7.25e-01  -2.5 4.52e-03   2.2 1.00e+00 1.00e+00h  1
+ 271  7.2081498e+02 1.59e-02 6.11e+00  -2.5 2.37e+03    -  1.28e-03 1.19e-05f  6
+ 272  7.2057627e+02 3.15e-01 5.07e+02  -2.5 2.49e-01    -  1.00e+00 1.00e+00F  1
+ 273  7.2065361e+02 3.40e-04 7.60e+00  -2.5 1.51e-02   2.6 1.00e+00 1.00e+00h  1
+ 274  7.2044548e+02 1.40e-01 3.86e+02  -2.5 2.30e-01    -  1.00e+00 1.00e+00F  1
+ 275  7.2051423e+02 6.47e-05 4.52e-01  -2.5 3.19e-03   2.2 1.00e+00 1.00e+00h  1
+ 276  7.2050920e+02 1.23e-02 4.96e+00  -2.5 1.25e+01    -  2.81e-01 2.03e-03f  6
+ 277  7.2033681e+02 4.68e-02 7.19e+02  -2.5 3.30e-01    -  1.00e+00 1.00e+00F  1
+ 278  7.2036597e+02 6.73e-06 1.80e-01  -2.5 3.20e-04   2.6 1.00e+00 1.00e+00h  1
+ 279  7.2036519e+02 2.32e-02 9.57e+00  -2.5 4.37e+01    -  8.83e-02 8.12e-04f  6
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 280  7.2019976e+02 4.56e-02 2.27e+02  -2.5 1.69e-01    -  1.00e+00 1.00e+00F  1
+ 281  7.2022690e+02 1.78e-05 9.47e-02  -2.5 5.39e-04   2.1 1.00e+00 1.00e+00h  1
+ 282  7.2022302e+02 1.39e-02 5.85e+00  -2.5 1.01e+01    -  4.03e-01 2.74e-03f  7
+ 283  7.2004379e+02 2.88e-01 5.07e+02  -2.5 2.81e-01    -  1.00e+00 1.00e+00F  1
+ 284  7.2011369e+02 2.68e-04 3.98e+00  -2.5 1.18e-02   2.5 1.00e+00 1.00e+00h  1
+ 285  7.1992743e+02 2.02e-01 9.51e+02  -2.5 4.04e-01    -  1.00e+00 1.00e+00F  1
+ 286  7.1999996e+02 1.15e-04 1.46e+00  -2.5 4.39e-04   3.0 1.00e+00 1.00e+00h  1
+ 287  7.1999945e+02 1.97e-06 1.39e-01  -2.5 4.67e-04   2.5 1.00e+00 1.00e+00h  1
+ 288  7.1999882e+02 2.01e-02 8.88e+00  -2.5 5.64e+00    -  2.27e-01 5.99e-03f  8
+ 289  7.1982381e+02 4.46e-02 2.25e+02  -2.5 1.66e-01    -  1.00e+00 1.00e+00F  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 290  7.1984908e+02 2.01e-05 8.79e-02  -2.5 6.01e-04   2.0 1.00e+00 1.00e+00h  1
+ 291  7.1984832e+02 1.88e-02 8.30e+00  -2.5 5.73e+00    -  1.57e-01 5.71e-03f  8
+ 292  7.1973753e+02 5.23e-02 2.39e+02  -2.5 1.81e-01    -  1.00e+00 1.00e+00H  1
+ 293  7.1976549e+02 7.00e-05 1.89e-01  -2.5 1.70e-03   1.5 1.00e+00 1.00e+00h  1
+ 294  7.1976482e+02 1.73e-02 7.66e+00  -2.5 8.30e+00    -  9.40e-02 3.79e-03f  8
+ 295  7.1965284e+02 6.25e-02 2.56e+02  -2.5 1.89e-01    -  1.00e+00 1.00e+00H  1
+ 296  7.1968594e+02 2.40e-05 1.06e-01  -2.5 5.58e-04   1.9 1.00e+00 1.00e+00h  1
+ 297  7.1968537e+02 1.60e-02 7.17e+00  -2.5 4.58e+00    -  1.68e-01 6.55e-03f  8
+ 298  7.1957640e+02 6.63e-02 2.59e+02  -2.5 1.86e-01    -  1.00e+00 1.00e+00H  1
+ 299  7.1960765e+02 4.47e-03 2.48e+00  -2.5 6.69e-03   1.5 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 300  7.1960721e+02 1.11e-03 5.39e-01  -2.5 8.82e-03   1.0 1.00e+00 1.00e+00h  1
+ 301  7.1960508e+02 9.98e-03 4.58e+00  -2.5 1.43e+00    -  5.31e-01 1.56e-02f  7
+ 302  7.1948268e+02 2.81e-01 4.63e+02  -2.5 2.75e-01    -  1.00e+00 1.00e+00H  1
+ 303  7.1953624e+02 2.42e-04 1.61e+00  -2.5 7.66e-03   2.3 1.00e+00 1.00e+00h  1
+ 304  7.1953427e+02 1.10e-02 6.13e+00  -2.5 7.74e-01    -  1.00e+00 3.12e-02f  6
+ 305  7.1942287e+02 7.34e-02 2.59e+02  -2.5 1.79e-01    -  1.00e+00 1.00e+00H  1
+ 306  7.1945894e+02 2.71e-05 1.05e-01  -2.5 6.55e-04   1.8 1.00e+00 1.00e+00h  1
+ 307  7.1945814e+02 9.44e-03 4.29e+00  -2.5 2.89e+00    -  3.22e-01 7.81e-03f  8
+ 308  7.1934248e+02 2.05e-01 3.81e+02  -2.5 2.33e-01    -  1.00e+00 1.00e+00H  1
+ 309  7.1940160e+02 1.12e-04 6.25e-01  -2.5 3.35e-03   2.3 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 310  7.1940005e+02 4.41e-03 2.07e+00  -2.5 1.93e+00    -  5.35e-01 7.81e-03f  8
+ 311  7.1939919e+02 1.56e-02 7.28e+00  -2.5 3.90e-01    -  1.00e+00 6.25e-02h  5
+ 312  7.1933660e+02 2.04e-02 1.32e+02  -2.5 1.23e-01    -  1.00e+00 1.00e+00H  1
+ 313  7.1934774e+02 1.52e-05 4.77e-02  -2.5 5.73e-04   1.8 1.00e+00 1.00e+00h  1
+ 314  7.1934658e+02 4.12e-03 1.92e+00  -2.5 1.87e+00    -  5.78e-01 7.81e-03f  8
+ 315  7.1934518e+02 6.66e-03 3.10e+00  -2.5 3.77e-01    -  1.00e+00 3.12e-02h  6
+ 316  7.1928614e+02 3.33e-01 4.10e+02  -2.5 2.50e-01    -  1.00e+00 1.00e+00H  1
+ 317  7.1930918e+02 3.52e-04 9.69e-01  -2.5 5.84e-03   2.2 1.00e+00 1.00e+00h  1
+ 318  7.1930771e+02 2.70e-03 1.74e+00  -2.5 6.95e-01    -  1.00e+00 1.56e-02f  7
+ 319  7.1930673e+02 1.20e-02 6.05e+00  -2.5 3.45e-01    -  1.00e+00 6.25e-02h  5
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 320  7.1925146e+02 1.96e-02 1.17e+02  -2.5 1.12e-01    -  1.00e+00 1.00e+00H  1
+ 321  7.1926196e+02 1.22e-05 3.70e-02  -2.5 4.99e-04   1.7 1.00e+00 1.00e+00h  1
+ 322  7.1926120e+02 2.35e-03 1.11e+00  -2.5 1.38e+00    -  9.00e-01 7.81e-03f  8
+ 323  7.1926066e+02 5.94e-03 2.79e+00  -2.5 4.31e-01    -  1.00e+00 3.12e-02h  6
+ 324  7.1918236e+02 2.18e-01 3.09e+02  -2.5 2.07e-01    -  1.00e+00 1.00e+00H  1
+ 325  7.1923331e+02 1.23e-04 2.43e-01  -2.5 1.65e-03   2.2 1.00e+00 1.00e+00h  1
+ 326  7.1923319e+02 4.02e-03 1.68e+00  -2.5 1.75e+00    -  7.63e-01 7.81e-03f  8
+ 327  7.1915685e+02 1.24e-01 4.61e+02  -2.5 2.62e-01    -  1.00e+00 1.00e+00H  1
+ 328  7.1920402e+02 3.22e-05 3.08e-01  -2.5 2.65e-04   2.6 1.00e+00 1.00e+00h  1
+ 329  7.1920371e+02 1.68e-03 4.99e-01  -2.5 2.52e+00    -  5.69e-01 3.48e-03f  9
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 330  7.1920358e+02 6.24e-03 2.70e+00  -2.5 4.66e-01    -  1.00e+00 3.12e-02h  6
+ 331  7.1913865e+02 7.76e-02 1.70e+02  -2.5 1.37e-01    -  1.00e+00 1.00e+00H  1
+ 332  7.1917263e+02 1.23e-05 6.72e-02  -2.5 1.90e-04   2.1 1.00e+00 1.00e+00h  1
+ 333  7.1917239e+02 9.63e-04 4.04e-01  -2.5 8.41e-01    -  1.00e+00 7.81e-03f  8
+ 334  7.1917211e+02 1.86e-03 8.42e-01  -2.5 4.12e-01    -  1.00e+00 1.56e-02h  7
+ 335  7.1917192e+02 3.44e-03 1.61e+00  -2.5 2.75e-01    -  1.00e+00 3.12e-02h  6
+ 336  7.1911370e+02 2.18e-01 2.23e+02  -2.5 1.73e-01    -  1.00e+00 1.00e+00H  1
+ 337  7.1915897e+02 1.11e-04 2.66e-01  -2.5 9.65e-04   1.6 1.00e+00 1.00e+00h  1
+ 338  7.1915879e+02 5.83e-04 4.20e-02  -2.5 1.17e+00    -  1.00e+00 3.91e-03h  9
+ 339  7.1915857e+02 1.08e-03 2.34e-01  -2.5 6.01e-01    -  1.00e+00 7.81e-03h  8
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 340  7.1915835e+02 1.92e-03 6.49e-01  -2.5 3.92e-01    -  1.00e+00 1.56e-02h  7
+ 341  7.1915812e+02 3.23e-03 1.30e+00  -2.5 2.46e-01    -  1.00e+00 3.12e-02h  6
+ 342  7.1909911e+02 1.92e-01 1.83e+02  -2.5 1.54e-01    -  1.00e+00 1.00e+00H  1
+ 343  7.1914573e+02 8.66e-05 1.95e-01  -2.5 3.17e-04   2.1 1.00e+00 1.00e+00h  1
+ 344  7.1914571e+02 8.26e-04 1.86e-01  -2.5 7.20e-01    -  1.00e+00 7.81e-03h  8
+ 345  7.1914558e+02 1.39e-03 4.68e-01  -2.5 3.17e-01    -  1.00e+00 1.56e-02h  7
+ 346  7.1914551e+02 2.45e-03 1.01e+00  -2.5 2.19e-01    -  1.00e+00 3.12e-02h  6
+ 347  7.1909080e+02 1.68e-01 1.45e+02  -2.5 1.37e-01    -  1.00e+00 1.00e+00H  1
+ 348  7.1913701e+02 6.16e-05 1.34e-01  -2.5 6.11e-04   1.6 1.00e+00 1.00e+00h  1
+ 349  7.1913696e+02 3.13e-04 2.37e-02  -2.5 4.15e-01    -  1.00e+00 7.81e-03h  8
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 350  7.1913688e+02 4.47e-04 7.23e-02  -3.8 3.04e-01    -  9.01e-01 7.81e-03h  8
+ 351  7.1913685e+02 8.60e-04 2.80e-01  -3.8 2.67e-01    -  1.00e+00 1.56e-02h  7
+ 352  7.1913675e+02 1.06e-03 3.83e-01  -3.8 1.91e-01    -  1.00e+00 1.56e-02h  7
+ 353  7.1908813e+02 1.92e-01 1.60e+02  -3.8 1.66e-01    -  1.00e+00 1.00e+00H  1
+ 354  7.1913284e+02 8.35e-05 1.97e-01  -3.8 4.49e-04   2.0 1.00e+00 1.00e+00h  1
+ 355  7.1913281e+02 2.41e-04 1.14e-01  -3.8 3.24e-01    -  1.00e+00 7.81e-03h  8
+ 356  7.1913280e+02 6.03e-04 8.24e-02  -3.8 2.45e-01    -  1.00e+00 1.56e-02h  7
+ 357  7.1913272e+02 7.44e-04 1.56e-01  -3.8 1.57e-01    -  1.00e+00 1.56e-02h  7
+ 358  7.1908511e+02 1.82e-01 9.12e+01  -3.8 1.36e-01    -  1.00e+00 1.00e+00H  1
+ 359  7.1912924e+02 7.28e-05 1.08e-01  -3.8 7.25e-04   1.5 1.00e+00 1.00e+00h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 360  7.1912922e+02 1.63e-04 5.82e-02  -3.8 1.21e-01    -  1.00e+00 1.56e-02h  7
+ 361  7.1908407e+02 1.52e-01 4.04e+01  -3.8 1.05e-01    -  1.00e+00 1.00e+00H  1
+ 362  7.1912772e+02 4.73e-05 4.49e-02  -3.8 1.13e-03   1.1 1.00e+00 1.00e+00h  1
+ 363  7.1911838e+02 1.73e-02 1.37e+01  -3.8 4.08e-02    -  1.00e+00 1.00e+00H  1
+ 364  7.1912710e+02 6.26e-07 9.94e-04  -3.8 2.34e-03    -  1.00e+00 1.00e+00h  1
+ 365  7.1912707e+02 3.97e-05 3.73e-01  -5.7 5.46e-03    -  1.00e+00 1.00e+00H  1
+ 366  7.1912709e+02 1.57e-07 7.92e-05  -5.7 7.56e-05    -  1.00e+00 1.00e+00h  1
+ 367  7.1912709e+02 9.87e-08 5.20e-05  -5.7 6.21e-05    -  1.00e+00 1.00e+00h  1
+ 368  7.1912709e+02 5.17e-12 2.73e-09  -5.7 1.10e-08    -  1.00e+00 1.00e+00h  1
+ 369  7.1912709e+02 1.81e-12 8.44e-08  -8.6 2.60e-06    -  1.00e+00 1.00e+00H  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+ 370  7.1912709e+02 3.17e-12 1.67e-09  -8.6 5.28e-11    -  1.00e+00 1.00e+00h  1
+
+Number of Iterations....: 370
+
+                                   (scaled)                 (unscaled)
+Objective...............:   7.1912709294038154e+02    7.1912709294038154e+02
+Dual infeasibility......:   1.6724612805774086e-09    1.6724612805774086e-09
+Constraint violation....:   3.1743080386448241e-12    3.1743080386448241e-12
+Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
+Complementarity.........:   2.5059035596802520e-09    2.5059035596802520e-09
+Overall NLP error.......:   2.5059035596802520e-09    2.5059035596802520e-09
+
+
+Number of objective function evaluations             = 1387
+Number of objective gradient evaluations             = 371
+Number of equality constraint evaluations            = 1387
+Number of inequality constraint evaluations          = 1387
+Number of equality constraint Jacobian evaluations   = 371
+Number of inequality constraint Jacobian evaluations = 371
+Number of Lagrangian Hessian evaluations             = 370
+Total seconds in IPOPT                               = 0.956
+
+EXIT: Optimal Solution Found.
+      solver  :   t_proc      (avg)   t_wall      (avg)    n_eval
+       nlp_f  |  67.06ms ( 48.35us)  67.12ms ( 48.39us)      1387
+       nlp_g  |  62.22ms ( 44.86us)  61.56ms ( 44.38us)      1387
+  nlp_grad_f  |  51.38ms (138.10us)  51.36ms (138.07us)       372
+  nlp_hess_l  | 392.57ms (  1.06ms) 392.97ms (  1.06ms)       370
+   nlp_jac_g  |  65.15ms (175.13us)  65.26ms (175.42us)       372
+       total  | 957.53ms (957.53ms) 956.50ms (956.50ms)         1
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Plot-the-Results">
+<h2>Plot the Results<a class="headerlink" href="#Plot-the-Results" title="Link to this heading"></a></h2>
+<p>Finally, we will plot the state and control trajectories.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Time grid for plotting</span>
+<span class="n">t_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Extend the control signal for plotting</span>
+<span class="n">u_sol_extended</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u_sol</span><span class="p">,</span> <span class="n">u_sol</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Create the figure and subplots</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+<span class="c1"># Plot the state trajectories on the first subplot</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_grid</span><span class="p">,</span> <span class="n">x_sol</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;theta&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_grid</span><span class="p">,</span> <span class="n">x_sol</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;theta_dot&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1">#ax1.set_xlabel(&#39;Time [s]&#39;)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;State&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">])</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;State Trajectories&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+<span class="c1"># Set grid steps</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mf">0.2</span><span class="p">))</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Plot the control trajectory on the second subplot</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">t_grid</span><span class="p">,</span> <span class="n">u_sol_extended</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time [s]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Control&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">])</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Control&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+<span class="c1"># Set grid steps</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mf">0.2</span><span class="p">))</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Set tick font size</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+<span class="c1"># Adjust layout</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;Figures/pendulum_swingup_single_shooting.pdf&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">)</span>
+
+<span class="c1"># Show the plots</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_single_shooting_pendulum_swingup_19_0.png" src="../_images/examples_single_shooting_pendulum_swingup_19_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simpleMPC_invPend.html" class="btn btn-neutral float-left" title="Pendulum on Cart System with MPC Control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="swingup_pendcart_nlmpc.html" class="btn btn-neutral float-right" title="Swingup of a pendulum on a cart using nonlinear MPC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

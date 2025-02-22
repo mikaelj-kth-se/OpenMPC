@@ -1,0 +1,391 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>invariant_sets.polytope &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">invariant_sets.polytope</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for invariant_sets.polytope</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cdd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvexHull</span>
+
+
+<div class="viewcode-block" id="Polytope">
+<a class="viewcode-back" href="../../invariant_sets.html#invariant_sets.polytope.Polytope">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Polytope</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="c1"># Normalize the polytope inequalities to the form a^Tx &lt;= 1</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        
+        <span class="c1"># Ensure that b is a 1D array</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+
+        <span class="c1"># Convert A and b into CDDlib format (H-representation)</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="n">A</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cdd_mat</span> <span class="o">=</span> <span class="n">cdd</span><span class="o">.</span><span class="n">matrix_from_array</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">rep_type</span><span class="o">=</span><span class="n">cdd</span><span class="o">.</span><span class="n">RepType</span><span class="o">.</span><span class="n">INEQUALITY</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poly</span> <span class="o">=</span> <span class="n">cdd</span><span class="o">.</span><span class="n">polyhedron_from_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdd_mat</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Polytope.normalize">
+<a class="viewcode-back" href="../../invariant_sets.html#invariant_sets.polytope.Polytope.normalize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Normalize the inequalities to the form a^T x &lt;= 1.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            A (numpy.ndarray): Inequality matrix of shape (m, n).</span>
+<span class="sd">            b (numpy.ndarray): Right-hand side vector of shape (m,) or (m, 1).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (numpy.ndarray, numpy.ndarray): Normalized A and b.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Ensure b is a 1D array</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="c1"># Check if dimensions are compatible</span>
+        <span class="k">if</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dimension mismatch: A has </span><span class="si">{</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> rows, but b has </span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> elements.&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Avoid division by zero</span>
+        <span class="n">b_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>  <span class="c1"># Use 1 to avoid division by zero</span>
+        <span class="n">A_normalized</span> <span class="o">=</span> <span class="n">A</span> <span class="o">/</span> <span class="n">b_norm</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">b_normalized</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">A_normalized</span><span class="p">,</span> <span class="n">b_normalized</span></div>
+
+
+    <span class="c1"># Other methods (plot, projection, intersect, etc.) remain unchanged</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Custom print method to display the H-representation of the polytope in a user-friendly format,</span>
+<span class="sd">        ensuring that the string length (including minus sign) is the same for all entries of A, </span>
+<span class="sd">        and that entries of b are also equally spaced.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Determine the maximum width for each element in A (for consistent alignment)</span>
+        <span class="n">A_max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">coef</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="k">for</span> <span class="n">coef</span> <span class="ow">in</span> <span class="n">row</span><span class="p">)</span>
+        <span class="n">b_max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bval</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">bval</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+
+        <span class="n">repr_str</span> <span class="o">=</span> <span class="s2">&quot;Hyperplane representation of polytope</span><span class="se">\n</span><span class="s2">&quot;</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">repr_str</span> <span class="o">+=</span> <span class="s2">&quot;  [[&quot;</span>  <span class="c1"># Start the first line with &#39;[[&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">repr_str</span> <span class="o">+=</span> <span class="s2">&quot;   [&quot;</span>  <span class="c1"># Subsequent lines with proper indentation</span>
+            
+            <span class="c1"># Format each row of A with the determined max width</span>
+            <span class="n">row_str</span> <span class="o">=</span> <span class="s2">&quot;  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">coef</span><span class="si">:{</span><span class="n">A_max_len</span><span class="si">}</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">coef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            
+            <span class="c1"># Add the corresponding b value with consistent width</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">repr_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row_str</span><span class="si">}</span><span class="s2">] x &lt;= [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:{</span><span class="n">b_max_len</span><span class="si">}</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">]</span><span class="se">\n</span><span class="s2">&quot;</span>  <span class="c1"># Last line</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">repr_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row_str</span><span class="si">}</span><span class="s2">] |    [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:{</span><span class="n">b_max_len</span><span class="si">}</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">]</span><span class="se">\n</span><span class="s2">&quot;</span>
+        
+        <span class="k">return</span> <span class="n">repr_str</span>
+
+
+<div class="viewcode-block" id="Polytope.get_V_representation">
+<a class="viewcode-back" href="../../invariant_sets.html#invariant_sets.polytope.Polytope.get_V_representation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_V_representation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the vertices (V-representation) of the polytope.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">generators</span> <span class="o">=</span> <span class="n">cdd</span><span class="o">.</span><span class="n">copy_generators</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poly</span><span class="p">)</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">generators</span><span class="o">.</span><span class="n">array</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">:]</span>  <span class="c1"># Skip the first column (homogenizing coordinate)</span>
+        <span class="k">return</span> <span class="n">vertices</span></div>
+
+
+
+<div class="viewcode-block" id="Polytope.volume">
+<a class="viewcode-back" href="../../invariant_sets.html#invariant_sets.polytope.Polytope.volume">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the volume of the polytope. Handles 1D intervals separately.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_V_representation</span><span class="p">()</span>
+
+        <span class="c1"># If there are no vertices, the volume is zero</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="c1"># Handle 1D intervals (polytope in 1D)</span>
+        <span class="k">if</span> <span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+
+        <span class="c1"># Handle higher-dimensional polytopes (2D and above)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hull</span> <span class="o">=</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">hull</span><span class="o">.</span><span class="n">volume</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error computing volume: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mf">0.0</span></div>
+
+    
+    
+<div class="viewcode-block" id="Polytope.plot">
+<a class="viewcode-back" href="../../invariant_sets.html#invariant_sets.polytope.Polytope.plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">showVertices</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the polytope using Matplotlib.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ax: Matplotlib axis object.</span>
+<span class="sd">            color: Fill color of the polytope.</span>
+<span class="sd">            edgecolor: Color of the polytope edges (if different from color).</span>
+<span class="sd">            alpha: Transparency of the fill.</span>
+<span class="sd">            linestyle: Line style for the edges.</span>
+<span class="sd">            showVertices: Boolean, whether to show the vertices as points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get vertices for plotting</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_V_representation</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>  <span class="c1"># Nothing to plot if no vertices</span>
+
+        <span class="n">hull</span> <span class="o">=</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="n">hull_vertices</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">hull</span><span class="o">.</span><span class="n">vertices</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">edgecolor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">edgecolor</span> <span class="o">=</span> <span class="n">color</span>  <span class="c1"># Use same color for edges if edgecolor is not specified</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hull_vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">hull_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hull_vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">hull_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">edgecolor</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">linestyle</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">hull_vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">hull_vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">showVertices</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hull_vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">hull_vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;ro&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Polytope.remove_redundancies">
+<a class="viewcode-back" href="../../invariant_sets.html#invariant_sets.polytope.Polytope.remove_redundancies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_redundancies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simplify the polytope by removing redundant constraints using matrix_canonicalize.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Make a copy of the matrix</span>
+        <span class="n">mat_copy</span> <span class="o">=</span> <span class="n">cdd</span><span class="o">.</span><span class="n">matrix_copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdd_mat</span><span class="p">)</span>
+        
+        <span class="c1"># Canonicalize the matrix to remove redundant constraints</span>
+        <span class="n">cdd</span><span class="o">.</span><span class="n">matrix_canonicalize</span><span class="p">(</span><span class="n">mat_copy</span><span class="p">)</span>
+
+        <span class="c1"># Update A and b after redundancy removal</span>
+        <span class="n">reduced_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mat_copy</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="o">-</span><span class="n">reduced_array</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">reduced_array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        
+        <span class="c1"># Update the cdd matrix as well</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cdd_mat</span> <span class="o">=</span> <span class="n">mat_copy</span></div>
+
+
+<div class="viewcode-block" id="Polytope.projection">
+<a class="viewcode-back" href="../../invariant_sets.html#invariant_sets.polytope.Polytope.projection">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dims</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Project the polytope onto the subspace of &#39;dims&#39; using cddlib block_elimination.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            dims (list): Indices of the dimensions to keep.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+
+        <span class="c1"># Convert A and b into the matrix required for CDD</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">b</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="n">A</span><span class="p">])</span>
+        <span class="n">cdd_mat</span> <span class="o">=</span> <span class="n">cdd</span><span class="o">.</span><span class="n">matrix_from_array</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">rep_type</span><span class="o">=</span><span class="n">cdd</span><span class="o">.</span><span class="n">RepType</span><span class="o">.</span><span class="n">INEQUALITY</span><span class="p">)</span>
+
+        <span class="c1"># We need to shift the dims because column 0 is b in [b -A]</span>
+        <span class="n">num_vars</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">cols_to_eliminate</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_vars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">)</span>
+
+        <span class="c1"># Perform block elimination using cddlib</span>
+        <span class="n">reduced_mat</span> <span class="o">=</span> <span class="n">cdd</span><span class="o">.</span><span class="n">block_elimination</span><span class="p">(</span><span class="n">cdd_mat</span><span class="p">,</span> <span class="n">cols_to_eliminate</span><span class="p">)</span>
+
+        <span class="c1"># Extract the reduced A and b from the resulting matrix</span>
+        <span class="n">reduced_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">reduced_mat</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>  <span class="c1"># Access the matrix using .array</span>
+        <span class="n">reduced_A</span> <span class="o">=</span> <span class="o">-</span><span class="n">reduced_array</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>  <span class="c1"># Take the matrix part (excluding the first column)</span>
+        <span class="n">reduced_b</span> <span class="o">=</span> <span class="n">reduced_array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>    <span class="c1"># First column corresponds to b</span>
+
+        <span class="c1"># Create a new polytope in the projected space</span>
+        <span class="n">projected_polytope</span> <span class="o">=</span> <span class="n">Polytope</span><span class="p">(</span><span class="n">reduced_A</span><span class="p">[:,</span> <span class="n">dims</span><span class="p">],</span> <span class="n">reduced_b</span><span class="p">)</span>
+
+        <span class="c1"># Remove redundancies from the new polytope</span>
+        <span class="n">projected_polytope</span><span class="o">.</span><span class="n">remove_redundancies</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">projected_polytope</span></div>
+
+
+<div class="viewcode-block" id="Polytope.intersect">
+<a class="viewcode-back" href="../../invariant_sets.html#invariant_sets.polytope.Polytope.intersect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">intersect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the intersection of two polytopes (self and other).</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A new Polytope representing the intersection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Combine the inequalities from both polytopes</span>
+        <span class="n">combined_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">A</span><span class="p">])</span>
+        <span class="n">combined_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">b</span><span class="p">])</span>
+
+        <span class="c1"># Create a new polytope representing the intersection</span>
+        <span class="n">intersected_polytope</span> <span class="o">=</span> <span class="n">Polytope</span><span class="p">(</span><span class="n">combined_A</span><span class="p">,</span> <span class="n">combined_b</span><span class="p">)</span>
+
+        <span class="c1"># Remove redundancies from the intersection result</span>
+        <span class="n">intersected_polytope</span><span class="o">.</span><span class="n">remove_redundancies</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">intersected_polytope</span></div>
+
+
+<div class="viewcode-block" id="Polytope.contains">
+<a class="viewcode-back" href="../../invariant_sets.html#invariant_sets.polytope.Polytope.contains">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if a point x is inside the polytope.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x: A point as a numpy array.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            True if the point is inside the polytope, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if Ax &lt;= b holds for the point x</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">+</span> <span class="n">tol</span><span class="p">)</span></div>
+
+
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if two polytopes define the same set by comparing their canonical forms.</span>
+<span class="sd">        This handles ordering and small numerical differences.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Canonicalize both polytopes</span>
+        <span class="n">self_canon</span> <span class="o">=</span> <span class="n">cdd</span><span class="o">.</span><span class="n">matrix_copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdd_mat</span><span class="p">)</span>
+        <span class="n">other_canon</span> <span class="o">=</span> <span class="n">cdd</span><span class="o">.</span><span class="n">matrix_copy</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">cdd_mat</span><span class="p">)</span>
+        
+        <span class="n">cdd</span><span class="o">.</span><span class="n">matrix_canonicalize</span><span class="p">(</span><span class="n">self_canon</span><span class="p">)</span>
+        <span class="n">cdd</span><span class="o">.</span><span class="n">matrix_canonicalize</span><span class="p">(</span><span class="n">other_canon</span><span class="p">)</span>
+
+        <span class="c1"># Convert the canonicalized matrices to arrays for comparison</span>
+        <span class="n">self_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">self_canon</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+        <span class="n">other_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">other_canon</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+
+        <span class="c1"># Sort the rows of both arrays (for consistent comparison)</span>
+        <span class="n">self_sorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">self_array</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">)))</span>
+        <span class="n">other_sorted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">other_array</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">)))</span>
+
+        <span class="c1"># Compare the sorted arrays with a tolerance</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">self_sorted</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">other_sorted</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">self_sorted</span><span class="p">,</span> <span class="n">other_sorted</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
