@@ -20,7 +20,7 @@ Q = np.diag([10, 10, 10, 1, 1, 1, 10, 10, 10, 1, 1, 1])
 R = np.diag([0.1, 0.1, 0.1, 0.1, 0.1, 0.1])
 
 # Compute the LQR controller and the corresponding Riccati solution
-dnom = np.array([0.00, 0.00, 0.0])
+dnom = np.array([0.00, 0.00, 0.0, 0, 0, 0])
 yref = np.array([0.0, 0.0, 0, 0, 0, 0, 0, 0, 0.0, 0, 0, 0])
 (xref, uref) = predictionModel.get_target_point(yref, dnom)
 L, P, _ = predictionModel.compute_lqr_controller(Q, R, (xref, uref, dnom))
@@ -53,11 +53,11 @@ simulationModel = simulationModel.c2d(samplingTime)
 estimatorModel = create_estimator_model(predictionModel)
 
 # Define the initial state and covariance estimates
-xe0 = np.array([0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])  # Initial state [\hat{x], \hat{d}]
-P0 = 1000 * np.eye(15)  # Initial state covariance
+xe0 = np.array([0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])  # Initial state [\hat{x], \hat{d}]
+P0 = 1000 * np.eye(18)  # Initial state covariance
 
 # Define the process noise and measurement noise covariance matrices
-Qnoise = np.diag([0.001] * 15)  # Process noise covariance
+Qnoise = np.diag([0.001] * 18)  # Process noise covariance
 Rnoise = np.diag([0.01] * 12)  # Measurement noise covariance
 
 # Pack the EKF parameters into a struct
@@ -81,12 +81,12 @@ time = np.arange(0, Tsim, dt)
 
 # Initial state
 x0 = xe0[0:12]
-d = np.array([0.001, 0.005, 0.0])
+d = np.array([0.001, 0.005, 0.0, 0.0, 0.0, 0.0])
 
 # Initialize state and control trajectories for simulation
 x_sim = [x0]
 u_sim = []
-d_hat = [np.array([0.0, 0.0, 0.0])]
+d_hat = [np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])]
 
 x_hat = xe0
 yref = np.array([0.0, 0.0, 0, 0, 0, 0, 0.0, 0.0, 0.1, 0, 0, 0])
@@ -97,7 +97,7 @@ for k in range(len(time)):
     x_hat = ekf.get_state()
 
     if time[k] > 10:
-        d = np.array([0.005, 0.01, 0.0])
+        d = np.array([0.005, 0.01, 0.0, 0, 0, 0])
         yref = np.array([0.0, 0.1, 0, 0, 0, 0, 0.0, 0.0, 0.2, 0, 0, 0])
 
     try:
