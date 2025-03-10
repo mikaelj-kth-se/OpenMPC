@@ -114,8 +114,10 @@ class MPC:
 
         
         # Dual mode implementation
+        # 
+        # (TODO): Brief explanation of dual mode
         if self.dual_mode_horizon != 0 :
-            # Predict states using the dual mode controller beyond the main horizon
+            # Predict states using the dual mode controller beyond the control horizon
             x_dual = self.x[:, self.N]  # Initial state for the dual mode phase
             for t in range(self.dual_mode_horizon):
                 # Compute control using the dual mode controller
