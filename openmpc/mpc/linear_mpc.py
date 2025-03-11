@@ -417,7 +417,7 @@ class SetPointTrackingMPC:
             self.set_disturbance(disturbance)
         _, u_pred = self.compute(x0)
 
-        return u_pred[:, 0]  # Return the entire vector for the first control input
+        return np.atleast_1d(u_pred[:, 0])  # Return the entire vector for the first control input
 
 
     def compute(self, x0):

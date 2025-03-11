@@ -171,9 +171,9 @@ class EKF:
             C_est = self.C(state_estimate, u, d).full()
             y_est = self.h(state_estimate, u, d).full().flatten()
      
-
         S = C_est @ self.P_est @ C_est.T + self.Sigma_v
         K = self.P_est @ C_est.T @ np.linalg.inv(S)
+
 
         self.x_est = self.x_est + K @ (y - y_est)
 

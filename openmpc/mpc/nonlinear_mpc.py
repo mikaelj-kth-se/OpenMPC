@@ -347,7 +347,7 @@ class SetPointTrackingNMPC:
         self.global_penalty_weight : float            = self.params.global_penalty_weight
         
         self.solver               : str        = self.params.solver
-        self.slack_penalty        : float      = self.params.slack_penalty
+        self.slack_penalty        : str        = self.params.slack_penalty
         self.terminal_set         : Polytope   = self.params.terminal_set
 
         self.L                 : np.ndarray = self.params.reference_controller  # reference linear feedback gain (default to zero)
@@ -358,7 +358,6 @@ class SetPointTrackingNMPC:
         self.opti = ca.Opti()
 
         # Tracking reference and siturbance parameters
-        self.r       = self.opti.parameter(self.system.size_output)       # reference output
         self.d       = self.opti.parameter(self.system.size_disturbance)  # Disturbance parameter
         self.x_ref   = self.opti.parameter(self.n)                        # reference state s.t.  f(x_ref, u_ref, d) = 0 and g(x_ref, u_ref, d) = y_ref
         self.u_ref   = self.opti.parameter(self.m)                        # reference input s.t.  f(x_ref, u_ref, d) = 0 and g(x_ref, u_ref, d) = y_ref
@@ -443,6 +442,7 @@ class SetPointTrackingNMPC:
                     slack = self.opti.variable()
                     slack_variables.append((slack, constraint.penalty_weight))
                     self.constraints += [(H @u_k <= b + np.ones(H.shape[0]) * slack,"input_constraint")]
+                    self.constraints += [(slack >= 0,"slack_positivity_constraint")]
 
             # Add state constraints 
             for constraint in self.x_constraints:
@@ -454,6 +454,7 @@ class SetPointTrackingNMPC:
                     slack = self.opti.variable()
                     slack_variables.append((slack, constraint.penalty_weight))
                     self.constraints += [(H @x_k <= b + np.ones(H.shape[0]) * slack,"state_constraint")]
+                    self.constraints += [(slack >= 0,"slack_positivity_constraint")]
 
             # Add output constraints
             for constraint in self.y_constraints:
@@ -465,6 +466,7 @@ class SetPointTrackingNMPC:
                     slack = self.opti.variable()
                     slack_variables.append((slack, constraint.penalty_weight))
                     self.constraints += [(H @self.g(x_k,u_k,self.d) <= b + np.ones(H.shape[0]) * slack,"output_constraint")]
+                    self.constraints += [(slack >= 0,"slack_positivity_constraint")]
 
 
         # Dual mode implementation
@@ -506,8 +508,8 @@ class SetPointTrackingNMPC:
 
             if self.terminal_set:
                 A_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
-                self.constraints += [A_terminal @ self.x[:, self.N] <= b_terminal]
-
+                self.constraints += [(A_terminal @ self.x[:, self.N] <= b_terminal,"terminal_constraint")] 
+                
         # Add slack penalties to the cost function
         for slack, penalty_weight in slack_variables:
             if self.slack_penalty == 'LINEAR':
@@ -591,25 +593,20 @@ class SetPointTrackingNMPC:
             X_initial       = np.zeros((self.n, self.N + self.Ndm + 1))
             X_initial[:, 0] = x0
             for k in range(self.N + self.Ndm):
-                X_initial[:, k + 1] = self.f(X_initial[:, k], uref, self.disturbance_value).full().flatten()
+                u = - self.L @ (X_initial[:, k] - xref) + uref
+                X_initial[:, k + 1] = self.f(X_initial[:, k], u, self.disturbance_value).full().flatten()
 
             # Initialize V_initial to make u = uref with the proposed state trajectory
-            V_initial =  self.L @ (X_initial[:, :self.N] - xref.reshape(-1,1))
+            V_initial =  np.zeros((self.m, self.N))
   
-        print(f"X_initial : {X_initial}")
-        print(f"V_initial : {V_initial}")
-        print(f"xref : {xref}")
-        print(f"uref : {uref}")
-        print(f"disturbance : {self.disturbance_value}")
         try:
             (x_opt, v_opt) = self.mpc_controller(x0, xref, uref, self.disturbance_value , X_initial, V_initial)
         except Exception as e:
             print(f"Solver failed: {e}")
             raise e
-
+      
+       
         # Extract the control and state trajectories
-        #v_opt = sol.value(self.v).reshape(m, N)
-        #x_opt = sol.value(self.x)
         u_opt = - self.L @ (x_opt[:, :self.N] - ca.repmat(xref, 1, self.N)) + uref + v_opt
 
 
@@ -620,22 +617,22 @@ class SetPointTrackingNMPC:
         return u_opt.full(), x_opt.full()
 
 
-    def get_control_action(self, x : np.ndarray , yref : np.ndarray , d : np.ndarray | None = None):
+    def get_control_action(self, x : np.ndarray , y_ref : np.ndarray , d : np.ndarray | None = None):
         """
         MPC controller that plans optimal controls and states over the prediction horizon
         and returns the first control action in the predicted optimal sequence.
 
         :param x: Current state.
         :type x: np.array
-        :param yref: Reference output.
-        :type yref: np.array
+        :param y_ref: Reference output.
+        :type y_ref: np.array
         :param d: Disturbance (optional).
         :type d: np.array, optional
         :return: The first control action in the predicted optimal sequence.
         :rtype: np.array
         """
         # Plan optimal controls and states over the next N samples
-        uPred, xPred = self.compute_predicted_optimal_controls(x, yref, d)
+        uPred, xPred = self.compute_predicted_optimal_controls(x, y_ref, d)
 
         # Apply the first control action in the predicted optimal sequence
         return uPred[:, 0]

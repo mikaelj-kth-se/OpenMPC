@@ -103,6 +103,12 @@ class KF:
 
     def _compute_stationary_gain(self):
         """Compute the stationary Kalman gain."""
+
+        print(self.A.T)
+        print(self.C.T)
+        print(self.Sigma_w)
+        print(self.Sigma_v)
+
         P = control.dare(self.A.T, self.C.T, self.Sigma_w, self.Sigma_v)[0]
         return P @ self.C.T @ np.linalg.inv(self.C @ P @ self.C.T + self.Sigma_v)
 
@@ -120,7 +126,7 @@ class KF:
         # Ensure measurement y is a column vector
         if u is not None:
             try:
-                u = np.array(u).reshape(-1,self.nu)
+                u = np.array(u).reshape(self.nu,)
             except:
                 raise ValueError(f"u must be reshapable into size {self.nu}")
         else:
@@ -128,13 +134,14 @@ class KF:
 
         # Predicted measurement 
         y_pred = self.C @ self.x_est + self.D @ u
+        y      = np.array(y).reshape(self.ny,)
 
         # Measurement residual 
         residual = (y - y_pred)
 
         # Kalman gain (only update if not stationary)
         if not self.is_stationary:
-            S = self.C @ self.P_est @ self.C.T + self.Sigma_v
+            S      = self.C @ self.P_est @ self.C.T + self.Sigma_v
             self.K = self.P_est @ self.C.T @ np.linalg.inv(S)
 
         # Update state estimate
@@ -145,7 +152,7 @@ class KF:
             self.P_est = (np.eye(self.nx) - self.K @ self.C) @ self.P_est
 
 
-    def prediction_update(self, u : np.ndarray | None = None):
+    def prediction_update(self, u : np.ndarray | None = None, d : np.ndarray | None = None):
         """
         Predict the next state based on the system dynamics and control input.
         :param u: Control input
@@ -156,19 +163,32 @@ class KF:
         # Ensure control input u is a column vector
         if u is not None:
             try:
-                u = np.array(u).reshape(-1,self.nu)
+                u = np.array(u).reshape(self.nu,)
             except:
                 raise ValueError(f"u must be reshapable into size {self.nu}")
         else:
             u = np.zeros(self.nu)
-
-        # Predict the next state
-        self.x_est = self.A @ self.x_est + self.B @ u
+        
+        if d is not None:
+            try:
+                d = np.array(d).reshape(self.nd,)
+            except:
+                raise ValueError(f"d must be reshapable into size {self.nd}")
+        else:
+            d = np.zeros(self.nd)
+        
+        if self.params.has_distrubance_filter:
+            # Predict the next state
+            self.x_est = self.A @ self.x_est + self.B @ u 
+        else :
+            # Predict the next state
+            self.x_est = self.A @ self.x_est + self.B @ u + self.Bd @ d
 
         # Update the error covariance matrix (if not stationary)
         if not self.is_stationary:
             self.P_est = self.A @ self.P_est @ self.A.T + self.Sigma_w
 
+    
     def get_state_estimate(self):
         """Return the estimated state vector x."""
         return self.x_est[:self.nx]

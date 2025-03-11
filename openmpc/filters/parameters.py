@@ -76,23 +76,27 @@ class KFParameters:
         :type d0: np.ndarray
     
         """
-        self.d0 = d0.flatten()
+
+        try :
+            self.d0 = np.array(d0).reshape(self.system.size_disturbance)
+        except:
+            raise ValueError(f"d0 must be of size {self.system.size_disturbance} or resizable into it")
 
         if isinstance(Sigma_wd, float):
             self.Sigma_wd = np.eye(self.system.size_disturbance) * Sigma_wd
         elif isinstance(Sigma_wd, np.ndarray):
             if Sigma_wd.shape != (self.system.size_disturbance, self.system.size_disturbance) :
                 raise ValueError(f"Sigma_wd must be of size ({self.system.size_disturbance}, {self.system.size_disturbance})")
+            else :
+                self.Sigma_wd = Sigma_wd
 
         if isinstance(P0d, float):
             self.P0d = np.eye(self.system.size_disturbance) * P0d
         elif isinstance(P0d, np.ndarray):
             if P0d.shape != (self.system.size_disturbance, self.system.size_disturbance) :
                 raise ValueError(f"P0d must be of size ({self.system.size_disturbance}, {self.system.size_disturbance})")
-
-
-        if len(d0) != self.system.size_disturbance :
-            raise ValueError(f"d0 must be of size {self.system.size_disturbance}")
+            else :
+                self.P0d = P0d
         
         self.has_distrubance_filter = True
 

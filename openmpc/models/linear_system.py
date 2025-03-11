@@ -84,8 +84,16 @@ class LinearSystem(Model) :
 
         if Bd is None:
             self._Bd = np.zeros((self._A.shape[0], self._B.shape[1]))
+        else :
+            self._Bd = Bd
+            if self._Bd.shape[0] != n:
+                raise ValueError("The number of rows in Bd must match the number of rows in A")
         if Cd is None:
             self._Cd = np.zeros((self._C.shape[0], self._B.shape[1]))  
+        else :
+            self._Cd = Cd
+            if self._Cd.shape[1] != m:
+                raise ValueError("The number of columns in Cd must match the number of columns in D")
 
         self._dt = dt
 
@@ -137,6 +145,26 @@ class LinearSystem(Model) :
     @property
     def dt(self):
         return self._dt
+    
+
+    def set_disturbance_interface(self, Bd, Cd):
+        """
+        Set the disturbance interface matrices.
+
+        :param Bd: Disturbance input matrix
+        :type Bd: np.ndarray
+        :param Cd: Disturbance output matrix
+        :type Cd: np.ndarray
+        """
+        if Bd.shape[0] != self._A.shape[0]:
+            raise ValueError("The number of rows in Bd must match the number of rows in A")
+        if Cd.shape[0] != self._C.shape[0]:
+            raise ValueError("The number of rows in Cd must match the number of rows in C")
+        
+        self._Bd = Bd
+        self._Cd = Cd
+
+        self.has_disturbance = True
 
 
         
@@ -157,12 +185,33 @@ class LinearSystem(Model) :
         :rtype: np.ndarray
         """
 
-        x = super()._check_and_normalise_state(x) 
-        u,x = super()._check_and_normalise_inputs(u,d) # sets to zero none inputs
-       
+        if x is None :
+            raise ValueError("State cannot be None.")
+        else :
+            try :
+                x = x.reshape(self.size_state,) # flattening
+            except:
+                raise ValueError(f"State size mismatch the system state. Expected size is array with dimension compatible with {self.size_state}, given size is {x.shape}.")
+    
+        if u is not None:
+            try:
+                u = u.reshape(self.size_input,)
+            except:
+                raise ValueError(f"Input size mismatch the system input. Expected size is array with dimension compatible with {self.size_input}, given size is {u.shape}.")
+        else:
+            u = np.zeros(self.size_input)
+        
+        if d is not None:
+            try:
+                d = d.reshape(self.size_disturbance,)
+            except:
+                raise ValueError(f"Disturbance size mismatch the system disturbance. Expected size is array with dimension compatible with {self.size_disturbance}, given size is {d.shape}.")
+        else:
+            d = np.zeros(self.size_disturbance)
+        
         x_next = self._A @ x + self._B @ u + self._Bd @ d
 
-        return x_next.flatten()
+        return x_next
     
     def output(self, x, u = None, d = None):
         """
