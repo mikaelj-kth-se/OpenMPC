@@ -598,6 +598,9 @@ class SetPointTrackingNMPC:
   
         print(f"X_initial : {X_initial}")
         print(f"V_initial : {V_initial}")
+        print(f"xref : {xref}")
+        print(f"uref : {uref}")
+        print(f"disturbance : {self.disturbance_value}")
         try:
             (x_opt, v_opt) = self.mpc_controller(x0, xref, uref, self.disturbance_value , X_initial, V_initial)
         except Exception as e:
