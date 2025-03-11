@@ -1,6 +1,6 @@
 import control
 import numpy as np
-from InvariantSets import Polytope, invariant_set
+from openmpc.InvariantSets import Polytope, invariant_set
 from .constraints import Constraint
 
 class MPCParameters:
@@ -34,7 +34,7 @@ class MPCParameters:
 
         self.Bd = None
         self.Cd = None
-        
+
         # Extract system matrices
         self.A, self.B, self.C, _ = self.get_system_matrices()
 
@@ -42,8 +42,8 @@ class MPCParameters:
     def get_system_matrices(self):
         """Extract the A, B, C, D matrices from the system object."""
         return self.system.A, self.system.B, self.system.C, self.system.D
-        
-        
+
+
     def get_system_matrices(self):
         return self.A, self.B, self.C, self.D
 
@@ -56,7 +56,7 @@ class MPCParameters:
             A = np.array([[1 if i == input_index else 0 for i in range(self.B.shape[1])]])
             A = np.vstack([A, -A])
             b = np.array([limit, limit])
-        
+
         constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
         self.u_constraints.append(constraint)
 
@@ -95,8 +95,8 @@ class MPCParameters:
         # Create and store the constraint
         constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
         self.u_constraints.append(constraint)
-        
-        
+
+
     def add_output_magnitude_constraint(self, limit, output_index=None, is_hard=True, penalty_weight=1):
         """Add magnitude constraint on a specific output: -limit <= y[output_index] <= limit."""
         if output_index is None:
@@ -145,8 +145,8 @@ class MPCParameters:
         # Create and store the constraint
         constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
         self.x_constraints.append(constraint)
-        
-        
+
+
     def add_state_magnitude_constraint(self, limit, state_index=None, is_hard=True, penalty_weight=1):
         """Add state magnitude constraint: -limit <= x[state_index] <= limit."""
         if state_index is None:
@@ -156,7 +156,7 @@ class MPCParameters:
             A = np.array([[1 if i == state_index else 0 for i in range(self.A.shape[0])]])
             A = np.vstack([A, -A])
             b = np.array([limit, limit])
-        
+
         constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
         self.x_constraints.append(constraint)
 
@@ -195,8 +195,8 @@ class MPCParameters:
         # Create and store the constraint
         constraint = Constraint(A, b, is_hard=is_hard, penalty_weight=penalty_weight)
         self.x_constraints.append(constraint)
-        
-        
+
+
     def add_general_state_constraints(self, Ax, bx, is_hard=True, penalty_weight=1):
         """Add general state constraints of the form Ax * x <= bx."""
         constraint = Constraint(Ax, bx, is_hard=is_hard, penalty_weight=penalty_weight)
@@ -212,7 +212,7 @@ class MPCParameters:
         A_cl = self.A - self.B @ controller
         P = control.dlyap(A_cl.T, self.Q + controller.T @ self.R @ controller)
         self.QT = P
-        
+
 
         # Construct the terminal set using the constraints
         Ax_list, bx_list = [], []
@@ -222,13 +222,13 @@ class MPCParameters:
             bx_list.append(b)
 
         for constraint in self.u_constraints:
-            A, b = constraint.to_polytope()            
+            A, b = constraint.to_polytope()
             Ax_list.append(A@controller)
             bx_list.append(b)
 
         Px = Polytope(np.vstack(Ax_list), np.concatenate(bx_list))
         self.terminal_set = invariant_set(A_cl, Px)
-                
+
     def add_dual_mode(self, controller=None, dual_mode_horizon=None):
         """Add a dual mode to the MPC with an optional controller and horizon."""
         if controller is None:
@@ -237,7 +237,7 @@ class MPCParameters:
             self.dual_mode_controller = controller
         else:
             self.dual_mode_controller = controller
-        
+
         # Set the dual mode horizon
         self.dual_mode_horizon = dual_mode_horizon
 
@@ -245,7 +245,7 @@ class MPCParameters:
         """Enable softening of the tracking constraint with the specified penalty weight."""
         self.soft_tracking = True
         self.tracking_penalty_weight = penalty_weight
-        
+
     def add_disturbances(self, Bd=None, Cd=None):
         """Add disturbance matrices to the system."""
         n = self.A.shape[0]  # Number of states
