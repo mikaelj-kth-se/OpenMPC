@@ -8,3 +8,4 @@ openmpc
    models
    mpc
    support
+   filters

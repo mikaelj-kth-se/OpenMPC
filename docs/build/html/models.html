@@ -83,6 +83,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="mpc.html">mpc package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support.html">support package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="filters.html">filters package</a></li>
 </ul>
 </li>
 </ul>
@@ -121,7 +122,7 @@
 <span id="models-linear-system-module"></span><h2>models.linear_system module<a class="headerlink" href="#module-models.linear_system" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="models.linear_system.LinearSystem">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LinearSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/linear_system.html#LinearSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.linear_system.LinearSystem" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LinearSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/linear_system.html#LinearSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.linear_system.LinearSystem" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#models.model.Model" title="models.model.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a></p>
 <p>Simple base class to define a linear system in state-space form. The system is assumed to be discrete-time.
 You can use the class method <cite>c2d</cite> obtain a discerete system from continuous time matrices if required.</p>
@@ -286,6 +287,28 @@ x_{k+1} = f(x_k,u_k,d_k)</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="models.linear_system.LinearSystem.output">
+<span class="sig-name descname"><span class="pre">output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/linear_system.html#LinearSystem.output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.linear_system.LinearSystem.output" title="Link to this definition"></a></dt>
+<dd><p>Output function
+y = g(x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – state vector</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em>) – input vector</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em>) – disturbance vector</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output vector</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="models.linear_system.LinearSystem.plot_trajectories">
 <span class="sig-name descname"><span class="pre">plot_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_trj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_trj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/linear_system.html#LinearSystem.plot_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.linear_system.LinearSystem.plot_trajectories" title="Link to this definition"></a></dt>
 <dd><blockquote>
@@ -398,37 +421,37 @@ If u and d are None, they are returned as none.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>np.array</em><em> or </em><em>None</em>) – The input signal to be checked and regularized.</p></li>
-<li><p><strong>d</strong> (<em>np.array</em><em> or </em><em>None</em>) – The disturbance signal to be checked and regularized.</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em><em> or </em><em>None</em>) – The input signal to be checked and regularized.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em> or </em><em>None</em>) – The disturbance signal to be checked and regularized.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The regularized input and disturbance signals.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple of np.array (u, d)</p>
+<dd class="field-odd"><p>tuple of np.ndarray (u, d)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="models.model.Model.discrete_dynamics">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discrete_dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/model.html#Model.discrete_dynamics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.model.Model.discrete_dynamics" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discrete_dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/model.html#Model.discrete_dynamics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.model.Model.discrete_dynamics" title="Link to this definition"></a></dt>
 <dd><p>Discrete dynamics
 x_{k+1} = f(x_k,u_k,d_k)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>np.array</em>) – state at time k</p></li>
-<li><p><strong>u</strong> (<em>np.array</em>) – input at time k</p></li>
-<li><p><strong>d</strong> (<em>np.array</em>) – disturbance at time k</p></li>
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – state at time k</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em>) – input at time k</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em>) – disturbance at time k</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>state at time k+1</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.array</p>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -445,16 +468,36 @@ x_{k+1} = f(x_k,u_k,d_k)</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="models.model.Model.output">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/model.html#Model.output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.model.Model.output" title="Link to this definition"></a></dt>
+<dd><p>Output function
+y = g(x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – state</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em>) – input</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em>) – disturbance</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output</p>
+</dd>
+</dl>
+<p>:rtype np.ndarray</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="models.model.Model.simulate">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/model.html#Model.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.model.Model.simulate" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/model.html#Model.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.model.Model.simulate" title="Link to this definition"></a></dt>
 <dd><p>Simulate the discrete time system for a number of steps. Input should be an array of size (steps, size_input) and disturbance should be an array of size (steps, disturbance_size)
 where steps is the number of steps to simulate.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x0</strong> (<em>np.array</em>) – initial state</p></li>
-<li><p><strong>u</strong> (<em>np.array</em>) – input signal</p></li>
-<li><p><strong>d</strong> (<em>np.array</em>) – disturbance signal</p></li>
+<li><p><strong>x0</strong> (<em>np.ndarray</em>) – initial state</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em>) – input signal</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em>) – disturbance signal</p></li>
 <li><p><strong>steps</strong> (<em>int</em>) – number of steps to simulate</p></li>
 </ul>
 </dd>
@@ -462,7 +505,7 @@ where steps is the number of steps to simulate.</p>
 <dd class="field-even"><p>state trajectory</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.array</p>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -498,7 +541,7 @@ where steps is the number of steps to simulate.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="models.nonlinear_system.NonlinearSystem.c2d">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">c2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">updfcn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disturbances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfcn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integrator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RK4'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/nonlinear_system.html#NonlinearSystem.c2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.nonlinear_system.NonlinearSystem.c2d" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">c2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">updfcn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disturbances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfcn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integrator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RK4'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/nonlinear_system.html#NonlinearSystem.c2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.nonlinear_system.NonlinearSystem.c2d" title="Link to this definition"></a></dt>
 <dd><p>Create a discrete-time NonlinearSystem from a continuous-time
 model using numerical integration.</p>
 <dl class="field-list simple">
@@ -548,21 +591,22 @@ model using numerical integration.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="models.nonlinear_system.NonlinearSystem.discrete_dynamics">
 <span class="sig-name descname"><span class="pre">discrete_dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/nonlinear_system.html#NonlinearSystem.discrete_dynamics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.nonlinear_system.NonlinearSystem.discrete_dynamics" title="Link to this definition"></a></dt>
-<dd><p>Discrete dynamics
-x_{k+1} = f(x_k,u_k,d_k)</p>
+<dd><p>Discrete dynamics</p>
+<div class="math notranslate nohighlight">
+\[x_{k+1} = f(x_k,u_k,d_k)\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>np.array</em>) – state</p></li>
-<li><p><strong>u</strong> (<em>np.array</em>) – input</p></li>
-<li><p><strong>d</strong> (<em>np.array</em>) – disturbance</p></li>
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – The current state.</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The current input.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The current disturbance.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>next state</p>
+<dd class="field-even"><p>The next state.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>x_next (np.array)</p>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -579,11 +623,20 @@ x_{k+1} = f(x_k,u_k,d_k)</p>
 <dd><p>Given a reference output valye y_ref we want to find the the eqilubrium pair (xref, uref) that satisfies the equilibrium conditions:</p>
 <p>x_ref = f(x_ref, u_ref, d)
 y_ref = g(x_ref, u_ref, d)</p>
-<p>Parameters:
-yref (array-like): The reference output values.
-d (array-like, optional): Nominal disturbance values. If not provided, set to a zero vector of the same dimension as ‘d’ in the prediction model.</p>
-<p>Returns:
-tuple: xref and uref that satisfy the equilibrium conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yref</strong> (<em>np.ndarray</em>) – The reference output value.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The disturbance signal. If not provided, set to a zero vector of the same dimension as ‘d’ in the prediction model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The equilibrium state x_ref and input u_ref.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray, np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -610,22 +663,49 @@ y_k = C*(x_k - xref) + D*(u_k - uref) + Dd*(d_k - dref)</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="models.nonlinear_system.NonlinearSystem.output">
+<span class="sig-name descname"><span class="pre">output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/nonlinear_system.html#NonlinearSystem.output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.nonlinear_system.NonlinearSystem.output" title="Link to this definition"></a></dt>
+<dd><p>Output function</p>
+<div class="math notranslate nohighlight">
+\[y_k = g(x_k,u_k,d_k)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – The current state.</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The current input.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The current disturbance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The output.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="models.nonlinear_system.NonlinearSystem.simulate">
 <span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/nonlinear_system.html#NonlinearSystem.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.nonlinear_system.NonlinearSystem.simulate" title="Link to this definition"></a></dt>
 <dd><p>Simulate the discrete time system for a number of steps. Input should be an array of size (steps, size_input) and disturbance should be an array of size (steps, disturbance_size)
 where steps is the number of steps to simulate.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>Args :</dt><dd><p>x0 (np.array): initial state
-u (np.array): input array of size (size_input,stps).
-d (np.array): disturbance of size (disturbance_size,steps)
-steps (int): number of steps to simulation steps (only used if the input and disturbance are None)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x0</strong> (<em>np.ndarray</em>) – The initial state.</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The input signal.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The disturbance signal.</p></li>
+<li><p><strong>steps</strong> (<em>int</em>) – The number of steps to simulate.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>x (np.array): state trajectory
-y (np.array): output trajectory</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The state trajectory and output trajectory.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray, np.ndarray</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py property">
@@ -658,7 +738,7 @@ y (np.array): output trajectory</p>
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-models" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="models.LinearSystem">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LinearSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/models/linear_system.html#LinearSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.LinearSystem" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LinearSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Bd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/models/linear_system.html#LinearSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.LinearSystem" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
 <p>Simple base class to define a linear system in state-space form. The system is assumed to be discrete-time.
 You can use the class method <cite>c2d</cite> obtain a discerete system from continuous time matrices if required.</p>
@@ -823,6 +903,28 @@ x_{k+1} = f(x_k,u_k,d_k)</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="models.LinearSystem.output">
+<span class="sig-name descname"><span class="pre">output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/models/linear_system.html#LinearSystem.output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.LinearSystem.output" title="Link to this definition"></a></dt>
+<dd><p>Output function
+y = g(x)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – state vector</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em>) – input vector</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em>) – disturbance vector</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>output vector</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="models.LinearSystem.plot_trajectories">
 <span class="sig-name descname"><span class="pre">plot_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_trj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_trj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/models/linear_system.html#LinearSystem.plot_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.LinearSystem.plot_trajectories" title="Link to this definition"></a></dt>
 <dd><blockquote>
@@ -897,7 +999,7 @@ typed the wrong dimensions.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="models.NonlinearSystem.c2d">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">c2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">updfcn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disturbances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfcn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integrator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RK4'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/models/nonlinear_system.html#NonlinearSystem.c2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.NonlinearSystem.c2d" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">c2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">updfcn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disturbances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfcn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integrator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RK4'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/models/nonlinear_system.html#NonlinearSystem.c2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.NonlinearSystem.c2d" title="Link to this definition"></a></dt>
 <dd><p>Create a discrete-time NonlinearSystem from a continuous-time
 model using numerical integration.</p>
 <dl class="field-list simple">
@@ -947,21 +1049,22 @@ model using numerical integration.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="models.NonlinearSystem.discrete_dynamics">
 <span class="sig-name descname"><span class="pre">discrete_dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/models/nonlinear_system.html#NonlinearSystem.discrete_dynamics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.NonlinearSystem.discrete_dynamics" title="Link to this definition"></a></dt>
-<dd><p>Discrete dynamics
-x_{k+1} = f(x_k,u_k,d_k)</p>
+<dd><p>Discrete dynamics</p>
+<div class="math notranslate nohighlight">
+\[x_{k+1} = f(x_k,u_k,d_k)\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>np.array</em>) – state</p></li>
-<li><p><strong>u</strong> (<em>np.array</em>) – input</p></li>
-<li><p><strong>d</strong> (<em>np.array</em>) – disturbance</p></li>
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – The current state.</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The current input.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The current disturbance.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>next state</p>
+<dd class="field-even"><p>The next state.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>x_next (np.array)</p>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -978,11 +1081,20 @@ x_{k+1} = f(x_k,u_k,d_k)</p>
 <dd><p>Given a reference output valye y_ref we want to find the the eqilubrium pair (xref, uref) that satisfies the equilibrium conditions:</p>
 <p>x_ref = f(x_ref, u_ref, d)
 y_ref = g(x_ref, u_ref, d)</p>
-<p>Parameters:
-yref (array-like): The reference output values.
-d (array-like, optional): Nominal disturbance values. If not provided, set to a zero vector of the same dimension as ‘d’ in the prediction model.</p>
-<p>Returns:
-tuple: xref and uref that satisfy the equilibrium conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yref</strong> (<em>np.ndarray</em>) – The reference output value.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The disturbance signal. If not provided, set to a zero vector of the same dimension as ‘d’ in the prediction model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The equilibrium state x_ref and input u_ref.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray, np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1009,22 +1121,49 @@ y_k = C*(x_k - xref) + D*(u_k - uref) + Dd*(d_k - dref)</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="models.NonlinearSystem.output">
+<span class="sig-name descname"><span class="pre">output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/models/nonlinear_system.html#NonlinearSystem.output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.NonlinearSystem.output" title="Link to this definition"></a></dt>
+<dd><p>Output function</p>
+<div class="math notranslate nohighlight">
+\[y_k = g(x_k,u_k,d_k)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – The current state.</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The current input.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The current disturbance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The output.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="models.NonlinearSystem.simulate">
 <span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/models/nonlinear_system.html#NonlinearSystem.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#models.NonlinearSystem.simulate" title="Link to this definition"></a></dt>
 <dd><p>Simulate the discrete time system for a number of steps. Input should be an array of size (steps, size_input) and disturbance should be an array of size (steps, disturbance_size)
 where steps is the number of steps to simulate.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>Args :</dt><dd><p>x0 (np.array): initial state
-u (np.array): input array of size (size_input,stps).
-d (np.array): disturbance of size (disturbance_size,steps)
-steps (int): number of steps to simulation steps (only used if the input and disturbance are None)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x0</strong> (<em>np.ndarray</em>) – The initial state.</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The input signal.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The disturbance signal.</p></li>
+<li><p><strong>steps</strong> (<em>int</em>) – The number of steps to simulate.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>x (np.array): state trajectory
-y (np.array): output trajectory</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The state trajectory and output trajectory.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray, np.ndarray</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py property">

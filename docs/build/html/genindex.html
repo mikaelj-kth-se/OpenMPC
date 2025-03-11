@@ -86,9 +86,11 @@
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
@@ -106,25 +108,29 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#models.LinearSystem.A">A (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.A">[1]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCParameters.add_dual_mode">add_dual_mode() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.add_dual_mode">[1]</a>
+      <li><a href="filters.html#filters.parameters.KFParameters.add_constant_disturbance_prediction">add_constant_disturbance_prediction() (KFParameters method)</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCParameters.add_general_state_constraints">add_general_state_constraints() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.add_general_state_constraints">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_dual_mode">add_dual_mode() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_dual_mode">[1]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCParameters.add_input_bound_constraint">add_input_bound_constraint() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.add_input_bound_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_general_state_constraints">add_general_state_constraints() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_general_state_constraints">[1]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCParameters.add_input_magnitude_constraint">add_input_magnitude_constraint() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.add_input_magnitude_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_input_bound_constraint">add_input_bound_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_input_bound_constraint">[1]</a>
+</li>
+      <li><a href="mpc.html#mpc.MPCProblem.add_input_magnitude_constraint">add_input_magnitude_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_input_magnitude_constraint">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mpc.html#mpc.MPCParameters.add_output_bound_constraint">add_output_bound_constraint() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.add_output_bound_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_output_bound_constraint">add_output_bound_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_output_bound_constraint">[1]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCParameters.add_output_magnitude_constraint">add_output_magnitude_constraint() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.add_output_magnitude_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_output_magnitude_constraint">add_output_magnitude_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_output_magnitude_constraint">[1]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCParameters.add_state_bound_constraint">add_state_bound_constraint() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.add_state_bound_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_reference_controller">add_reference_controller() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_reference_controller">[1]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCParameters.add_state_magnitude_constraint">add_state_magnitude_constraint() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.add_state_magnitude_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_state_bound_constraint">add_state_bound_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_state_bound_constraint">[1]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCParameters.add_terminal_ingredients">add_terminal_ingredients() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.add_terminal_ingredients">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_state_magnitude_constraint">add_state_magnitude_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_state_magnitude_constraint">[1]</a>
+</li>
+      <li><a href="mpc.html#mpc.MPCProblem.add_terminal_ingredients">add_terminal_ingredients() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_terminal_ingredients">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -156,7 +162,7 @@
 </li>
       <li><a href="models.html#models.model.Model.check_and_normalise_input_signals">check_and_normalise_input_signals() (Model method)</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCParameters.check_offsetfree_conditions">check_offsetfree_conditions() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.check_offsetfree_conditions">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.check_offsetfree_conditions">check_offsetfree_conditions() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.check_offsetfree_conditions">[1]</a>
 </li>
       <li><a href="models.html#models.LinearSystem.closed_loop_simulate">closed_loop_simulate() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.closed_loop_simulate">[1]</a>
 </li>
@@ -223,9 +229,47 @@
   </ul></td>
 </tr></table>
 
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="filters.html#filters.ekf.EKF">EKF (class in filters.ekf)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    filters
+
+      <ul>
+        <li><a href="filters.html#module-filters">module</a>
+</li>
+      </ul></li>
+      <li>
+    filters.ekf
+
+      <ul>
+        <li><a href="filters.html#module-filters.ekf">module</a>
+</li>
+      </ul></li>
+      <li>
+    filters.kf
+
+      <ul>
+        <li><a href="filters.html#module-filters.kf">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    filters.parameters
+
+      <ul>
+        <li><a href="filters.html#module-filters.parameters">module</a>
+</li>
+      </ul></li>
       <li><a href="support.html#support.forward_euler">forward_euler() (in module support)</a>
 
       <ul>
@@ -248,10 +292,24 @@
         <li><a href="mpc.html#mpc.SetPointTrackingNMPC.get_control_action">(SetPointTrackingNMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.get_control_action">[1]</a>
 </li>
       </ul></li>
-      <li><a href="models.html#models.LinearSystem.get_lqr_controller">get_lqr_controller() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.get_lqr_controller">[1]</a>
+      <li><a href="filters.html#filters.ekf.EKF.get_covariance">get_covariance() (EKF method)</a>
 </li>
+      <li><a href="filters.html#filters.ekf.EKF.get_estimated_disturbance">get_estimated_disturbance() (EKF method)</a>
+
+      <ul>
+        <li><a href="filters.html#filters.kf.KalmanFilter.get_estimated_disturbance">(KalmanFilter method)</a>
+</li>
+      </ul></li>
+      <li><a href="filters.html#filters.ekf.EKF.get_estimated_state">get_estimated_state() (EKF method)</a>
+
+      <ul>
+        <li><a href="filters.html#filters.kf.KalmanFilter.get_estimated_state">(KalmanFilter method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="models.html#models.LinearSystem.get_lqr_controller">get_lqr_controller() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.get_lqr_controller">[1]</a>
+</li>
       <li><a href="models.html#models.LinearSystem.get_lqr_cost_matrix">get_lqr_cost_matrix() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.get_lqr_cost_matrix">[1]</a>
 </li>
       <li><a href="invariant_sets.html#invariant_sets.get_n_step_controllable_set">get_n_step_controllable_set() (in module invariant_sets)</a>
@@ -318,6 +376,18 @@
   </ul></td>
 </tr></table>
 
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="filters.html#filters.kf.KalmanFilter">KalmanFilter (class in filters.kf)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="filters.html#filters.parameters.KFParameters">KFParameters (class in filters.parameters)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -343,6 +413,12 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="filters.html#filters.ekf.EKF.measurement_update">measurement_update() (EKF method)</a>
+
+      <ul>
+        <li><a href="filters.html#filters.kf.KalmanFilter.measurement_update">(KalmanFilter method)</a>
+</li>
+      </ul></li>
       <li><a href="models.html#models.model.Model">Model (class in models.model)</a>
 </li>
       <li>
@@ -377,6 +453,14 @@
     module
 
       <ul>
+        <li><a href="filters.html#module-filters">filters</a>
+</li>
+        <li><a href="filters.html#module-filters.ekf">filters.ekf</a>
+</li>
+        <li><a href="filters.html#module-filters.kf">filters.kf</a>
+</li>
+        <li><a href="filters.html#module-filters.parameters">filters.parameters</a>
+</li>
         <li><a href="invariant_sets.html#module-invariant_sets">invariant_sets</a>
 </li>
         <li><a href="invariant_sets.html#module-invariant_sets.invariant_sets">invariant_sets.invariant_sets</a>
@@ -442,10 +526,10 @@
         <li><a href="mpc.html#module-mpc.parameters">module</a>
 </li>
       </ul></li>
-      <li><a href="mpc.html#mpc.MPCParameters">MPCParameters (class in mpc)</a>
+      <li><a href="mpc.html#mpc.MPCProblem">MPCProblem (class in mpc)</a>
 
       <ul>
-        <li><a href="mpc.html#mpc.parameters.MPCParameters">(class in mpc.parameters)</a>
+        <li><a href="mpc.html#mpc.parameters.MPCProblem">(class in mpc.parameters)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -485,6 +569,16 @@
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="models.html#models.LinearSystem.output">output() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.output">[1]</a>
+
+      <ul>
+        <li><a href="models.html#models.model.Model.output">(Model method)</a>
+</li>
+        <li><a href="models.html#models.NonlinearSystem.output">(NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.output">[1]</a>
+</li>
+      </ul></li>
+  </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
@@ -506,6 +600,12 @@
 
       <ul>
         <li><a href="invariant_sets.html#invariant_sets.invariant_sets.pre_set">(in module invariant_sets.invariant_sets)</a>
+</li>
+      </ul></li>
+      <li><a href="filters.html#filters.ekf.EKF.prediction_update">prediction_update() (EKF method)</a>
+
+      <ul>
+        <li><a href="filters.html#filters.kf.KalmanFilter.prediction_update">(KalmanFilter method)</a>
 </li>
       </ul></li>
       <li><a href="invariant_sets.html#invariant_sets.Polytope.projection">projection() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.projection">[1]</a>
@@ -532,6 +632,12 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="filters.html#filters.ekf.EKF.set_covariance_matrix">set_covariance_matrix() (EKF method)</a>
+
+      <ul>
+        <li><a href="filters.html#filters.kf.KalmanFilter.set_covariance_matrix">(KalmanFilter method)</a>
+</li>
+      </ul></li>
       <li><a href="mpc.html#mpc.SetPointTrackingMPC.set_disturbance">set_disturbance() (SetPointTrackingMPC method)</a>, <a href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC.set_disturbance">[1]</a>
 
       <ul>
@@ -542,6 +648,12 @@
 
       <ul>
         <li><a href="mpc.html#mpc.SetPointTrackingNMPC.set_reference">(SetPointTrackingNMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.set_reference">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="filters.html#filters.ekf.EKF.set_state">set_state() (EKF method)</a>
+
+      <ul>
+        <li><a href="filters.html#filters.kf.KalmanFilter.set_state">(KalmanFilter method)</a>
 </li>
       </ul></li>
       <li><a href="mpc.html#mpc.SetPointTrackingMPC">SetPointTrackingMPC (class in mpc)</a>
@@ -572,6 +684,8 @@
         <li><a href="models.html#models.NonlinearSystem.size_disturbance">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_disturbance">[1]</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#models.LinearSystem.size_input">size_input (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.size_input">[1]</a>
 
       <ul>
@@ -580,8 +694,6 @@
         <li><a href="models.html#models.NonlinearSystem.size_input">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_input">[1]</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="models.html#models.LinearSystem.size_output">size_output (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.size_output">[1]</a>
 
       <ul>
@@ -598,7 +710,7 @@
         <li><a href="models.html#models.NonlinearSystem.size_state">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_state">[1]</a>
 </li>
       </ul></li>
-      <li><a href="mpc.html#mpc.MPCParameters.soften_tracking_constraint">soften_tracking_constraint() (MPCParameters method)</a>, <a href="mpc.html#mpc.parameters.MPCParameters.soften_tracking_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.soften_tracking_constraint">soften_tracking_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.soften_tracking_constraint">[1]</a>
 </li>
       <li>
     support

@@ -20,6 +20,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="filters package" href="filters.html" />
     <link rel="prev" title="mpc package" href="mpc.html" /> 
 </head>
 
@@ -79,6 +80,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="filters.html">filters package</a></li>
 </ul>
 </li>
 </ul>
@@ -139,7 +141,9 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="support.integrators.RK">
 <span class="sig-name descname"><span class="pre">RK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">updfcn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disturbances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/support/integrators.html#RK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#support.integrators.RK" title="Link to this definition"></a></dt>
-<dd><p>Create a Runge-Kutta expression for the given ODE.</p>
+<dd><p>Create a Runge-Kutta expression for the given ODE. Note that the expression in the output will depend only on the given
+states, inputs, and disturbances. So if the input is not given , then the output expression will not contain any input.
+The same holds for the disturbances. The state must always be given.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -163,7 +167,9 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="support.integrators.forward_euler">
 <span class="sig-name descname"><span class="pre">forward_euler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">updfcn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disturbances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/support/integrators.html#forward_euler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#support.integrators.forward_euler" title="Link to this definition"></a></dt>
-<dd><p>Create a forward-Euler expression for the given ODE.</p>
+<dd><p>Create a forward-Euler expression for the given ODE. Note that the expression in the output will depend only on the given
+states, inputs, and disturbances. So if the input is not given , then the output expression will not contain any input.
+The same holds for the disturbances. The state must always be given.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -172,11 +178,11 @@
 <li><p><strong>inputs</strong> (<em>casadi.MX</em><em>,</em><em>casadi.SX</em>) – The inputs of the system (default is None).</p></li>
 <li><p><strong>disturbances</strong> (<em>casadi.MX</em><em>,</em><em>casadi.SX</em>) – The disturbances of the system (default is None).</p></li>
 <li><p><strong>dt</strong> (<em>float</em>) – Time step for the integrator.</p></li>
-<li><p><strong>order</strong> (<em>int</em>) – Order of the Runge-Kutta method (default is 4).</p></li>
+<li><p><strong>steps</strong> (<em>int</em>) – Number of integration steps (default is 1).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>CasADi expression for one integration step.</p>
+<dd class="field-even"><p>CasADi expression for one integration step using euler method.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>casadi.MX</p>
@@ -208,7 +214,9 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="support.RK">
 <span class="sig-name descname"><span class="pre">RK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">updfcn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disturbances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/support/integrators.html#RK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#support.RK" title="Link to this definition"></a></dt>
-<dd><p>Create a Runge-Kutta expression for the given ODE.</p>
+<dd><p>Create a Runge-Kutta expression for the given ODE. Note that the expression in the output will depend only on the given
+states, inputs, and disturbances. So if the input is not given , then the output expression will not contain any input.
+The same holds for the disturbances. The state must always be given.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -232,7 +240,9 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="support.forward_euler">
 <span class="sig-name descname"><span class="pre">forward_euler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">updfcn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disturbances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/support/integrators.html#forward_euler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#support.forward_euler" title="Link to this definition"></a></dt>
-<dd><p>Create a forward-Euler expression for the given ODE.</p>
+<dd><p>Create a forward-Euler expression for the given ODE. Note that the expression in the output will depend only on the given
+states, inputs, and disturbances. So if the input is not given , then the output expression will not contain any input.
+The same holds for the disturbances. The state must always be given.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -241,11 +251,11 @@
 <li><p><strong>inputs</strong> (<em>casadi.MX</em><em>,</em><em>casadi.SX</em>) – The inputs of the system (default is None).</p></li>
 <li><p><strong>disturbances</strong> (<em>casadi.MX</em><em>,</em><em>casadi.SX</em>) – The disturbances of the system (default is None).</p></li>
 <li><p><strong>dt</strong> (<em>float</em>) – Time step for the integrator.</p></li>
-<li><p><strong>order</strong> (<em>int</em>) – Order of the Runge-Kutta method (default is 4).</p></li>
+<li><p><strong>steps</strong> (<em>int</em>) – Number of integration steps (default is 1).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>CasADi expression for one integration step.</p>
+<dd class="field-even"><p>CasADi expression for one integration step using euler method.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>casadi.MX</p>
@@ -261,6 +271,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="mpc.html" class="btn btn-neutral float-left" title="mpc package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="filters.html" class="btn btn-neutral float-right" title="filters package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

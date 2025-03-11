@@ -87,9 +87,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearSystem</span><span class="p">,</span> <span class="n">NonlinearSystem</span>
 
 
-<div class="viewcode-block" id="MPCParameters">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">MPCParameters</span><span class="p">:</span>
+<div class="viewcode-block" id="MPCProblem">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MPCProblem</span><span class="p">:</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class to define all the parameters for the MPC controller.</span>
@@ -180,8 +180,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tracking_penalty_weight</span> <span class="o">=</span> <span class="mf">1.</span>  <span class="c1"># Default penalty weight for soft tracking</span>
 
     
-<div class="viewcode-block" id="MPCParameters.add_input_magnitude_constraint">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.add_input_magnitude_constraint">[docs]</a>
+<div class="viewcode-block" id="MPCProblem.add_input_magnitude_constraint">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_input_magnitude_constraint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_input_magnitude_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span> <span class="p">:</span><span class="nb">float</span> <span class="p">,</span> <span class="n">input_index</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add input magnitude constraint: -limit &lt;= u &lt;= limit.</span>
@@ -216,8 +216,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">u_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MPCParameters.add_input_bound_constraint">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.add_input_bound_constraint">[docs]</a>
+<div class="viewcode-block" id="MPCProblem.add_input_bound_constraint">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_input_bound_constraint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_input_bound_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limits</span> <span class="p">:</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span> <span class="n">input_index</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds input bounds constraints. The constraints can be symmetric or asymmetric based on `limits`.</span>
@@ -260,8 +260,8 @@
 
         
         
-<div class="viewcode-block" id="MPCParameters.add_output_magnitude_constraint">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.add_output_magnitude_constraint">[docs]</a>
+<div class="viewcode-block" id="MPCProblem.add_output_magnitude_constraint">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_output_magnitude_constraint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_output_magnitude_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span> <span class="p">:</span><span class="nb">float</span> <span class="p">,</span> <span class="n">output_index</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add magnitude constraint on a specific output: -limit &lt;= y[output_index] &lt;= limit.&quot;&quot;&quot;</span>
         
@@ -278,8 +278,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MPCParameters.add_output_bound_constraint">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.add_output_bound_constraint">[docs]</a>
+<div class="viewcode-block" id="MPCProblem.add_output_bound_constraint">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_output_bound_constraint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_output_bound_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limits</span> <span class="p">:</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span> <span class="n">output_index</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds output bounds constraints. The constraints can be symmetric or asymmetric based on `limits`.</span>
@@ -321,8 +321,8 @@
 
         
         
-<div class="viewcode-block" id="MPCParameters.add_state_magnitude_constraint">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.add_state_magnitude_constraint">[docs]</a>
+<div class="viewcode-block" id="MPCProblem.add_state_magnitude_constraint">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_state_magnitude_constraint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_state_magnitude_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span> <span class="p">:</span><span class="nb">float</span> <span class="p">,</span> <span class="n">state_index</span>  <span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add state magnitude constraint: -limit &lt;= x[state_index] &lt;= limit.&quot;&quot;&quot;</span>
         
@@ -339,8 +339,8 @@
 
 
 
-<div class="viewcode-block" id="MPCParameters.add_state_bound_constraint">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.add_state_bound_constraint">[docs]</a>
+<div class="viewcode-block" id="MPCProblem.add_state_bound_constraint">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_state_bound_constraint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_state_bound_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">limits</span> <span class="p">:</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span> <span class="n">state_index</span>  <span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds state bounds constraints. The constraints can be symmetric or asymmetric based on `limits`.</span>
@@ -382,8 +382,8 @@
 
         
         
-<div class="viewcode-block" id="MPCParameters.add_general_state_constraints">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.add_general_state_constraints">[docs]</a>
+<div class="viewcode-block" id="MPCProblem.add_general_state_constraints">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_general_state_constraints">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_general_state_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ax</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bx</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add general state constraints of the form Ax * x &lt;= bx.&quot;&quot;&quot;</span>
 
@@ -396,9 +396,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MPCParameters.add_terminal_ingredients">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.add_terminal_ingredients">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_terminal_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MPCProblem.add_terminal_ingredients">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_terminal_ingredients">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_terminal_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add terminal ingredients using a controller (defaults to LQR).&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">NonlinearSystem</span><span class="p">):</span> <span class="c1">#! feature not supported for nonlinear systems</span>
@@ -436,9 +436,9 @@
 
 
                 
-<div class="viewcode-block" id="MPCParameters.add_dual_mode">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.add_dual_mode">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_dual_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dual_mode_horizon</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">controller</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">)</span> <span class="p">:</span> 
+<div class="viewcode-block" id="MPCProblem.add_dual_mode">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_dual_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_dual_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">horizon</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">controller</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">)</span> <span class="p">:</span> 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        Add a dual mode to the MPC with an optional controller and horizon.</span>
 
@@ -453,18 +453,36 @@
         <span class="c1"># set the dual mode controller</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_controller</span> <span class="o">=</span> <span class="n">controller</span>
         <span class="c1"># Set the dual mode horizon</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dual_mode_horizon</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">horizon</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">controller</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The controller must be non-zero.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_controller</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_input</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_controller</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The controller shape must be </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_input</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span><span class="si">}</span><span class="s2">. Given </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_controller</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The horizon must be non-negative.&quot;</span><span class="p">)</span></div>
 
-        
+    
+
+<div class="viewcode-block" id="MPCProblem.add_reference_controller">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_reference_controller">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_reference_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a reference controller to the MPC.</span>
+
+<span class="sd">        :param controller: The reference controller for the MPC.</span>
+<span class="sd">        :type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference_controller</span> <span class="o">=</span> <span class="n">controller</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_controller</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_input</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_controller</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The controller shape must be </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_input</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span><span class="si">}</span><span class="s2">. Given </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_controller</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
 
         
-<div class="viewcode-block" id="MPCParameters.soften_tracking_constraint">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.soften_tracking_constraint">[docs]</a>
+<div class="viewcode-block" id="MPCProblem.soften_tracking_constraint">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.soften_tracking_constraint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">soften_tracking_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Enable softening of the tracking constraint with the specified penalty weight.&quot;&quot;&quot;</span>
 
@@ -476,8 +494,8 @@
 
         
 
-<div class="viewcode-block" id="MPCParameters.check_offsetfree_conditions">
-<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCParameters.check_offsetfree_conditions">[docs]</a>
+<div class="viewcode-block" id="MPCProblem.check_offsetfree_conditions">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.check_offsetfree_conditions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">check_offsetfree_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the conditions for offset-free MPC.&quot;&quot;&quot;</span>
 
@@ -538,7 +556,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, Mikael Johansson.</p>
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

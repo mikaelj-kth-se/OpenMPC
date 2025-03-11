@@ -82,7 +82,7 @@
   <h1>Source code for mpc.linear_mpc</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cvxpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.mpc.parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPCParameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.mpc.parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPCProblem</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.invariant_sets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Polytope</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.support</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constraint</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearSystem</span>
@@ -104,7 +104,7 @@
 <span class="sd">        &amp;H_y (C x_t + D u_t) \leq h_y \\</span>
 <span class="sd">        &amp;x_0 = x_0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpc_params</span> <span class="p">:</span> <span class="n">MPCParameters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpc_params</span> <span class="p">:</span> <span class="n">MPCProblem</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        MPC controller class for linear systems.</span>
 
@@ -198,8 +198,10 @@
 
         
         <span class="c1"># Dual mode implementation</span>
+        <span class="c1"># </span>
+        <span class="c1"># (TODO): Brief explanation of dual mode</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">:</span>
-            <span class="c1"># Predict states using the dual mode controller beyond the main horizon</span>
+            <span class="c1"># Predict states using the dual mode controller beyond the control horizon</span>
             <span class="n">x_dual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span>  <span class="c1"># Initial state for the dual mode phase</span>
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_horizon</span><span class="p">):</span>
                 <span class="c1"># Compute control using the dual mode controller</span>
@@ -306,7 +308,7 @@
 <span class="sd">        &amp;x_0 = x_0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpc_params</span> <span class="p">:</span> <span class="n">MPCParameters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpc_params</span> <span class="p">:</span> <span class="n">MPCProblem</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the TrackingMPC with the given MPC parameters.</span>
@@ -316,7 +318,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Extract MPC parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">params</span>              <span class="p">:</span> <span class="n">MPCParameters</span> <span class="o">=</span> <span class="n">mpc_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span>              <span class="p">:</span> <span class="n">MPCProblem</span> <span class="o">=</span> <span class="n">mpc_params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">system</span>               <span class="p">:</span> <span class="n">LinearSystem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">system</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">get_system_matrices</span><span class="p">()</span>
 
@@ -538,7 +540,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, Mikael Johansson.</p>
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

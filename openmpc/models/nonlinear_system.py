@@ -362,7 +362,11 @@ class NonlinearSystem(Model):
 
         return x_ref, u_ref
     
-    def compute_lqr_controller(self, Q, R, x_ref : np.ndarray | None = None, u_ref : np.ndarray | None = None, d_ref : np.ndarray | None = None):
+    def compute_lqr_controller(self, Q : np.ndarray, 
+                                     R : np.ndarray, 
+                                     x_ref : np.ndarray | None = None, 
+                                     u_ref : np.ndarray | None = None, 
+                                     d_ref : np.ndarray | None = None):
         """
         Compute the infinite-horizon LQR controller for the given prediction model.
 
@@ -377,8 +381,8 @@ class NonlinearSystem(Model):
         :param d_ref: The reference disturbance vector. If not provided, set to a zero vector of the same dimension as 'd' in the prediction model.
         :type d_ref: np.ndarray, optional
         
-        :return: The LQR controller gain matrix, the Riccati solution, and the discrete-time state-space model.
-        :rtype: np.ndarray, np.ndarray
+        :return: A tuple (L,P) where L is the feedback gain matrix and P is the algebraic Riccati equation solution.
+        :rtype: tuple(np.ndarray, np.ndarray)
         """
 
 
@@ -397,7 +401,7 @@ class NonlinearSystem(Model):
         A,B,C,D,Bd,Dd = self.linearize(x_ref, u_ref, d_ref)
         
         # Compute the infinite-horizon LQR controller using dlqr
-        L, P, _ = ctrl.dlqr(A, B, Q, R)
+        L, P, _ =  ctrl.dlqr(A, B, Q, R)
         
         return L, P
     

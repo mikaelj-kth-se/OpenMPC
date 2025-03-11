@@ -131,42 +131,63 @@
 <div class="viewcode-block" id="Model.discrete_dynamics">
 <a class="viewcode-back" href="../../models.html#models.model.Model.discrete_dynamics">[docs]</a>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">discrete_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">discrete_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">u</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Discrete dynamics</span>
 <span class="sd">        x_{k+1} = f(x_k,u_k,d_k)</span>
 
 <span class="sd">        :param x: state at time k</span>
-<span class="sd">        :type x: np.array</span>
+<span class="sd">        :type x: np.ndarray</span>
 <span class="sd">        :param u: input at time k</span>
-<span class="sd">        :type u: np.array</span>
+<span class="sd">        :type u: np.ndarray</span>
 <span class="sd">        :param d: disturbance at time k</span>
-<span class="sd">        :type d: np.array</span>
+<span class="sd">        :type d: np.ndarray</span>
 <span class="sd">        :return: state at time k+1</span>
-<span class="sd">        :rtype: np.array</span>
+<span class="sd">        :rtype: np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+    
+<div class="viewcode-block" id="Model.output">
+<a class="viewcode-back" href="../../models.html#models.model.Model.output">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">u</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Output function</span>
+<span class="sd">        y = g(x)</span>
+
+<span class="sd">        :param x: state</span>
+<span class="sd">        :type x: np.ndarray</span>
+<span class="sd">        :param u: input</span>
+<span class="sd">        :type u: np.ndarray</span>
+<span class="sd">        :param d: disturbance</span>
+<span class="sd">        :type d: np.ndarray</span>
+
+<span class="sd">        :return: output</span>
+<span class="sd">        :rtype np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
     
 <div class="viewcode-block" id="Model.simulate">
 <a class="viewcode-back" href="../../models.html#models.model.Model.simulate">[docs]</a>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span> <span class="kc">None</span> <span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">steps</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">u</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">steps</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span> 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simulate the discrete time system for a number of steps. Input should be an array of size (steps, size_input) and disturbance should be an array of size (steps, disturbance_size)</span>
 <span class="sd">        where steps is the number of steps to simulate.</span>
 
 <span class="sd">        :param x0: initial state</span>
-<span class="sd">        :type x0: np.array</span>
+<span class="sd">        :type x0: np.ndarray</span>
 <span class="sd">        :param u: input signal</span>
-<span class="sd">        :type u: np.array</span>
+<span class="sd">        :type u: np.ndarray</span>
 <span class="sd">        :param d: disturbance signal</span>
-<span class="sd">        :type d: np.array</span>
+<span class="sd">        :type d: np.ndarray</span>
 <span class="sd">        :param steps: number of steps to simulate</span>
 <span class="sd">        :type steps: int</span>
 <span class="sd">        :return: state trajectory</span>
-<span class="sd">        :rtype: np.array</span>
+<span class="sd">        :rtype: np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
@@ -188,11 +209,11 @@
 <span class="sd">        Check and normalise the input and disturbance signals. If u or d is None, then it is set to zeros of appropriate dimensions. If u or d is an array, then its size is checked and reshaped to the expected size.</span>
 
 <span class="sd">        :param u: The input signal to be checked and normalized.</span>
-<span class="sd">        :type u: np.array or None</span>
+<span class="sd">        :type u: np.ndarray or None</span>
 <span class="sd">        :param d: The disturbance signal to be checked and normalized.</span>
-<span class="sd">        :type d: np.array or None</span>
+<span class="sd">        :type d: np.ndarray or None</span>
 <span class="sd">        :return: The normalized input and disturbance signals.</span>
-<span class="sd">        :rtype: tuple of np.array (u, d)</span>
+<span class="sd">        :rtype: tuple of np.ndarray (u, d)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -225,11 +246,11 @@
 <span class="sd">        If u and d are None, they are returned as none.</span>
 
 <span class="sd">        :param u: The input signal to be checked and regularized.</span>
-<span class="sd">        :type u: np.array or None</span>
+<span class="sd">        :type u: np.ndarray or None</span>
 <span class="sd">        :param d: The disturbance signal to be checked and regularized.</span>
-<span class="sd">        :type d: np.array or None</span>
+<span class="sd">        :type d: np.ndarray or None</span>
 <span class="sd">        :return: The regularized input and disturbance signals.</span>
-<span class="sd">        :rtype: tuple of np.array (u, d)</span>
+<span class="sd">        :rtype: tuple of np.ndarray (u, d)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
 
@@ -271,7 +292,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, Mikael Johansson.</p>
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

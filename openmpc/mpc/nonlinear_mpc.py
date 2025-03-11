@@ -328,7 +328,6 @@ class SetPointTrackingNMPC:
         
         """
         
-      
 
         # Extract MPC parameters
         self.params               : MPCProblem   = mpc_params
@@ -602,6 +601,7 @@ class SetPointTrackingNMPC:
             (x_opt, v_opt) = self.mpc_controller(x0, xref, uref, self.disturbance_value , X_initial, V_initial)
         except Exception as e:
             print(f"Solver failed: {e}")
+            raise e
 
         # Extract the control and state trajectories
         #v_opt = sol.value(self.v).reshape(m, N)
