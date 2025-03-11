@@ -103,12 +103,6 @@ class KF:
 
     def _compute_stationary_gain(self):
         """Compute the stationary Kalman gain."""
-
-        print(self.A.T)
-        print(self.C.T)
-        print(self.Sigma_w)
-        print(self.Sigma_v)
-
         P = control.dare(self.A.T, self.C.T, self.Sigma_w, self.Sigma_v)[0]
         return P @ self.C.T @ np.linalg.inv(self.C @ P @ self.C.T + self.Sigma_v)
 

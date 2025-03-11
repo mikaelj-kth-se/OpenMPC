@@ -289,6 +289,7 @@ class SetPointTrackingMPC:
         :param reference: The reference trajectory.
         :type reference: np.ndarray
         """
+        
         self.r.value = np.array(reference).reshape(self.system.size_output,)  # Explicitly set to correct shape
 
     def set_disturbance(self, disturbance : np.ndarray):
@@ -405,6 +406,12 @@ class SetPointTrackingMPC:
                 self.cost += self.global_penalty_weight * penalty_weight * cp.square(slack)  # Quadratic penalty
             else :
                 raise ValueError("Invalid slack penalty type. Must be 'LINEAR' or 'SQUARE'.")
+            
+        if self.soft_tracking:
+            if self.slack_penalty == 'LINEAR':
+                self.cost += self.tracking_penalty_weight * cp.norm(self.slack_tracking, 1)
+            elif self.slack_penalty == 'SQUARE':
+                self.cost += self.tracking_penalty_weight * cp.square(self.slack_tracking)
 
         # Create the problem instance
         self.problem = cp.Problem(cp.Minimize(self.cost), self.constraints)
