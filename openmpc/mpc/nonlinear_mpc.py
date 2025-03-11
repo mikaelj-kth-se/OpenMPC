@@ -591,12 +591,13 @@ class SetPointTrackingNMPC:
             X_initial       = np.zeros((self.n, self.N + self.Ndm + 1))
             X_initial[:, 0] = x0
             for k in range(self.N + self.Ndm):
-                u = - self.L @ (X_initial[:, k] - xref) + uref
-                X_initial[:, k + 1] = self.f(X_initial[:, k], u, self.disturbance_value).full().flatten()
+                X_initial[:, k + 1] = self.f(X_initial[:, k], uref, self.disturbance_value).full().flatten()
 
             # Initialize V_initial to make u = uref with the proposed state trajectory
-            V_initial = np.zeros((self.m, self.N))
-
+            V_initial =  self.L @ (X_initial[:, :self.N] - xref.reshape(-1,1))
+  
+        print(f"X_initial : {X_initial}")
+        print(f"V_initial : {V_initial}")
         try:
             (x_opt, v_opt) = self.mpc_controller(x0, xref, uref, self.disturbance_value , X_initial, V_initial)
         except Exception as e:
