@@ -1,0 +1,13 @@
+{
+    "ros.distro": "humble",
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}/openmpc",
+        "${workspaceFolder}/examples"
+    ],
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}",
+        "${workspaceFolder}/openmpc",
+        "${workspaceFolder}/examples"
+    ],
+    "terminal.integrated.env.linux": {"PYTHONPATH": "${workspaceFolder}/openmpc:${workspaceFolder}"},
+}

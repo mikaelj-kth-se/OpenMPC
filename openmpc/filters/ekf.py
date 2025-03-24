@@ -4,6 +4,14 @@ from openmpc.models.nonlinear_system import NonlinearSystem
 from openmpc.filters.parameters import KFParameters
 
 class EKF:
+    """
+    
+    Extended Kalman Filter class.
+    
+    This class creates a an Extended Kalman filter class.
+    
+    
+    """
     def __init__(self, parameters : KFParameters):
         """
         Initialize the Extended Kalman filter.
