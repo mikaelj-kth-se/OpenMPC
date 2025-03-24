@@ -1,0 +1,158 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openmpc.support.constraints &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openmpc.support.constraints</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openmpc.support.constraints</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<div class="viewcode-block" id="Constraint">
+<a class="viewcode-back" href="../../../support.html#support.Constraint">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Constraint</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple class to represent polyhedral constraints of the form Hx &lt;= b.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">H</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">b</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the Constraint class.</span>
+
+<span class="sd">        Define constraints of the form Hx &lt;= b. Penality is given for soft constraints in MPC optimization.</span>
+<span class="sd">        </span>
+<span class="sd">        :param H: The matrix H in the constraint Hx &lt;= b.</span>
+<span class="sd">        :type H: np.ndarray</span>
+<span class="sd">        :param b: The vector b in the constraint Hx &lt;= b.</span>
+<span class="sd">        :type b: np.ndarray</span>
+<span class="sd">        :param is_hard: A boolean indicating whether the constraint is hard or soft.</span>
+<span class="sd">        :type is_hard: bool</span>
+<span class="sd">        :param penalty_weight: The penalty weight for the constraint. Only used if is_hard is False.</span>
+<span class="sd">        :type penalty_weight: float</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">H</span>       <span class="o">=</span> <span class="n">H</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span>       <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_hard</span> <span class="o">=</span> <span class="n">is_hard</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">penalty_weight</span> <span class="o">=</span> <span class="n">penalty_weight</span>  <span class="c1"># Only used if is_hard is False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">penalty_weight</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;penalty_weight must be non-negative.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">!=</span> <span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of rows in A must match the length of b. A has shape </span><span class="si">{}</span><span class="s2"> and b has length </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+
+<div class="viewcode-block" id="Constraint.to_polytope">
+<a class="viewcode-back" href="../../../support.html#support.Constraint.to_polytope">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_polytope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the polytope representation.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

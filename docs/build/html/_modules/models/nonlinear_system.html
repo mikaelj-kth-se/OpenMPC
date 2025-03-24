@@ -1,0 +1,559 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>models.nonlinear_system &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">models.nonlinear_system</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for models.nonlinear_system</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">casadi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ca</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">control</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ctrl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.support.integrators</span><span class="w"> </span><span class="kn">import</span> <span class="n">RK</span><span class="p">,</span><span class="n">forward_euler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.models.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+
+
+<div class="viewcode-block" id="NonlinearSystem">
+<a class="viewcode-back" href="../../models.html#models.nonlinear_system.NonlinearSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NonlinearSystem</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disturbances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outfcn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a discrete NonlinearSystem object. </span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            x_{k+1} = f(x_k, u_k, d_k)\\</span>
+<span class="sd">            y_k = g(x_k, u_k, d_k)</span>
+
+<span class="sd">        :param updfcn: The update function f(x, u, d) that defines the system dynamics.</span>
+<span class="sd">        :type updfcn: casadi.MX,cas</span>
+<span class="sd">        :param states: The system states.</span>
+<span class="sd">        :type states: casadi.MX,casadi.SX</span>
+<span class="sd">        :param inputs: The system inputs.</span>
+<span class="sd">        :type inputs: casadi.MX,cas</span>
+<span class="sd">        :param disturbances: The system disturbances.</span>
+<span class="sd">        :type disturbances: casadi.MX,casadi.SX</span>
+<span class="sd">        :param outfcn: The output function g(x, u, d).</span>
+<span class="sd">        :type outfcn: casadi.MX,cas</span>
+<span class="sd">        :param dt: The time step.</span>
+<span class="sd">        :type dt: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span>       <span class="o">=</span> <span class="n">states</span>  <span class="c1"># System states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span>       <span class="o">=</span> <span class="n">inputs</span>  <span class="c1"># System inputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span> <span class="o">=</span> <span class="n">disturbances</span>  <span class="c1"># System disturbances</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updfcn_expr</span>  <span class="o">=</span> <span class="n">updfcn</span>  <span class="c1"># ODE update function expression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outfcn_expr</span>  <span class="o">=</span> <span class="n">outfcn</span>  <span class="c1"># Output function expression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span>           <span class="o">=</span> <span class="n">dt</span>      <span class="c1"># Time step</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_disturbance</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">disturbances</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_inputs</span>      <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The time step must be positive.&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># create fake inputs and distrurbances if necessary (by default the input and output will be of dimension 1 even if their impact is zero)</span>
+        <span class="c1"># this allows for a readable implementation.</span>
+        <span class="k">if</span> <span class="n">disturbances</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">inputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span>
+
+
+        <span class="c1"># the model contains always x,u,d even if the dynamics does not depend on all of them (e.g there is a symbolic perturbation even if the system does not have any).</span>
+        <span class="c1"># this make the code more readable and easier to implement.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updfcn</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;updfcn&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">updfcn</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">outfcn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outfcn</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;outfcn&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outfcn_expr</span><span class="p">])</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outfcn</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;outfcn&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">])</span> <span class="c1"># identity mapping</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outfcn_expr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_disturbance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of disturbance inputs to the system.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="o">.</span><span class="n">size1</span><span class="p">()</span>
+       
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of inputs to the system.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">size1</span><span class="p">()</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of outputs of the system.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">outfcn_expr</span><span class="o">.</span><span class="n">size1</span><span class="p">()</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">size1</span><span class="p">()</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span>
+    
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_discretize_dynamics</span><span class="p">(</span>  <span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disturbances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">integrator</span><span class="o">=</span><span class="s1">&#39;RK4&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a continuous-time model to a discrete-time model using numerical integration.</span>
+<span class="sd">        This is a static method that can be called without creating an instance of the class.</span>
+<span class="sd">        It is useful to create a discrete-time model from a continuous-time model to then create an instance of the class NonlinearSystem.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">integrator</span> <span class="o">==</span> <span class="s1">&#39;Euler&#39;</span><span class="p">:</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;steps&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">updfcn_discrete_expr</span> <span class="o">=</span> <span class="n">forward_euler</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">disturbances</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">integrator</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RK1&#39;</span><span class="p">,</span> <span class="s1">&#39;RK2&#39;</span><span class="p">,</span> <span class="s1">&#39;RK3&#39;</span><span class="p">,</span> <span class="s1">&#39;RK4&#39;</span><span class="p">]:</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">integrator</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">integrator</span> <span class="o">!=</span> <span class="s1">&#39;RK1&#39;</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="n">updfcn_discrete_expr</span> <span class="o">=</span> <span class="n">RK</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">disturbances</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Integrator &#39;</span><span class="si">{</span><span class="n">integrator</span><span class="si">}</span><span class="s2">&#39; is not supported yet.&quot;</span><span class="p">)</span>        
+
+        <span class="k">return</span> <span class="n">updfcn_discrete_expr</span>
+    
+    
+<div class="viewcode-block" id="NonlinearSystem.c2d">
+<a class="viewcode-back" href="../../models.html#models.nonlinear_system.NonlinearSystem.c2d">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">c2d</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disturbances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outfcn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">integrator</span><span class="o">=</span><span class="s1">&#39;RK4&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a discrete-time NonlinearSystem from a continuous-time</span>
+<span class="sd">        model using numerical integration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            updfcn (casadi.MX,casadi.SX): The update expression f(x, u, d) that defines the system dynamics.</span>
+<span class="sd">            states (casadi.MX,casadi.SX): The system states.</span>
+<span class="sd">            inputs (casadi.MX,casadi.SX, optional): The system inputs.</span>
+<span class="sd">            disturbances (casadi.MX,casadi.SX, optional): The system disturbances.</span>
+<span class="sd">            outfcn (casadi.MX,casadi.SX, optional): The output function g(x, u, d).</span>
+<span class="sd">            dt (float, optional): The time step. Defaults to 0.1.</span>
+<span class="sd">            integrator (str, optional): The integrator type. Defaults to &#39;RK4&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            NonlinearSystem: The discrete-time system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">updfcn_discrete_expr</span> <span class="o">=</span> <span class="n">NonlinearSystem</span><span class="o">.</span><span class="n">_discretize_dynamics</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">disturbances</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">NonlinearSystem</span><span class="p">(</span>
+            <span class="n">updfcn</span> <span class="o">=</span>       <span class="n">updfcn_discrete_expr</span><span class="p">,</span>
+            <span class="n">outfcn</span> <span class="o">=</span>       <span class="n">outfcn</span><span class="p">,</span>
+            <span class="n">inputs</span> <span class="o">=</span>       <span class="n">inputs</span><span class="p">,</span>
+            <span class="n">states</span> <span class="o">=</span>       <span class="n">states</span><span class="p">,</span>
+            <span class="n">disturbances</span> <span class="o">=</span> <span class="n">disturbances</span><span class="p">,</span>
+            <span class="n">dt</span>           <span class="o">=</span> <span class="n">dt</span>
+        <span class="p">)</span></div>
+
+    
+    
+<div class="viewcode-block" id="NonlinearSystem.discrete_dynamics">
+<a class="viewcode-back" href="../../models.html#models.nonlinear_system.NonlinearSystem.discrete_dynamics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">discrete_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Discrete dynamics</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            x_{k+1} = f(x_k,u_k,d_k)</span>
+
+<span class="sd">        :param x: The current state.</span>
+<span class="sd">        :type x: np.ndarray</span>
+<span class="sd">        :param u: The current input.</span>
+<span class="sd">        :type u: np.ndarray, optional</span>
+<span class="sd">        :param d: The current disturbance.</span>
+<span class="sd">        :type d: np.ndarray, optional</span>
+<span class="sd">        :return: The next state.</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">x</span>   <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_state</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_inputs</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="c1"># Create the update function based on the presence of inputs and disturbances</span>
+        <span class="n">x_next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">updfcn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x_next</span><span class="o">.</span><span class="n">full</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
+
+    
+<div class="viewcode-block" id="NonlinearSystem.output">
+<a class="viewcode-back" href="../../models.html#models.nonlinear_system.NonlinearSystem.output">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Output function</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            y_k = g(x_k,u_k,d_k)</span>
+
+<span class="sd">        :param x: The current state.</span>
+<span class="sd">        :type x: np.ndarray</span>
+<span class="sd">        :param u: The current input.</span>
+<span class="sd">        :type u: np.ndarray, optional</span>
+<span class="sd">        :param d: The current disturbance.</span>
+<span class="sd">        :type d: np.ndarray, optional</span>
+<span class="sd">        :return: The output.</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">x</span>   <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_state</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_inputs</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outfcn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">full</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="NonlinearSystem.simulate">
+<a class="viewcode-back" href="../../models.html#models.nonlinear_system.NonlinearSystem.simulate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simulate the discrete time system for a number of steps. Input should be an array of size (steps, size_input) and disturbance should be an array of size (steps, disturbance_size)</span>
+<span class="sd">        where steps is the number of steps to simulate.</span>
+
+<span class="sd">        :param x0: The initial state.</span>
+<span class="sd">        :type x0: np.ndarray</span>
+<span class="sd">        :param u: The input signal.</span>
+<span class="sd">        :type u: np.ndarray, optional</span>
+<span class="sd">        :param d: The disturbance signal.</span>
+<span class="sd">        :type d: np.ndarray, optional</span>
+<span class="sd">        :param steps: The number of steps to simulate.</span>
+<span class="sd">        :type steps: int</span>
+<span class="sd">        :return: The state trajectory and output trajectory.</span>
+<span class="sd">        :rtype: np.ndarray, np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+
+        <span class="c1"># check the input and disturbance signals</span>
+        <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">check_and_normalise_input_signals</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span> <span class="n">steps</span><span class="p">))</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,</span> <span class="n">steps</span><span class="p">))</span>
+
+        
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">x_trj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">,</span> <span class="n">steps</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">y_trj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_output</span><span class="p">,</span> <span class="n">steps</span><span class="p">))</span>
+        <span class="n">x_trj</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x0</span>
+
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+
+            <span class="n">x_next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discrete_dynamics</span><span class="p">(</span><span class="n">x_trj</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="p">,</span> <span class="n">u</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">d</span><span class="p">[:,</span> <span class="n">k</span><span class="p">])</span>
+            <span class="n">y</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">x_trj</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="p">,</span> <span class="n">u</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">d</span><span class="p">[:,</span> <span class="n">k</span><span class="p">])</span>
+
+
+            <span class="n">x_trj</span><span class="p">[:,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_next</span>
+            <span class="n">y_trj</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span>   <span class="o">=</span> <span class="n">y</span>
+
+        
+        <span class="k">return</span> <span class="n">x_trj</span><span class="p">,</span> <span class="n">y_trj</span> </div>
+
+
+
+    
+    
+<div class="viewcode-block" id="NonlinearSystem.linearize">
+<a class="viewcode-back" href="../../models.html#models.nonlinear_system.NonlinearSystem.linearize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">linearize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">u_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Linearize the NonlinearSystem around a target point with the form (xref, uref, dref).</span>
+
+<span class="sd">        x_{k+1} = A*(x_k - xref) + B*(u_k - uref) + Bd*(d_k - dref)</span>
+<span class="sd">        y_k = C*(x_k - xref) + D*(u_k - uref) + Dd*(d_k - dref)</span>
+
+<span class="sd">        :param x_ref: The reference state vector. If not provided, set to a zero vector of the same dimension as &#39;x&#39; in the prediction model.</span>
+<span class="sd">        :type x_ref: np.ndarray, optional</span>
+<span class="sd">        :param u_ref: The reference input vector. If not provided, set to a zero vector of the same dimension as &#39;u&#39; in the prediction model.</span>
+<span class="sd">        :type u_ref: np.ndarray, optional</span>
+<span class="sd">        :param d_ref: The reference disturbance vector. If not provided, set to a zero vector of the same dimension as &#39;d&#39; in the prediction model.</span>
+<span class="sd">        :type d_ref: np.ndarray, optional</span>
+<span class="sd">        :return: The system matrices A, B, C, D, Bd, Dd.</span>
+<span class="sd">        :rtype: np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">x_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="n">u_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">u_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="n">d_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,)</span>
+
+        <span class="n">x0</span> <span class="o">=</span> <span class="n">x_ref</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">,)</span>
+        <span class="n">u0</span> <span class="o">=</span> <span class="n">u_ref</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,)</span>
+        <span class="n">d0</span> <span class="o">=</span> <span class="n">d_ref</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,)</span>
+
+        <span class="c1"># Compute Jacobians for A, B, E matrices</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updfcn_expr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>       <span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updfcn_expr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span>       <span class="p">)</span>
+        <span class="n">Bd</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updfcn_expr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">)</span>
+
+
+        <span class="n">A_func</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;A_func&#39;</span>  <span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">A</span><span class="p">])</span>
+        <span class="n">B_func</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;B_func&#39;</span>  <span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">B</span><span class="p">])</span>
+        <span class="n">Bd_func</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;Bd_func&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">Bd</span><span class="p">])</span>
+
+        <span class="n">A_matrix</span>  <span class="o">=</span> <span class="n">A_func</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">d0</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>
+        <span class="n">B_matrix</span>  <span class="o">=</span> <span class="n">B_func</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">d0</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>
+        <span class="n">Bd_matrix</span> <span class="o">=</span> <span class="n">Bd_func</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">d0</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>      
+
+        
+        <span class="n">C</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outfcn_expr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>       <span class="p">)</span>
+        <span class="n">D</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outfcn_expr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span>       <span class="p">)</span>
+        <span class="n">Dd</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outfcn_expr</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">)</span>
+
+        <span class="n">C_func</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;C_func&#39;</span> <span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">C</span><span class="p">])</span>
+        <span class="n">D_func</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;D_func&#39;</span> <span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">D</span><span class="p">])</span>
+        <span class="n">Dd_func</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;Dd_func&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">Dd</span><span class="p">])</span>
+
+        <span class="n">C_matrix</span>  <span class="o">=</span> <span class="n">C_func</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">d0</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>
+        <span class="n">D_matrix</span>  <span class="o">=</span> <span class="n">D_func</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">d0</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>
+        <span class="n">Dd_matrix</span> <span class="o">=</span> <span class="n">Dd_func</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">d0</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>
+
+
+        <span class="k">return</span> <span class="n">A_matrix</span><span class="p">,</span> <span class="n">B_matrix</span><span class="p">,</span> <span class="n">C_matrix</span><span class="p">,</span> <span class="n">D_matrix</span><span class="p">,</span> <span class="n">Bd_matrix</span><span class="p">,</span> <span class="n">Dd_matrix</span></div>
+
+
+<div class="viewcode-block" id="NonlinearSystem.get_target_point">
+<a class="viewcode-back" href="../../models.html#models.nonlinear_system.NonlinearSystem.get_target_point">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a reference output valye y_ref we want to find the the eqilubrium pair (xref, uref) that satisfies the equilibrium conditions:</span>
+
+<span class="sd">        x_ref = f(x_ref, u_ref, d)</span>
+<span class="sd">        y_ref = g(x_ref, u_ref, d)</span>
+<span class="sd">        </span>
+
+<span class="sd">        :param yref: The reference output value.</span>
+<span class="sd">        :type yref: np.ndarray</span>
+<span class="sd">        :param d: The disturbance signal. If not provided, set to a zero vector of the same dimension as &#39;d&#39; in the prediction model.</span>
+<span class="sd">        :type d: np.ndarray, optional</span>
+<span class="sd">        :return: The equilibrium state x_ref and input u_ref.</span>
+<span class="sd">        :rtype: np.ndarray, np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Define symbols</span>
+        <span class="n">x</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+        <span class="n">u</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span>
+        <span class="n">d_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbances</span>
+
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Disturbance signal size mismatch the system disturbance. Expected size is array with dimension compatible with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="s2">, given size is </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+       
+        <span class="n">f</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d_model</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">updfcn_expr</span><span class="p">])</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d_model</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outfcn_expr</span><span class="p">])</span>
+            
+        <span class="c1"># Determine the dimensions of x and u</span>
+        <span class="n">n_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_state</span>
+        <span class="n">n_u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_input</span>
+
+        <span class="c1"># Define symbolic variables for xref and uref</span>
+        <span class="n">xref</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;xref&#39;</span><span class="p">,</span> <span class="n">n_x</span><span class="p">)</span>
+        <span class="n">uref</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">MX</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="s1">&#39;uref&#39;</span><span class="p">,</span> <span class="n">n_u</span><span class="p">)</span>
+
+        <span class="c1"># Define the nonlinear system of equations for equilibrium conditions</span>
+        <span class="n">eq1</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xref</span><span class="p">,</span> <span class="n">uref</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">xref</span>
+        <span class="n">eq2</span> <span class="o">=</span> <span class="n">g</span><span class="p">(</span><span class="n">xref</span><span class="p">,</span> <span class="n">uref</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">yref</span>
+        <span class="n">eqs</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">vertcat</span><span class="p">(</span><span class="n">eq1</span><span class="p">,</span> <span class="n">eq2</span><span class="p">)</span>
+
+
+        <span class="c1"># Define the NLP problem</span>
+        <span class="n">nlp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">ca</span><span class="o">.</span><span class="n">vertcat</span><span class="p">(</span><span class="n">xref</span><span class="p">,</span> <span class="n">uref</span><span class="p">),</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="n">ca</span><span class="o">.</span><span class="n">sumsqr</span><span class="p">(</span><span class="n">uref</span><span class="p">),</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="n">eqs</span><span class="p">}</span>
+
+        <span class="c1"># Set solver options</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ipopt.print_level&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;print_time&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+        <span class="n">solver</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">nlpsol</span><span class="p">(</span><span class="s1">&#39;solver&#39;</span><span class="p">,</span> <span class="s1">&#39;ipopt&#39;</span><span class="p">,</span> <span class="n">nlp</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+
+        <span class="c1"># Solve the NLP</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="n">solver</span><span class="p">(</span><span class="n">lbg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ubg</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">xref_sol</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">][:</span><span class="n">n_x</span><span class="p">]</span>
+        <span class="n">uref_sol</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">][</span><span class="n">n_x</span><span class="p">:</span><span class="n">n_x</span><span class="o">+</span><span class="n">n_u</span><span class="p">]</span>
+        
+        <span class="n">x_ref</span> <span class="o">=</span> <span class="n">xref_sol</span><span class="o">.</span><span class="n">full</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">u_ref</span> <span class="o">=</span> <span class="n">uref_sol</span><span class="o">.</span><span class="n">full</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+
+        <span class="k">return</span> <span class="n">x_ref</span><span class="p">,</span> <span class="n">u_ref</span></div>
+
+    
+<div class="viewcode-block" id="NonlinearSystem.compute_lqr_controller">
+<a class="viewcode-back" href="../../models.html#models.nonlinear_system.NonlinearSystem.compute_lqr_controller">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_lqr_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">x_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">u_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the infinite-horizon LQR controller for the given prediction model.</span>
+
+<span class="sd">        :param Q: The state cost matrix.</span>
+<span class="sd">        :type Q: np.ndarray</span>
+<span class="sd">        :param R: The input cost matrix.</span>
+<span class="sd">        :type R: np.ndarray</span>
+<span class="sd">        :param x_ref: The reference state vector. If not provided, set to a zero vector of the same dimension as &#39;x&#39; in the prediction model.</span>
+<span class="sd">        :type x_ref: np.ndarray, optional</span>
+<span class="sd">        :param u_ref: The reference input vector. If not provided, set to a zero vector of the same dimension as &#39;u&#39; in the prediction model.</span>
+<span class="sd">        :type u_ref: np.ndarray, optional</span>
+<span class="sd">        :param d_ref: The reference disturbance vector. If not provided, set to a zero vector of the same dimension as &#39;d&#39; in the prediction model.</span>
+<span class="sd">        :type d_ref: np.ndarray, optional</span>
+<span class="sd">        </span>
+<span class="sd">        :return: The LQR controller gain matrix, the Riccati solution, and the discrete-time state-space model.</span>
+<span class="sd">        :rtype: np.ndarray, np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+        <span class="k">if</span> <span class="n">x_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">u_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">u_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">d_ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span>
+
+        <span class="n">x_ref</span> <span class="o">=</span> <span class="n">x_ref</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">,)</span>
+        <span class="n">u_ref</span> <span class="o">=</span> <span class="n">u_ref</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,)</span>
+        <span class="n">d_ref</span> <span class="o">=</span> <span class="n">d_ref</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,)</span>
+
+        <span class="c1"># Linearize the system around the target point</span>
+        <span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">Bd</span><span class="p">,</span><span class="n">Dd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linearize</span><span class="p">(</span><span class="n">x_ref</span><span class="p">,</span> <span class="n">u_ref</span><span class="p">,</span> <span class="n">d_ref</span><span class="p">)</span>
+        
+        <span class="c1"># Compute the infinite-horizon LQR controller using dlqr</span>
+        <span class="n">L</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ctrl</span><span class="o">.</span><span class="n">dlqr</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">L</span><span class="p">,</span> <span class="n">P</span></div>
+
+    
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">string_out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="s2">&quot;x_k+1 = f(x_k, u_k, d_k)</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="s2">&quot;y_k = g(x_k, u_k, d_k)</span><span class="se">\n\n\n</span><span class="s2">&quot;</span>
+
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;Parameters: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;----------------------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dt                    : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;state dimension       : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;input dimension       : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;disturbance dimension : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output dimension      : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_output</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;is autonomous          : </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_inputs</span><span class="p">))</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;has disturbances       : </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">has_disturbance</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">string_out</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

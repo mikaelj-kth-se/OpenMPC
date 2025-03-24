@@ -1,0 +1,593 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openmpc.models.linear_system &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openmpc.models.linear_system</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openmpc.models.linear_system</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">control</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w">  </span><span class="nn">.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+
+
+<div class="viewcode-block" id="LinearSystem">
+<a class="viewcode-back" href="../../../models.html#models.LinearSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LinearSystem</span><span class="p">(</span><span class="n">Model</span><span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple base class to define a linear system in state-space form. The system is assumed to be discrete-time.</span>
+<span class="sd">    You can use the class method `c2d` obtain a discerete system from continuous time matrices if required.</span>
+
+<span class="sd">    Model of the system </span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        x_{k+1} = A x_k + B u_k + Bd d_k</span>
+
+<span class="sd">        y_k = C x_k + D u_k + Cd d_k</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span>  <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                       <span class="n">B</span>  <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                       <span class="n">C</span>  <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                       <span class="n">D</span>  <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">Bd</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                       <span class="n">Cd</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">dt</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize linear system</span>
+
+<span class="sd">        :param A: State matrix</span>
+<span class="sd">        :type A: np.ndarray</span>
+<span class="sd">        :param B: Input matrix</span>
+<span class="sd">        :type B: np.ndarray</span>
+<span class="sd">        :param C: Output matrix</span>
+<span class="sd">        :type C: np.ndarray</span>
+<span class="sd">        :param D: Feedforward matrix</span>
+<span class="sd">        :type D: np.ndarray</span>
+<span class="sd">        :param Bd: Disturbance input matrix</span>
+<span class="sd">        :type Bd: np.ndarray</span>
+<span class="sd">        :param Cd: Disturbance output matrix</span>
+<span class="sd">        :type Cd: np.ndarray</span>
+<span class="sd">        :param dt: Sampling time</span>
+<span class="sd">        :type dt: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_A</span> <span class="o">=</span> <span class="n">A</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">B</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">has_input</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_B</span> <span class="o">=</span> <span class="n">B</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">has_input</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of rows in B must match the number of rows in A&quot;</span><span class="p">)</span>
+        
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># take all the state without feed-forward in case No oputput is given</span>
+        <span class="k">if</span> <span class="n">C</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_C</span> <span class="o">=</span> <span class="n">C</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of columns in C must match the number of rows in A (state dimension)&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">D</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_D</span> <span class="o">=</span> <span class="n">D</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">m</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of columns in D must match the number of columns in B (input dimension)&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># distrurbances assumed to be one dimension with zero effect on the output</span>
+
+        <span class="k">if</span> <span class="n">Bd</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">Cd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">has_disturbance</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">has_disturbance</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">Bd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">Cd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span> <span class="o">=</span> <span class="n">dt</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">A</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        State matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_A</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">B</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Input matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">C</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Output matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">D</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Bd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Cd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_disturbance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span>
+
+
+        
+
+<div class="viewcode-block" id="LinearSystem.discrete_dynamics">
+<a class="viewcode-back" href="../../../models.html#models.LinearSystem.discrete_dynamics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">discrete_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Discrete dynamics</span>
+<span class="sd">        x_{k+1} = f(x_k,u_k,d_k)</span>
+
+<span class="sd">        :param x: state vector</span>
+<span class="sd">        :type x: np.ndarray</span>
+<span class="sd">        :param u: input vector</span>
+<span class="sd">        :type u: np.ndarray</span>
+<span class="sd">        :param d: disturbance vector</span>
+<span class="sd">        :type d: np.ndarray</span>
+<span class="sd">        :return: next state vector</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_state</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+        <span class="n">u</span><span class="p">,</span><span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_inputs</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">d</span><span class="p">)</span> <span class="c1"># sets to zero none inputs</span>
+       
+        <span class="n">x_next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_A</span> <span class="o">@</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span> <span class="o">@</span> <span class="n">u</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span> <span class="o">@</span> <span class="n">d</span>
+
+        <span class="k">return</span> <span class="n">x_next</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
+
+    
+<div class="viewcode-block" id="LinearSystem.output">
+<a class="viewcode-back" href="../../../models.html#models.LinearSystem.output">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Output function</span>
+<span class="sd">        y = g(x)</span>
+
+<span class="sd">        :param x: state vector</span>
+<span class="sd">        :type x: np.ndarray</span>
+<span class="sd">        :param u: input vector</span>
+<span class="sd">        :type u: np.ndarray</span>
+<span class="sd">        :param d: disturbance vector</span>
+<span class="sd">        :type d: np.ndarray</span>
+<span class="sd">        :return: output vector</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_state</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_inputs</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C</span> <span class="o">@</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D</span> <span class="o">@</span> <span class="n">u</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span> <span class="o">@</span> <span class="n">d</span>
+
+        <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
+
+    
+<div class="viewcode-block" id="LinearSystem.simulate">
+<a class="viewcode-back" href="../../../models.html#models.LinearSystem.simulate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">steps</span> <span class="o">=</span> <span class="mi">10</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simulate the discrete time system for a number of steps. Input should be an array of size (size_input,steps) and disturbance should be an array of size (disturbance_size,steps)</span>
+<span class="sd">        where steps is the number of steps to simulate. Note that the function will attempt to reshape your array to the given form (size_input,steps). Hence the output will not be the length you expact if you have an array with </span>
+<span class="sd">        typed the wrong dimensions.</span>
+
+<span class="sd">        :param x0: Initial state vector</span>
+<span class="sd">        :type x0: np.ndarray</span>
+<span class="sd">        :param u: Input signal</span>
+<span class="sd">        :type u: np.ndarray</span>
+<span class="sd">        :param d: Disturbance signal</span>
+<span class="sd">        :type d: np.ndarray</span>
+<span class="sd">        :param steps: Number of steps to simulate</span>
+<span class="sd">        :type steps: int</span>
+<span class="sd">        </span>
+<span class="sd">        :return x_trj: State trajectory of shape (size_state, steps+1)</span>
+<span class="sd">        :rtype x_trj: np.ndarray</span>
+<span class="sd">        :return y_trj: Output trajectory of shape (size_output, steps)</span>
+<span class="sd">        :rtype y_trj: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        
+        <span class="c1"># check the input and disturbance signals and regualises them. None inputs are left unchanged</span>
+        <span class="n">x0</span>  <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_state</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+        <span class="n">u</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">check_and_normalise_input_signals</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span> <span class="n">steps</span><span class="p">))</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,</span> <span class="n">steps</span><span class="p">))</span>
+            
+        
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">x_trj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">,</span> <span class="n">steps</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">y_trj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_output</span><span class="p">,</span> <span class="n">steps</span><span class="p">))</span>
+        <span class="n">x_trj</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x0</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+
+            <span class="n">x_next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_A</span> <span class="o">@</span> <span class="n">x_trj</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span> <span class="o">@</span> <span class="n">u</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span> <span class="o">@</span> <span class="n">d</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C</span> <span class="o">@</span> <span class="n">x_trj</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D</span> <span class="o">@</span> <span class="n">u</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span> <span class="o">@</span> <span class="n">d</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+
+            <span class="n">x_trj</span><span class="p">[:,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_next</span>
+            <span class="n">y_trj</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span>   <span class="o">=</span> <span class="n">y</span>
+
+        
+        <span class="k">return</span> <span class="n">x_trj</span><span class="p">,</span> <span class="n">y_trj</span> </div>
+
+    
+
+<div class="viewcode-block" id="LinearSystem.closed_loop_simulate">
+<a class="viewcode-back" href="../../../models.html#models.LinearSystem.closed_loop_simulate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">closed_loop_simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        Simulate the LinearSystem in closed-loop with an L gain (a.k.a A-BL).</span>
+
+<span class="sd">        :param x0: Initial state vector</span>
+<span class="sd">        :type x0: np.ndarray</span>
+<span class="sd">        :param L: Gain matrix</span>
+<span class="sd">        :type L: np.ndarray</span>
+<span class="sd">        :param d: Disturbance signal</span>
+<span class="sd">        :type d: np.ndarray</span>
+<span class="sd">        :param steps: Number of steps to simulate</span>
+<span class="sd">        :type steps: int</span>
+
+<span class="sd">        :returns x_trj: State trajectory of shape (size_state, steps+1)</span>
+<span class="sd">        :rtype x_trj: np.ndarray</span>
+<span class="sd">        :returns y_trj: Output trajectory of shape (size_output, steps)</span>
+<span class="sd">        :rtype y_trj: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">x0</span>    <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">,</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;L gain matrix does not match the system dimensions. Expected shape is (</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">) while given is </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span> <span class="n">steps</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Disturbance signal size mismatch the system disturbance. Expected size is array with dimension compatible with (</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">), given size is </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span> <span class="n">steps</span><span class="p">))</span>
+
+        
+
+        <span class="n">y_trj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_output</span><span class="p">,</span> <span class="n">steps</span><span class="p">))</span>
+        <span class="n">x_trj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">,</span> <span class="n">steps</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">x_trj</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="c1"># initial state condition</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+            
+            <span class="n">x_next</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_A</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span><span class="nd">@L</span><span class="p">)</span> <span class="o">@</span> <span class="n">x_trj</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_C</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D</span> <span class="nd">@L</span><span class="p">)</span><span class="nd">@x_trj</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+
+            <span class="n">x_trj</span><span class="p">[:,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_next</span>
+            <span class="n">y_trj</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span>   <span class="o">=</span> <span class="n">y</span>
+
+        <span class="k">return</span> <span class="n">x_trj</span><span class="p">,</span> <span class="n">y_trj</span> </div>
+
+
+
+<div class="viewcode-block" id="LinearSystem.get_system_matrices">
+<a class="viewcode-back" href="../../../models.html#models.LinearSystem.get_system_matrices">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_system_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span></div>
+
+
+    
+<div class="viewcode-block" id="LinearSystem.c2d">
+<a class="viewcode-back" href="../../../models.html#models.LinearSystem.c2d">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">c2d</span><span class="p">(</span><span class="n">A_cont</span><span class="p">,</span> <span class="n">B_cont</span><span class="p">,</span> <span class="n">C_cont</span><span class="p">,</span> <span class="n">D_cont</span><span class="p">,</span><span class="n">dt</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert continuous-time state-space model to discrete-time.</span>
+<span class="sd">        </span>
+<span class="sd">        :param A_cont: Continuous-time state matrix</span>
+<span class="sd">        :type A_cont: np.ndarray</span>
+<span class="sd">        :param B_cont: Continuous-time input matrix</span>
+<span class="sd">        :type B_cont: np.ndarray</span>
+<span class="sd">        :param C_cont: Continuous-time output matrix</span>
+<span class="sd">        :type C_cont: np.ndarray</span>
+<span class="sd">        :param D_cont: Continuous-time feedforward matrix</span>
+<span class="sd">        :type D_cont: np.ndarray</span>
+<span class="sd">        :param dt: Sampling time</span>
+<span class="sd">        :type dt: float</span>
+<span class="sd">        </span>
+<span class="sd">        :returns: Discrete-time state-space model</span>
+<span class="sd">        :rtype: LinearSystem</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Create the state-space system</span>
+        <span class="n">sys_cont</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">ss</span><span class="p">(</span><span class="n">A_cont</span><span class="p">,</span> <span class="n">B_cont</span><span class="p">,</span> <span class="n">C_cont</span><span class="p">,</span> <span class="n">D_cont</span><span class="p">)</span>
+
+        <span class="c1"># Sample the system with a sampling time h = 0.25 seconds</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="n">sys_disc</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">c2d</span><span class="p">(</span><span class="n">sys_cont</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+        <span class="c1"># Extract the discrete-time matrices</span>
+        <span class="n">Adist</span><span class="p">,</span> <span class="n">Bdist</span><span class="p">,</span> <span class="n">Cdist</span><span class="p">,</span> <span class="n">Ddist</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">ssdata</span><span class="p">(</span><span class="n">sys_disc</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">LinearSystem</span><span class="p">(</span><span class="n">Adist</span><span class="p">,</span> <span class="n">Bdist</span><span class="p">,</span> <span class="n">Cdist</span><span class="p">,</span> <span class="n">Ddist</span><span class="p">)</span></div>
+
+
+    
+<div class="viewcode-block" id="LinearSystem.get_lqr_controller">
+<a class="viewcode-back" href="../../../models.html#models.LinearSystem.get_lqr_controller">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_lqr_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Q</span><span class="p">,</span><span class="n">R</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solve the discrete-time algebraic Riccati equation (DARE) for the given system.</span>
+
+<span class="sd">        :param Q: The state weighting matrix.</span>
+<span class="sd">        :type Q: np.ndarray</span>
+<span class="sd">        :param R: The input weighting matrix.</span>
+<span class="sd">        :type R: np.ndarray</span>
+
+<span class="sd">        :returns: Optimal gain of the LQR solution.</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">L</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">dlqr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> 
+       
+        <span class="k">return</span> <span class="n">L</span> </div>
+
+    
+<div class="viewcode-block" id="LinearSystem.get_lqr_cost_matrix">
+<a class="viewcode-back" href="../../../models.html#models.LinearSystem.get_lqr_cost_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_lqr_cost_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Q</span><span class="p">,</span><span class="n">R</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solve the discrete-time algebraic Riccati equation (DARE) for the given system.</span>
+
+<span class="sd">        :param Q: The state weighting matrix.</span>
+<span class="sd">        :type Q: np.ndarray</span>
+<span class="sd">        :param R: The input weighting matrix.</span>
+<span class="sd">        :type R: np.ndarray</span>
+
+<span class="sd">        :returns: symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">dlqr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> 
+       
+        <span class="k">return</span> <span class="n">P</span></div>
+
+    
+    
+    
+<div class="viewcode-block" id="LinearSystem.plot_trajectories">
+<a class="viewcode-back" href="../../../models.html#models.LinearSystem.plot_trajectories">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_trj</span><span class="p">,</span> <span class="n">y_trj</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Barebone function to plot state and output trajectories.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x_trj (np.array): State trajectory.</span>
+<span class="sd">            y_trj (np.array): Output trajectory.</span>
+<span class="sd">            title (str): The title of the plot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+        <span class="c1"># Plot state trajectory</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_trj</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1"> - State Trajectories&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time Step&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;State Values&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;State </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">)])</span>
+
+        <span class="c1"># Plot output trajectory</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y_trj</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1"> - Output Trajectories&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time Step&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Output Values&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;Output </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_output</span><span class="p">)])</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+        
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">string_out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="s2">&quot;x_(k+1) = A x_k + B u_k + Bd d_k</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="s2">&quot;y_k     = C x_k + D u_k + Cd d_k</span><span class="se">\n\n\n</span><span class="s2">&quot;</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;Parameters: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dt                    : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="si">}</span><span class="s2"> (note: default is 1)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;state dimension       : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;input dimension       : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;disturbance dimension : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output dimension      : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_output</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;is autonomous          : </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_input</span><span class="p">))</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;has disturbances       : </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">has_disturbance</span><span class="p">))</span>
+
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;System matrices: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="s2">&quot;A = </span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="s2">&quot;B = </span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="s2">&quot;Bd = </span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="s2">&quot;C = </span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="s2">&quot;D = </span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="p">)</span>
+        <span class="n">string_out</span> <span class="o">+=</span> <span class="s2">&quot;Cd = </span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">string_out</span></div>
+
+        
+
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_lqr_controller</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the discrete-time algebraic Riccati equation (DARE) for the given system.</span>
+
+<span class="sd">    :param A: The state matrix.</span>
+<span class="sd">    :type A: np.ndarray</span>
+<span class="sd">    :param B: The input matrix.</span>
+<span class="sd">    :type B: np.ndarray</span>
+<span class="sd">    :param Q: The state weighting matrix.</span>
+<span class="sd">    :type Q: np.ndarray</span>
+<span class="sd">    :param R: The input weighting matrix.</span>
+<span class="sd">    :type R: np.ndarray</span>
+
+<span class="sd">    :returns: Optimal gain of the LQR solution.</span>
+<span class="sd">    :rtype: np.ndarray</span>
+<span class="sd">    :returns: symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.</span>
+<span class="sd">    :rtype np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">L</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">E</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">dlqr</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">L</span><span class="p">,</span><span class="n">P</span>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span> <span class="p">:</span>
+
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">LinearSystem</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">B</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">C</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">D</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

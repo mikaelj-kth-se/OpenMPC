@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>filters.ekf &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">filters.ekf</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for filters.ekf</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">casadi</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ca</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.models.nonlinear_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">NonlinearSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.filters.parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">KFParameters</span>
+
+<div class="viewcode-block" id="EKF">
+<a class="viewcode-back" href="../../filters.html#filters.ekf.EKF">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EKF</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span> <span class="p">:</span> <span class="n">KFParameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the Extended Kalman filter.</span>
+
+<span class="sd">        :param parameters: Kalman filter parameters.</span>
+<span class="sd">        :type parameters: KFParameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="p">:</span> <span class="n">NonlinearSystem</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">parameters</span>
+        
+    
+        <span class="c1"># estract dimensions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ny</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_output</span>
+
+        <span class="c1"># extract symbolic states for differentiation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">inputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_disturbances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">disturbances</span>
+
+        <span class="c1"># define linearized system matrices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">symbolic_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">updfcn_expr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_states</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Bd</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;Bd&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">symbolic_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">updfcn_expr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_disturbances</span><span class="p">)])</span>
+        
+        <span class="c1"># note that we do not linearize the output function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">symbolic_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">outfcn_expr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_states</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">symbolic_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_disturbances</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">outfcn_expr</span><span class="p">])</span>
+
+
+        <span class="c1"># Initialize covariance matrices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_w</span>  <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">Sigma_w</span>  <span class="c1"># Process noise covariance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_v</span>  <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">Sigma_v</span>  <span class="c1"># Measurement noise covariance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_wd</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">Sigma_wd</span>  <span class="c1"># Disturbance noise covariance</span>
+
+        <span class="c1"># Initialize state covariance estimate and state estimate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">P0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">x0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">))</span> <span class="c1"># Kalman Gain</span>
+
+
+        <span class="c1"># Expand filter in case disturbance has to be estimated</span>
+        <span class="k">if</span> <span class="n">parameters</span><span class="o">.</span><span class="n">has_distrubance_filter</span><span class="p">:</span>
+            <span class="c1"># Construct the extended state-space matrices</span>
+
+            <span class="n">A</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">vertcat</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">horzcat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">symbolic_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_disturbances</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">Bd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">symbolic_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_disturbances</span><span class="p">)),</span>
+                            <span class="n">ca</span><span class="o">.</span><span class="n">horzcat</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">DM</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">)</span>                                                <span class="p">,</span> <span class="n">ca</span><span class="o">.</span><span class="n">DM</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">)))</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">symbolic_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbolic_disturbances</span><span class="p">],</span> <span class="p">[</span><span class="n">A</span><span class="p">])</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">d0</span><span class="p">])</span> <span class="c1"># now the state estimate includes also the disturbance estimate</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">P_est</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">))],</span>
+                                   <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_wd</span><span class="p">]])</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">([[</span><span class="bp">self</span><span class="o">.</span><span class="n">Sigma_w</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">))],</span>
+                                    <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_wd</span><span class="p">]])</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span> <span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">))</span> <span class="c1"># Kalman Gain</span>
+
+
+<div class="viewcode-block" id="EKF.prediction_update">
+<a class="viewcode-back" href="../../filters.html#filters.ekf.EKF.prediction_update">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prediction_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform the prediction step of the EKF. If the input is not provided, zero is assumed. </span>
+<span class="sd">        Same approach is considered for the disturbance.</span>
+<span class="sd">        Note that if the disturbance filter is active, then the provided disturbance is ignored</span>
+<span class="sd">        and the current disturbacne estimate is used instead.</span>
+
+<span class="sd">        :param u: Control input.</span>
+<span class="sd">        :type u: np.ndarray, optional</span>
+<span class="sd">        :param d: Disturbance input.</span>
+<span class="sd">        :type d: np.ndarray, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;u must be of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="si">}</span><span class="s2"> or reshapable into it&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;d must be of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="si">}</span><span class="s2"> or reshapable into it&quot;</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">has_distrubance_filter</span><span class="p">:</span>
+            <span class="c1"># if the filter for the distrurbance is active then use the prediction model to update the state</span>
+            <span class="n">state_estimate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">]</span>
+            <span class="n">disturbance_estimate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">:]</span>
+            <span class="n">A_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">(</span><span class="n">state_estimate</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">disturbance_estimate</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>
+            
+            <span class="c1"># update estimate of the extended state (recall disturbance dynamics is just d_t+1 = d_t)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">updfcn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">:]))</span>  <span class="c1"># use nonlinear model to update the state</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span> <span class="o">=</span> <span class="n">A_est</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span> <span class="o">@</span> <span class="n">A_est</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_w</span>           <span class="c1"># use linearized model to update the covariance</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If the disturbance filter is not active then use the provided input to update the state (meaning that the disturbance is know the same as the input is known)</span>
+            <span class="n">A_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">updfcn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="c1"># use nonlinear model to update the state</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span> <span class="o">=</span> <span class="n">A_est</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span> <span class="o">@</span> <span class="n">A_est</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_w</span>           <span class="c1"># use linearized model to update the covariance</span></div>
+
+
+<div class="viewcode-block" id="EKF.measurement_update">
+<a class="viewcode-back" href="../../filters.html#filters.ekf.EKF.measurement_update">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">measurement_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_meas</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">u</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform the measurement update step of the EKF. If the input is not provided, zero is assumed.</span>
+<span class="sd">        Same approach is considered for the disturbance.</span>
+<span class="sd">        Note that if the disturbance filter is active, then the provided disturbance is ignored</span>
+<span class="sd">        and the current disturbacne estimate is used instead.</span>
+
+<span class="sd">        :param y_meas: Measured output.</span>
+<span class="sd">        :type y_meas: np.ndarray</span>
+<span class="sd">        :param u: Control input.</span>
+<span class="sd">        :type u: np.ndarray, optional</span>
+<span class="sd">        :param d: Disturbance input.</span>
+<span class="sd">        :type d: np.ndarray, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;u must be of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="si">}</span><span class="s2"> or reshapable into it&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;d must be of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="si">}</span><span class="s2"> or reshapable into it&quot;</span><span class="p">)</span>
+
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">has_distrubance_filter</span><span class="p">:</span>
+            <span class="c1"># if the filter for the distrurbance is active then use the prediction model to update the state</span>
+            <span class="n">state_estimate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">]</span>
+            <span class="n">disturbance_estimate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">:]</span>
+
+            <span class="n">C_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">(</span><span class="n">state_estimate</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">disturbance_estimate</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>
+            <span class="n">y_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="n">state_estimate</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">disturbance_estimate</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If the disturbance filter is not active then use the provided input to update the state (meaning that the disturbance is know the same as the input is known)</span>
+            <span class="n">C_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span>
+            <span class="n">y_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+     
+
+        <span class="n">S</span> <span class="o">=</span> <span class="n">C_est</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span> <span class="o">@</span> <span class="n">C_est</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_v</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span> <span class="o">@</span> <span class="n">C_est</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span> <span class="o">+</span> <span class="n">K</span> <span class="o">@</span> <span class="p">(</span><span class="n">y_meas</span> <span class="o">-</span> <span class="n">y_est</span><span class="p">)</span>
+
+        <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">P_est</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span> <span class="o">=</span> <span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="n">K</span> <span class="o">@</span> <span class="n">C_est</span><span class="p">)</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span></div>
+
+
+<div class="viewcode-block" id="EKF.get_estimated_state">
+<a class="viewcode-back" href="../../filters.html#filters.ekf.EKF.get_estimated_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_estimated_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the estimated state vector x.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="EKF.get_estimated_disturbance">
+<a class="viewcode-back" href="../../filters.html#filters.ekf.EKF.get_estimated_disturbance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_estimated_disturbance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the estimated disturbance vector d.</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Estimated disturbance vector.</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">has_distrubance_filter</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Disturbance estimation is not enabled in the Kalman filter parameters. Please enable it in the parameters.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EKF.get_covariance">
+<a class="viewcode-back" href="../../filters.html#filters.ekf.EKF.get_covariance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current state covariance estimate.</span>
+
+<span class="sd">        :return: Current state covariance estimate.</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span></div>
+
+
+<div class="viewcode-block" id="EKF.set_state">
+<a class="viewcode-back" href="../../filters.html#filters.ekf.EKF.set_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">d0</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set or reset the state and disturbance estimate.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        :param x0: Initial state estimate for the Kalman filter.</span>
+<span class="sd">        :type x0: np.ndarray</span>
+<span class="sd">        :param d0: Initial disturbance estimate for the Kalman filter.</span>
+<span class="sd">        :type d0: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">has_distrubance_filter</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">d0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">d0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">d0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;d0 must be reshapable into size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x0 must be reshapable into size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_est</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">x0</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">d0</span><span class="o">.</span><span class="n">flatten</span><span class="p">()])</span></div>
+
+
+<div class="viewcode-block" id="EKF.set_covariance_matrix">
+<a class="viewcode-back" href="../../filters.html#filters.ekf.EKF.set_covariance_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_covariance_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set or reset the error covariance matrix.</span>
+<span class="sd">        </span>
+<span class="sd">        :param P0: Initial error covariance matrix.</span>
+<span class="sd">        :type P0: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">P0</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;P0 must have shape (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">P_est</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">P_est</span> <span class="o">=</span> <span class="n">P0</span>  </div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

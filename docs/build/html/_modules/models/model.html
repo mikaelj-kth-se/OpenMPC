@@ -1,0 +1,315 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>models.model &mdash; openmpc 0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=837179f8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#mosek-license">Mosek License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">openmpc</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">openmpc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">models.model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for models.model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+
+<div class="viewcode-block" id="Model">
+<a class="viewcode-back" href="../../models.html#models.model.Model">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Model</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="n">_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;Model&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">Model</span><span class="o">.</span><span class="n">_counter</span><span class="p">)</span>
+            <span class="n">Model</span><span class="o">.</span><span class="n">_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+    
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;discrete time step of the model&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ne">NotImplementedError</span>
+    
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ne">NotImplementedError</span>
+    
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_disturbance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ne">NotImplementedError</span>
+        
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ne">NotImplementedError</span>
+        
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ne">NotImplementedError</span>
+            
+
+<div class="viewcode-block" id="Model.discrete_dynamics">
+<a class="viewcode-back" href="../../models.html#models.model.Model.discrete_dynamics">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">discrete_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">u</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Discrete dynamics</span>
+<span class="sd">        x_{k+1} = f(x_k,u_k,d_k)</span>
+
+<span class="sd">        :param x: state at time k</span>
+<span class="sd">        :type x: np.ndarray</span>
+<span class="sd">        :param u: input at time k</span>
+<span class="sd">        :type u: np.ndarray</span>
+<span class="sd">        :param d: disturbance at time k</span>
+<span class="sd">        :type d: np.ndarray</span>
+<span class="sd">        :return: state at time k+1</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+    
+<div class="viewcode-block" id="Model.output">
+<a class="viewcode-back" href="../../models.html#models.model.Model.output">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">u</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Output function</span>
+<span class="sd">        y = g(x)</span>
+
+<span class="sd">        :param x: state</span>
+<span class="sd">        :type x: np.ndarray</span>
+<span class="sd">        :param u: input</span>
+<span class="sd">        :type u: np.ndarray</span>
+<span class="sd">        :param d: disturbance</span>
+<span class="sd">        :type d: np.ndarray</span>
+
+<span class="sd">        :return: output</span>
+<span class="sd">        :rtype np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+    
+<div class="viewcode-block" id="Model.simulate">
+<a class="viewcode-back" href="../../models.html#models.model.Model.simulate">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">u</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">steps</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simulate the discrete time system for a number of steps. Input should be an array of size (steps, size_input) and disturbance should be an array of size (steps, disturbance_size)</span>
+<span class="sd">        where steps is the number of steps to simulate.</span>
+
+<span class="sd">        :param x0: initial state</span>
+<span class="sd">        :type x0: np.ndarray</span>
+<span class="sd">        :param u: input signal</span>
+<span class="sd">        :type u: np.ndarray</span>
+<span class="sd">        :param d: disturbance signal</span>
+<span class="sd">        :type d: np.ndarray</span>
+<span class="sd">        :param steps: number of steps to simulate</span>
+<span class="sd">        :type steps: int</span>
+<span class="sd">        :return: state trajectory</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+    
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_and_normalise_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">)</span> <span class="p">:</span>
+        
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;State cannot be None.&quot;</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">,)</span> <span class="c1"># flattening</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;State size mismatch the system state. Expected size is array with dimension compatible with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="si">}</span><span class="s2">, given size is </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_and_normalise_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">u</span><span class="p">,</span><span class="n">d</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check and normalise the input and disturbance signals. If u or d is None, then it is set to zeros of appropriate dimensions. If u or d is an array, then its size is checked and reshaped to the expected size.</span>
+
+<span class="sd">        :param u: The input signal to be checked and normalized.</span>
+<span class="sd">        :type u: np.ndarray or None</span>
+<span class="sd">        :param d: The disturbance signal to be checked and normalized.</span>
+<span class="sd">        :type d: np.ndarray or None</span>
+<span class="sd">        :return: The normalized input and disturbance signals.</span>
+<span class="sd">        :rtype: tuple of np.ndarray (u, d)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input signal size mismatch the system input. Expected size is array with dimension compatible with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="si">}</span><span class="s2">, given size is </span><span class="si">{</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Disturbance signal size mismatch the system disturbance. Expected size is array with dimension compatible with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="s2">, given size is </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span>
+
+
+<div class="viewcode-block" id="Model.check_and_normalise_input_signals">
+<a class="viewcode-back" href="../../models.html#models.model.Model.check_and_normalise_input_signals">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_and_normalise_input_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span> <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check and regularize the input triplet (u, d) to the model.</span>
+
+<span class="sd">        If d is not None and u is None, then u is set to zero with same length of the signal d. </span>
+<span class="sd">        If u is not None and d is None, then d is set to zero with the same length of the signal u.</span>
+<span class="sd">        If u and d are not None, then they should have the same number of columns, otherwise an error is raised.</span>
+<span class="sd">        If u and d are None, they are returned as none.</span>
+
+<span class="sd">        :param u: The input signal to be checked and regularized.</span>
+<span class="sd">        :type u: np.ndarray or None</span>
+<span class="sd">        :param d: The disturbance signal to be checked and regularized.</span>
+<span class="sd">        :type d: np.ndarray or None</span>
+<span class="sd">        :return: The regularized input and disturbance signals.</span>
+<span class="sd">        :rtype: tuple of np.ndarray (u, d)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+
+        <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input signal size mismatch the system input. Expected size is array with dimension compatible with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="si">}</span><span class="s2">, given size is </span><span class="si">{</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Disturbance signal size mismatch the system disturbance. Expected size is array with dimension compatible with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="s2">, given size is </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        
+        
+        <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">elif</span> <span class="n">u</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">elif</span> <span class="n">u</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input and disturbance signals should have the same number of columns. Given input signal has </span><span class="si">{</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> columns and disturbance signal has </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> columns. Note that your input signal has </span><span class="si">{</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> dimensions and disturbance signal has </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> dimension.&quot;</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">u</span><span class="p">,</span><span class="n">d</span></div>
+
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot; : &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Mikael Johansson, Pedro Roque and Gregorio Marchesini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

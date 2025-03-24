@@ -6,7 +6,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-.vscode/
 
 # C extensions
 *.so
@@ -175,3 +174,4 @@ cython_debug/
 pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
+

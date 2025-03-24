@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='OpenMPC',  # Replace with your project name
+    name='openmpc',  # Replace with your project name
     version='0.1.0',  # Version of your project
     author='Mikael Johansson',
     author_email='mikaelj@kth.se',
@@ -13,7 +13,7 @@ setup(
     install_requires=[
         'numpy>=1.21.0',  # List your dependencies here
         'casadi>=3.6.3',
-        'cvxpy>=1.3.0',
+        'cvxpy[mosek]>=1.3.0',
         'pycddlib>=3.0.0b6',
         'matplotlib',
         'control'

@@ -1,3 +1,4 @@
+
 ## OpenMPC - an open and flexible MPC toolkit for teaching and research
 
 ![OpenMPC logo](images/logo.png)
