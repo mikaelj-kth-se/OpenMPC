@@ -41,7 +41,6 @@ autodoc_default_options = {
     "module-first": True,  # Show the module name at the top
 }
 
-autodoc_mock_imports = ["pycddlib"]
 
 # Avoid showing module names in front of function definitions
 add_module_names = False 
