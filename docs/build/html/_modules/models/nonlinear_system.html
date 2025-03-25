@@ -31,7 +31,7 @@
           
           <a href="../../index.html">
             
-              <img src="../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -41,14 +41,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#contributing">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -466,7 +470,11 @@
     
 <div class="viewcode-block" id="NonlinearSystem.compute_lqr_controller">
 <a class="viewcode-back" href="../../models.html#models.nonlinear_system.NonlinearSystem.compute_lqr_controller">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_lqr_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">x_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">u_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_lqr_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                                     <span class="n">R</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                                     <span class="n">x_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                                     <span class="n">u_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                                     <span class="n">d_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the infinite-horizon LQR controller for the given prediction model.</span>
 
@@ -481,8 +489,8 @@
 <span class="sd">        :param d_ref: The reference disturbance vector. If not provided, set to a zero vector of the same dimension as &#39;d&#39; in the prediction model.</span>
 <span class="sd">        :type d_ref: np.ndarray, optional</span>
 <span class="sd">        </span>
-<span class="sd">        :return: The LQR controller gain matrix, the Riccati solution, and the discrete-time state-space model.</span>
-<span class="sd">        :rtype: np.ndarray, np.ndarray</span>
+<span class="sd">        :return: A tuple (L,P) where L is the feedback gain matrix and P is the algebraic Riccati equation solution.</span>
+<span class="sd">        :rtype: tuple(np.ndarray, np.ndarray)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
 
@@ -501,7 +509,7 @@
         <span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">Bd</span><span class="p">,</span><span class="n">Dd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linearize</span><span class="p">(</span><span class="n">x_ref</span><span class="p">,</span> <span class="n">u_ref</span><span class="p">,</span> <span class="n">d_ref</span><span class="p">)</span>
         
         <span class="c1"># Compute the infinite-horizon LQR controller using dlqr</span>
-        <span class="n">L</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ctrl</span><span class="o">.</span><span class="n">dlqr</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+        <span class="n">L</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span>  <span class="n">ctrl</span><span class="o">.</span><span class="n">dlqr</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="n">L</span><span class="p">,</span> <span class="n">P</span></div>
 

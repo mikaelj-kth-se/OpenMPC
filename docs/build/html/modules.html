@@ -23,7 +23,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="invariant_sets package" href="invariant_sets.html" />
-    <link rel="prev" title="Examples" href="examples.html" /> 
+    <link rel="prev" title="Model Predictive Control" href="about_openmpc.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
           
           <a href="index.html">
             
-              <img src="_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -46,14 +46,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#contributing">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
@@ -165,6 +169,7 @@
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.get_system_matrices"><code class="docutils literal notranslate"><span class="pre">LinearSystem.get_system_matrices()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.output"><code class="docutils literal notranslate"><span class="pre">LinearSystem.output()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.plot_trajectories"><code class="docutils literal notranslate"><span class="pre">LinearSystem.plot_trajectories()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.set_disturbance_interface"><code class="docutils literal notranslate"><span class="pre">LinearSystem.set_disturbance_interface()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.simulate"><code class="docutils literal notranslate"><span class="pre">LinearSystem.simulate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.size_disturbance"><code class="docutils literal notranslate"><span class="pre">LinearSystem.size_disturbance</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.size_input"><code class="docutils literal notranslate"><span class="pre">LinearSystem.size_input</span></code></a></li>
@@ -226,6 +231,7 @@
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.get_system_matrices"><code class="docutils literal notranslate"><span class="pre">LinearSystem.get_system_matrices()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.output"><code class="docutils literal notranslate"><span class="pre">LinearSystem.output()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.plot_trajectories"><code class="docutils literal notranslate"><span class="pre">LinearSystem.plot_trajectories()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.set_disturbance_interface"><code class="docutils literal notranslate"><span class="pre">LinearSystem.set_disturbance_interface()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.simulate"><code class="docutils literal notranslate"><span class="pre">LinearSystem.simulate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.size_disturbance"><code class="docutils literal notranslate"><span class="pre">LinearSystem.size_disturbance</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.size_input"><code class="docutils literal notranslate"><span class="pre">LinearSystem.size_input</span></code></a></li>
@@ -377,25 +383,21 @@
 <li class="toctree-l2"><a class="reference internal" href="filters.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="filters.html#module-filters.ekf">filters.ekf module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="filters.html#filters.ekf.EKF"><code class="docutils literal notranslate"><span class="pre">EKF</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.ekf.EKF.get_covariance"><code class="docutils literal notranslate"><span class="pre">EKF.get_covariance()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.ekf.EKF.get_estimated_disturbance"><code class="docutils literal notranslate"><span class="pre">EKF.get_estimated_disturbance()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.ekf.EKF.get_estimated_state"><code class="docutils literal notranslate"><span class="pre">EKF.get_estimated_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.ekf.EKF.get_covariance_estimate"><code class="docutils literal notranslate"><span class="pre">EKF.get_covariance_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.ekf.EKF.get_disturbance_estimate"><code class="docutils literal notranslate"><span class="pre">EKF.get_disturbance_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.ekf.EKF.get_state_estimate"><code class="docutils literal notranslate"><span class="pre">EKF.get_state_estimate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="filters.html#filters.ekf.EKF.measurement_update"><code class="docutils literal notranslate"><span class="pre">EKF.measurement_update()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="filters.html#filters.ekf.EKF.prediction_update"><code class="docutils literal notranslate"><span class="pre">EKF.prediction_update()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.ekf.EKF.set_covariance_matrix"><code class="docutils literal notranslate"><span class="pre">EKF.set_covariance_matrix()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.ekf.EKF.set_state"><code class="docutils literal notranslate"><span class="pre">EKF.set_state()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="filters.html#module-filters.kf">filters.kf module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="filters.html#filters.kf.KalmanFilter"><code class="docutils literal notranslate"><span class="pre">KalmanFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.kf.KalmanFilter.get_estimated_disturbance"><code class="docutils literal notranslate"><span class="pre">KalmanFilter.get_estimated_disturbance()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.kf.KalmanFilter.get_estimated_state"><code class="docutils literal notranslate"><span class="pre">KalmanFilter.get_estimated_state()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.kf.KalmanFilter.measurement_update"><code class="docutils literal notranslate"><span class="pre">KalmanFilter.measurement_update()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.kf.KalmanFilter.prediction_update"><code class="docutils literal notranslate"><span class="pre">KalmanFilter.prediction_update()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.kf.KalmanFilter.set_covariance_matrix"><code class="docutils literal notranslate"><span class="pre">KalmanFilter.set_covariance_matrix()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.kf.KalmanFilter.set_state"><code class="docutils literal notranslate"><span class="pre">KalmanFilter.set_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filters.html#filters.kf.KF"><code class="docutils literal notranslate"><span class="pre">KF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.kf.KF.get_disturbance_estimate"><code class="docutils literal notranslate"><span class="pre">KF.get_disturbance_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.kf.KF.get_state_estimate"><code class="docutils literal notranslate"><span class="pre">KF.get_state_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.kf.KF.measurement_update"><code class="docutils literal notranslate"><span class="pre">KF.measurement_update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.kf.KF.prediction_update"><code class="docutils literal notranslate"><span class="pre">KF.prediction_update()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -407,7 +409,28 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="filters.html#module-filters">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="filters.html#module-filters">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="filters.html#filters.EKF"><code class="docutils literal notranslate"><span class="pre">EKF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.EKF.get_covariance_estimate"><code class="docutils literal notranslate"><span class="pre">EKF.get_covariance_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.EKF.get_disturbance_estimate"><code class="docutils literal notranslate"><span class="pre">EKF.get_disturbance_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.EKF.get_state_estimate"><code class="docutils literal notranslate"><span class="pre">EKF.get_state_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.EKF.measurement_update"><code class="docutils literal notranslate"><span class="pre">EKF.measurement_update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.EKF.prediction_update"><code class="docutils literal notranslate"><span class="pre">EKF.prediction_update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="filters.html#filters.KF"><code class="docutils literal notranslate"><span class="pre">KF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.KF.get_disturbance_estimate"><code class="docutils literal notranslate"><span class="pre">KF.get_disturbance_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.KF.get_state_estimate"><code class="docutils literal notranslate"><span class="pre">KF.get_state_estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.KF.measurement_update"><code class="docutils literal notranslate"><span class="pre">KF.measurement_update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.KF.prediction_update"><code class="docutils literal notranslate"><span class="pre">KF.prediction_update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="filters.html#filters.KFParameters"><code class="docutils literal notranslate"><span class="pre">KFParameters</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="filters.html#filters.KFParameters.add_constant_disturbance_prediction"><code class="docutils literal notranslate"><span class="pre">KFParameters.add_constant_disturbance_prediction()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -418,7 +441,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="about_openmpc.html" class="btn btn-neutral float-left" title="Model Predictive Control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="invariant_sets.html" class="btn btn-neutral float-right" title="invariant_sets package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

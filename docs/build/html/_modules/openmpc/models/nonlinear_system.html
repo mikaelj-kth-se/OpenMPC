@@ -31,7 +31,7 @@
           
           <a href="../../../index.html">
             
-              <img src="../../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -41,14 +41,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#contributing">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -88,7 +92,7 @@
 
 
 <div class="viewcode-block" id="NonlinearSystem">
-<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NonlinearSystem</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disturbances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outfcn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
@@ -196,7 +200,7 @@
     
     
 <div class="viewcode-block" id="NonlinearSystem.c2d">
-<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.c2d">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.c2d">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">c2d</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disturbances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outfcn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">integrator</span><span class="o">=</span><span class="s1">&#39;RK4&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -230,7 +234,7 @@
     
     
 <div class="viewcode-block" id="NonlinearSystem.discrete_dynamics">
-<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.discrete_dynamics">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.discrete_dynamics">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">discrete_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Discrete dynamics</span>
@@ -258,7 +262,7 @@
 
     
 <div class="viewcode-block" id="NonlinearSystem.output">
-<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.output">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.output">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Output function</span>
@@ -285,7 +289,7 @@
 
 
 <div class="viewcode-block" id="NonlinearSystem.simulate">
-<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.simulate">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.simulate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simulate the discrete time system for a number of steps. Input should be an array of size (steps, size_input) and disturbance should be an array of size (steps, disturbance_size)</span>
@@ -335,7 +339,7 @@
     
     
 <div class="viewcode-block" id="NonlinearSystem.linearize">
-<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.linearize">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.linearize">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">linearize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">u_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Linearize the NonlinearSystem around a target point with the form (xref, uref, dref).</span>
@@ -397,7 +401,7 @@
 
 
 <div class="viewcode-block" id="NonlinearSystem.get_target_point">
-<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.get_target_point">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.get_target_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_target_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a reference output valye y_ref we want to find the the eqilubrium pair (xref, uref) that satisfies the equilibrium conditions:</span>
@@ -465,8 +469,12 @@
 
     
 <div class="viewcode-block" id="NonlinearSystem.compute_lqr_controller">
-<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.compute_lqr_controller">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_lqr_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">x_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">u_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.compute_lqr_controller">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_lqr_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                                     <span class="n">R</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                                     <span class="n">x_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                                     <span class="n">u_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                                     <span class="n">d_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the infinite-horizon LQR controller for the given prediction model.</span>
 
@@ -481,8 +489,8 @@
 <span class="sd">        :param d_ref: The reference disturbance vector. If not provided, set to a zero vector of the same dimension as &#39;d&#39; in the prediction model.</span>
 <span class="sd">        :type d_ref: np.ndarray, optional</span>
 <span class="sd">        </span>
-<span class="sd">        :return: The LQR controller gain matrix, the Riccati solution, and the discrete-time state-space model.</span>
-<span class="sd">        :rtype: np.ndarray, np.ndarray</span>
+<span class="sd">        :return: A tuple (L,P) where L is the feedback gain matrix and P is the algebraic Riccati equation solution.</span>
+<span class="sd">        :rtype: tuple(np.ndarray, np.ndarray)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
 
@@ -501,7 +509,7 @@
         <span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">Bd</span><span class="p">,</span><span class="n">Dd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linearize</span><span class="p">(</span><span class="n">x_ref</span><span class="p">,</span> <span class="n">u_ref</span><span class="p">,</span> <span class="n">d_ref</span><span class="p">)</span>
         
         <span class="c1"># Compute the infinite-horizon LQR controller using dlqr</span>
-        <span class="n">L</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ctrl</span><span class="o">.</span><span class="n">dlqr</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+        <span class="n">L</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span>  <span class="n">ctrl</span><span class="o">.</span><span class="n">dlqr</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="n">L</span><span class="p">,</span> <span class="n">P</span></div>
 

@@ -31,7 +31,7 @@
           
           <a href="../../../index.html">
             
-              <img src="../../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -41,14 +41,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#contributing">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -85,7 +89,7 @@
 
 
 <div class="viewcode-block" id="RK">
-<a class="viewcode-back" href="../../../support.html#support.RK">[docs]</a>
+<a class="viewcode-back" href="../../../support.html#openmpc.support.integrators.RK">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">RK</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">,</span><span class="n">disturbances</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a Runge-Kutta expression for the given ODE. Note that the expression in the output will depend only on the given </span>
@@ -153,7 +157,7 @@
 
 
 <div class="viewcode-block" id="forward_euler">
-<a class="viewcode-back" href="../../../support.html#support.forward_euler">[docs]</a>
+<a class="viewcode-back" href="../../../support.html#openmpc.support.integrators.forward_euler">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">forward_euler</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">,</span><span class="n">disturbances</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a forward-Euler expression for the given ODE. Note that the expression in the output will depend only on the given </span>
@@ -204,7 +208,7 @@
 
 
 <div class="viewcode-block" id="Integrator">
-<a class="viewcode-back" href="../../../support.html#support.Integrator">[docs]</a>
+<a class="viewcode-back" href="../../../support.html#openmpc.support.integrators.Integrator">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Integrator</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">,</span><span class="n">disturbances</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">integratorType</span><span class="o">=</span><span class="s1">&#39;RK4&#39;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="n">integratorType</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;RK&#39;</span><span class="p">):</span>

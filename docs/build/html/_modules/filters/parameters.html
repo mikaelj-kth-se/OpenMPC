@@ -31,7 +31,7 @@
           
           <a href="../../index.html">
             
-              <img src="../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -41,14 +41,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#contributing">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -122,7 +126,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">P0</span> <span class="o">=</span> <span class="n">P0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_wd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d0</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d0</span>       <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P0d</span>      <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">))</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">has_distrubance_filter</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># checks </span>
@@ -150,7 +156,7 @@
         
 <div class="viewcode-block" id="KFParameters.add_constant_disturbance_prediction">
 <a class="viewcode-back" href="../../filters.html#filters.parameters.KFParameters.add_constant_disturbance_prediction">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_constant_disturbance_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Sigma_wd</span>  <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span> <span class="n">d0</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_constant_disturbance_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Sigma_wd</span>  <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span> <span class="n">d0</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">P0d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">float</span><span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add disturbace prediction to the Kalman filter parameters.</span>
 
@@ -160,20 +166,27 @@
 <span class="sd">        :type d0: np.ndarray</span>
 <span class="sd">    </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_wd</span> <span class="o">=</span> <span class="n">Sigma_wd</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d0</span> <span class="o">=</span> <span class="n">d0</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">d0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;d0 must be of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="s2"> or resizable into it&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Sigma_wd</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_wd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span> <span class="o">*</span> <span class="n">Sigma_wd</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Sigma_wd</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">Sigma_wd</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span> <span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sigma_wd must be of size (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Sigma_wd</span> <span class="o">=</span> <span class="n">Sigma_wd</span>
 
-        
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d0</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span> <span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;d0 must be of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">P0d</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">P0d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span> <span class="o">*</span> <span class="n">P0d</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">P0d</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">P0d</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;P0d must be of size (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">P0d</span> <span class="o">=</span> <span class="n">P0d</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">has_distrubance_filter</span> <span class="o">=</span> <span class="kc">True</span></div>
 </div>

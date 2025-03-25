@@ -31,7 +31,7 @@
           
           <a href="../../index.html">
             
-              <img src="../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -41,14 +41,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#contributing">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -384,6 +388,7 @@
 <span class="sd">        :param reference: The reference trajectory.</span>
 <span class="sd">        :type reference: np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_output</span><span class="p">,)</span>  <span class="c1"># Explicitly set to correct shape</span></div>
 
 
@@ -504,6 +509,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_penalty_weight</span> <span class="o">*</span> <span class="n">penalty_weight</span> <span class="o">*</span> <span class="n">cp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">slack</span><span class="p">)</span>  <span class="c1"># Quadratic penalty</span>
             <span class="k">else</span> <span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid slack penalty type. Must be &#39;LINEAR&#39; or &#39;SQUARE&#39;.&quot;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">soft_tracking</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span> <span class="o">==</span> <span class="s1">&#39;LINEAR&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracking_penalty_weight</span> <span class="o">*</span> <span class="n">cp</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slack_tracking</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span> <span class="o">==</span> <span class="s1">&#39;SQUARE&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracking_penalty_weight</span> <span class="o">*</span> <span class="n">cp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slack_tracking</span><span class="p">)</span>
 
         <span class="c1"># Create the problem instance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">problem</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">Minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cost</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
@@ -518,7 +529,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_disturbance</span><span class="p">(</span><span class="n">disturbance</span><span class="p">)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">u_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">u_pred</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># Return the entire vector for the first control input</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">u_pred</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>  <span class="c1"># Return the entire vector for the first control input</span></div>
 
 
 

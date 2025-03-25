@@ -35,7 +35,7 @@
           
           <a href="index.html">
             
-              <img src="_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -45,14 +45,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#contributing">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
@@ -68,14 +72,19 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-filters.kf">filters.kf module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#filters.kf.KalmanFilter"><code class="docutils literal notranslate"><span class="pre">KalmanFilter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filters.kf.KF"><code class="docutils literal notranslate"><span class="pre">KF</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-filters.parameters">filters.parameters module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#filters.parameters.KFParameters"><code class="docutils literal notranslate"><span class="pre">KFParameters</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-filters">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-filters">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#filters.EKF"><code class="docutils literal notranslate"><span class="pre">EKF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filters.KF"><code class="docutils literal notranslate"><span class="pre">KF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filters.KFParameters"><code class="docutils literal notranslate"><span class="pre">KFParameters</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -116,11 +125,13 @@
 <span id="filters-ekf-module"></span><h2>filters.ekf module<a class="headerlink" href="#module-filters.ekf" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="filters.ekf.EKF">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EKF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">KFParameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EKF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="openmpc.filters.html#openmpc.filters.parameters.KFParameters" title="openmpc.filters.parameters.KFParameters"><span class="pre">KFParameters</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Extended Kalman Filter class.</p>
+<p>This class creates a an Extended Kalman filter class.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="filters.ekf.EKF.get_covariance">
-<span class="sig-name descname"><span class="pre">get_covariance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF.get_covariance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF.get_covariance" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="filters.ekf.EKF.get_covariance_estimate">
+<span class="sig-name descname"><span class="pre">get_covariance_estimate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF.get_covariance_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF.get_covariance_estimate" title="Link to this definition"></a></dt>
 <dd><p>Get the current state covariance estimate.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -133,8 +144,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="filters.ekf.EKF.get_estimated_disturbance">
-<span class="sig-name descname"><span class="pre">get_estimated_disturbance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF.get_estimated_disturbance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF.get_estimated_disturbance" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="filters.ekf.EKF.get_disturbance_estimate">
+<span class="sig-name descname"><span class="pre">get_disturbance_estimate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF.get_disturbance_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF.get_disturbance_estimate" title="Link to this definition"></a></dt>
 <dd><p>Return the estimated disturbance vector d.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -147,14 +158,14 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="filters.ekf.EKF.get_estimated_state">
-<span class="sig-name descname"><span class="pre">get_estimated_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF.get_estimated_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF.get_estimated_state" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="filters.ekf.EKF.get_state_estimate">
+<span class="sig-name descname"><span class="pre">get_state_estimate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF.get_state_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF.get_state_estimate" title="Link to this definition"></a></dt>
 <dd><p>Return the estimated state vector x.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="filters.ekf.EKF.measurement_update">
-<span class="sig-name descname"><span class="pre">measurement_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_meas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF.measurement_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF.measurement_update" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">measurement_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF.measurement_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF.measurement_update" title="Link to this definition"></a></dt>
 <dd><p>Perform the measurement update step of the EKF. If the input is not provided, zero is assumed.
 Same approach is considered for the disturbance.
 Note that if the disturbance filter is active, then the provided disturbance is ignored
@@ -162,7 +173,7 @@ and the current disturbacne estimate is used instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>y_meas</strong> (<em>np.ndarray</em>) – Measured output.</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – Measured output.</p></li>
 <li><p><strong>u</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Control input.</p></li>
 <li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Disturbance input.</p></li>
 </ul>
@@ -187,99 +198,78 @@ and the current disturbacne estimate is used instead.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="filters.ekf.EKF.set_covariance_matrix">
-<span class="sig-name descname"><span class="pre">set_covariance_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF.set_covariance_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF.set_covariance_matrix" title="Link to this definition"></a></dt>
-<dd><p>Set or reset the error covariance matrix.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>P0</strong> (<em>np.ndarray</em>) – Initial error covariance matrix.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="filters.ekf.EKF.set_state">
-<span class="sig-name descname"><span class="pre">set_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/ekf.html#EKF.set_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.ekf.EKF.set_state" title="Link to this definition"></a></dt>
-<dd><p>Set or reset the state and disturbance estimate.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x0</strong> (<em>np.ndarray</em>) – Initial state estimate for the Kalman filter.</p></li>
-<li><p><strong>d0</strong> (<em>np.ndarray</em>) – Initial disturbance estimate for the Kalman filter.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
 <section id="module-filters.kf">
 <span id="filters-kf-module"></span><h2>filters.kf module<a class="headerlink" href="#module-filters.kf" title="Link to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="filters.kf.KalmanFilter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">KalmanFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">KFParameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_stationary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KalmanFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KalmanFilter" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="filters.kf.KF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">KF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="openmpc.filters.html#openmpc.filters.parameters.KFParameters" title="openmpc.filters.parameters.KFParameters"><span class="pre">KFParameters</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_stationary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KF" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Kalman filter class for output regulation for linear time-invariant systems under constant unkown input perturbations.</p>
-<p>Extended system takes the form</p>
+<p>Kalman filter class for output regulation for linear time-invariant systems under constant unknown input perturbations.</p>
+<p>Extended system takes the form:</p>
 <div class="math notranslate nohighlight">
-\[ \begin{align}\begin{aligned}egin{align*}
-x_{t+1} = A x_t + B u_t + Bd d_t + wx_t\
-d_{t+1} = d_t + wd_t\
-y_t     = C x_t + D u_t + Cd d_t + v_t\
-\end{align*}\\where\\A_ext = [A Bd]
-        [0 I ]
-B_ext = [B]
-        [0]
-C_ext = [C Cd]\end{aligned}\end{align} \]</div>
+\[egin{aligned}
+    x_{t+1} &amp;= A x_t + B u_t + B_d d_t + w_x\
+    d_{t+1} &amp;= d_t + w_d\
+    y_t     &amp;= C x_t + D u_t + C_d d_t + v_t
+\end{aligned}\]</div>
+<p>where the extended system matrices are:</p>
+<div class="math notranslate nohighlight">
+\[A_{     ext{ext}} =
+egin{bmatrix}
+    A &amp; B_d \
+    0 &amp; I
+\end{bmatrix}, \quad
+B_{     ext{ext}} =
+egin{bmatrix}
+    B \
+    0
+\end{bmatrix}, \quad
+C_{     ext{ext}} =
+egin{bmatrix}
+    C &amp; C_d
+\end{bmatrix}, \quad
+D_{     ext{ext}} =
+egin{bmatrix}
+    D \
+    0
+\end{bmatrix}\]</div>
 <dl class="py method">
-<dt class="sig sig-object py" id="filters.kf.KalmanFilter.get_estimated_disturbance">
-<span class="sig-name descname"><span class="pre">get_estimated_disturbance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KalmanFilter.get_estimated_disturbance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KalmanFilter.get_estimated_disturbance" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="filters.kf.KF.get_disturbance_estimate">
+<span class="sig-name descname"><span class="pre">get_disturbance_estimate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KF.get_disturbance_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KF.get_disturbance_estimate" title="Link to this definition"></a></dt>
 <dd><p>Return the estimated disturbance vector d.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="filters.kf.KalmanFilter.get_estimated_state">
-<span class="sig-name descname"><span class="pre">get_estimated_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KalmanFilter.get_estimated_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KalmanFilter.get_estimated_state" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="filters.kf.KF.get_state_estimate">
+<span class="sig-name descname"><span class="pre">get_state_estimate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KF.get_state_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KF.get_state_estimate" title="Link to this definition"></a></dt>
 <dd><p>Return the estimated state vector x.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="filters.kf.KalmanFilter.measurement_update">
-<span class="sig-name descname"><span class="pre">measurement_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KalmanFilter.measurement_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KalmanFilter.measurement_update" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="filters.kf.KF.measurement_update">
+<span class="sig-name descname"><span class="pre">measurement_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KF.measurement_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KF.measurement_update" title="Link to this definition"></a></dt>
 <dd><p>Update the state estimate based on the new measurement.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="filters.kf.KalmanFilter.prediction_update">
-<span class="sig-name descname"><span class="pre">prediction_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KalmanFilter.prediction_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KalmanFilter.prediction_update" title="Link to this definition"></a></dt>
-<dd><p>Predict the next state based on the system dynamics and control input.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="filters.kf.KalmanFilter.set_covariance_matrix">
-<span class="sig-name descname"><span class="pre">set_covariance_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KalmanFilter.set_covariance_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KalmanFilter.set_covariance_matrix" title="Link to this definition"></a></dt>
-<dd><p>Set or reset the error covariance matrix.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>P0</strong> (<em>np.ndarray</em>) – Initial error covariance matrix.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="filters.kf.KalmanFilter.set_state">
-<span class="sig-name descname"><span class="pre">set_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KalmanFilter.set_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KalmanFilter.set_state" title="Link to this definition"></a></dt>
-<dd><p>Set or reset the state and disturbance estimate.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x0</strong> (<em>np.ndarray</em>) – Initial state estimate for the Kalman filter.</p></li>
-<li><p><strong>d0</strong> (<em>np.ndarray</em>) – Initial disturbance estimate for the Kalman filter.</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – Measurement vector</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em>) – Control input</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.kf.KF.prediction_update">
+<span class="sig-name descname"><span class="pre">prediction_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/kf.html#KF.prediction_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.kf.KF.prediction_update" title="Link to this definition"></a></dt>
+<dd><p>Predict the next state based on the system dynamics and control input.
+:param u: Control input
+:type u: np.ndarray
+:return: Estimated state vector x
+:rtype: np.ndarray</p>
 </dd></dl>
 
 </dd></dl>
@@ -289,12 +279,12 @@ C_ext = [C Cd]\end{aligned}\end{align} \]</div>
 <span id="filters-parameters-module"></span><h2>filters.parameters module<a class="headerlink" href="#module-filters.parameters" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="filters.parameters.KFParameters">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">KFParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="models.html#models.NonlinearSystem" title="openmpc.models.nonlinear_system.NonlinearSystem"><span class="pre">NonlinearSystem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="models.html#models.LinearSystem" title="openmpc.models.linear_system.LinearSystem"><span class="pre">LinearSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sigma_w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sigma_v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/parameters.html#KFParameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.parameters.KFParameters" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">KFParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem" title="openmpc.models.nonlinear_system.NonlinearSystem"><span class="pre">NonlinearSystem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="openmpc.models.html#openmpc.models.linear_system.LinearSystem" title="openmpc.models.linear_system.LinearSystem"><span class="pre">LinearSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sigma_w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sigma_v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/parameters.html#KFParameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.parameters.KFParameters" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Defines set of parameters to be fed into  general Kalman filter!</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="filters.parameters.KFParameters.add_constant_disturbance_prediction">
-<span class="sig-name descname"><span class="pre">add_constant_disturbance_prediction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Sigma_wd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/parameters.html#KFParameters.add_constant_disturbance_prediction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.parameters.KFParameters.add_constant_disturbance_prediction" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_constant_disturbance_prediction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Sigma_wd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P0d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/filters/parameters.html#KFParameters.add_constant_disturbance_prediction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.parameters.KFParameters.add_constant_disturbance_prediction" title="Link to this definition"></a></dt>
 <dd><p>Add disturbace prediction to the Kalman filter parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -311,6 +301,175 @@ C_ext = [C Cd]\end{aligned}\end{align} \]</div>
 </section>
 <section id="module-filters">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-filters" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="filters.EKF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EKF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="openmpc.filters.html#openmpc.filters.parameters.KFParameters" title="openmpc.filters.parameters.KFParameters"><span class="pre">KFParameters</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/ekf.html#EKF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.EKF" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Extended Kalman Filter class.</p>
+<p>This class creates a an Extended Kalman filter class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.EKF.get_covariance_estimate">
+<span class="sig-name descname"><span class="pre">get_covariance_estimate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/ekf.html#EKF.get_covariance_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.EKF.get_covariance_estimate" title="Link to this definition"></a></dt>
+<dd><p>Get the current state covariance estimate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Current state covariance estimate.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.EKF.get_disturbance_estimate">
+<span class="sig-name descname"><span class="pre">get_disturbance_estimate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/ekf.html#EKF.get_disturbance_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.EKF.get_disturbance_estimate" title="Link to this definition"></a></dt>
+<dd><p>Return the estimated disturbance vector d.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Estimated disturbance vector.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.EKF.get_state_estimate">
+<span class="sig-name descname"><span class="pre">get_state_estimate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/ekf.html#EKF.get_state_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.EKF.get_state_estimate" title="Link to this definition"></a></dt>
+<dd><p>Return the estimated state vector x.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.EKF.measurement_update">
+<span class="sig-name descname"><span class="pre">measurement_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/ekf.html#EKF.measurement_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.EKF.measurement_update" title="Link to this definition"></a></dt>
+<dd><p>Perform the measurement update step of the EKF. If the input is not provided, zero is assumed.
+Same approach is considered for the disturbance.
+Note that if the disturbance filter is active, then the provided disturbance is ignored
+and the current disturbacne estimate is used instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – Measured output.</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Control input.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Disturbance input.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.EKF.prediction_update">
+<span class="sig-name descname"><span class="pre">prediction_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/ekf.html#EKF.prediction_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.EKF.prediction_update" title="Link to this definition"></a></dt>
+<dd><p>Perform the prediction step of the EKF. If the input is not provided, zero is assumed.
+Same approach is considered for the disturbance.
+Note that if the disturbance filter is active, then the provided disturbance is ignored
+and the current disturbacne estimate is used instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Control input.</p></li>
+<li><p><strong>d</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Disturbance input.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="filters.KF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">KF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="openmpc.filters.html#openmpc.filters.parameters.KFParameters" title="openmpc.filters.parameters.KFParameters"><span class="pre">KFParameters</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_stationary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/kf.html#KF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.KF" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Kalman filter class for output regulation for linear time-invariant systems under constant unknown input perturbations.</p>
+<p>Extended system takes the form:</p>
+<div class="math notranslate nohighlight">
+\[egin{aligned}
+    x_{t+1} &amp;= A x_t + B u_t + B_d d_t + w_x\
+    d_{t+1} &amp;= d_t + w_d\
+    y_t     &amp;= C x_t + D u_t + C_d d_t + v_t
+\end{aligned}\]</div>
+<p>where the extended system matrices are:</p>
+<div class="math notranslate nohighlight">
+\[A_{     ext{ext}} =
+egin{bmatrix}
+    A &amp; B_d \
+    0 &amp; I
+\end{bmatrix}, \quad
+B_{     ext{ext}} =
+egin{bmatrix}
+    B \
+    0
+\end{bmatrix}, \quad
+C_{     ext{ext}} =
+egin{bmatrix}
+    C &amp; C_d
+\end{bmatrix}, \quad
+D_{     ext{ext}} =
+egin{bmatrix}
+    D \
+    0
+\end{bmatrix}\]</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.KF.get_disturbance_estimate">
+<span class="sig-name descname"><span class="pre">get_disturbance_estimate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/kf.html#KF.get_disturbance_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.KF.get_disturbance_estimate" title="Link to this definition"></a></dt>
+<dd><p>Return the estimated disturbance vector d.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.KF.get_state_estimate">
+<span class="sig-name descname"><span class="pre">get_state_estimate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/kf.html#KF.get_state_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.KF.get_state_estimate" title="Link to this definition"></a></dt>
+<dd><p>Return the estimated state vector x.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.KF.measurement_update">
+<span class="sig-name descname"><span class="pre">measurement_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/kf.html#KF.measurement_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.KF.measurement_update" title="Link to this definition"></a></dt>
+<dd><p>Update the state estimate based on the new measurement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – Measurement vector</p></li>
+<li><p><strong>u</strong> (<em>np.ndarray</em>) – Control input</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.KF.prediction_update">
+<span class="sig-name descname"><span class="pre">prediction_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/kf.html#KF.prediction_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.KF.prediction_update" title="Link to this definition"></a></dt>
+<dd><p>Predict the next state based on the system dynamics and control input.
+:param u: Control input
+:type u: np.ndarray
+:return: Estimated state vector x
+:rtype: np.ndarray</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="filters.KFParameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">KFParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem" title="openmpc.models.nonlinear_system.NonlinearSystem"><span class="pre">NonlinearSystem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="openmpc.models.html#openmpc.models.linear_system.LinearSystem" title="openmpc.models.linear_system.LinearSystem"><span class="pre">LinearSystem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sigma_w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sigma_v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/parameters.html#KFParameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.KFParameters" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Defines set of parameters to be fed into  general Kalman filter!</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="filters.KFParameters.add_constant_disturbance_prediction">
+<span class="sig-name descname"><span class="pre">add_constant_disturbance_prediction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Sigma_wd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P0d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/filters/parameters.html#KFParameters.add_constant_disturbance_prediction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#filters.KFParameters.add_constant_disturbance_prediction" title="Link to this definition"></a></dt>
+<dd><p>Add disturbace prediction to the Kalman filter parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Sigma_wd</strong> (<em>np.ndarray</em><em> | </em><em>float</em>) – Process noise covariance for the disturbance. If float, the assume Sigma_wd = eye(size_d) * Sigma_wd</p></li>
+<li><p><strong>d0</strong> (<em>np.ndarray</em>) – Initial disturbance estimate for the Kalman filter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

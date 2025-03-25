@@ -1,4 +1,4 @@
-installation
+Installation
 --------------------------------------------------------------------
 
 This repo contains OpenMPC, an open, flexible and easy-to-use MPC

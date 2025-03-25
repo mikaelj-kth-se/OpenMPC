@@ -31,7 +31,7 @@
           
           <a href="../../index.html">
             
-              <img src="../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -41,14 +41,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html#contributing">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -421,7 +425,6 @@
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
-      
 
         <span class="c1"># Extract MPC parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span>               <span class="p">:</span> <span class="n">MPCProblem</span>   <span class="o">=</span> <span class="n">mpc_params</span>
@@ -441,7 +444,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">global_penalty_weight</span> <span class="p">:</span> <span class="nb">float</span>            <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">global_penalty_weight</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">solver</span>               <span class="p">:</span> <span class="nb">str</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">solver</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span>        <span class="p">:</span> <span class="nb">float</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">slack_penalty</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span>        <span class="p">:</span> <span class="nb">str</span>        <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">slack_penalty</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span>         <span class="p">:</span> <span class="n">Polytope</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">terminal_set</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span>                 <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">reference_controller</span>  <span class="c1"># reference linear feedback gain (default to zero)</span>
@@ -452,7 +455,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">opti</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">Opti</span><span class="p">()</span>
 
         <span class="c1"># Tracking reference and siturbance parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">r</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opti</span><span class="o">.</span><span class="n">parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_output</span><span class="p">)</span>       <span class="c1"># reference output</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d</span>       <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opti</span><span class="o">.</span><span class="n">parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span>  <span class="c1"># Disturbance parameter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_ref</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opti</span><span class="o">.</span><span class="n">parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>                        <span class="c1"># reference state s.t.  f(x_ref, u_ref, d) = 0 and g(x_ref, u_ref, d) = y_ref</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">u_ref</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opti</span><span class="o">.</span><span class="n">parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>                        <span class="c1"># reference input s.t.  f(x_ref, u_ref, d) = 0 and g(x_ref, u_ref, d) = y_ref</span>
@@ -543,6 +545,7 @@
                     <span class="n">slack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opti</span><span class="o">.</span><span class="n">variable</span><span class="p">()</span>
                     <span class="n">slack_variables</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">slack</span><span class="p">,</span> <span class="n">constraint</span><span class="o">.</span><span class="n">penalty_weight</span><span class="p">))</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">H</span> <span class="nd">@u_k</span> <span class="o">&lt;=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">slack</span><span class="p">,</span><span class="s2">&quot;input_constraint&quot;</span><span class="p">)]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">slack</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span><span class="s2">&quot;slack_positivity_constraint&quot;</span><span class="p">)]</span>
 
             <span class="c1"># Add state constraints </span>
             <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span><span class="p">:</span>
@@ -554,6 +557,7 @@
                     <span class="n">slack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opti</span><span class="o">.</span><span class="n">variable</span><span class="p">()</span>
                     <span class="n">slack_variables</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">slack</span><span class="p">,</span> <span class="n">constraint</span><span class="o">.</span><span class="n">penalty_weight</span><span class="p">))</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">H</span> <span class="nd">@x_k</span> <span class="o">&lt;=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">slack</span><span class="p">,</span><span class="s2">&quot;state_constraint&quot;</span><span class="p">)]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">slack</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span><span class="s2">&quot;slack_positivity_constraint&quot;</span><span class="p">)]</span>
 
             <span class="c1"># Add output constraints</span>
             <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span><span class="p">:</span>
@@ -565,6 +569,7 @@
                     <span class="n">slack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opti</span><span class="o">.</span><span class="n">variable</span><span class="p">()</span>
                     <span class="n">slack_variables</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">slack</span><span class="p">,</span> <span class="n">constraint</span><span class="o">.</span><span class="n">penalty_weight</span><span class="p">))</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">H</span> <span class="nd">@self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="n">x_k</span><span class="p">,</span><span class="n">u_k</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">d</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">slack</span><span class="p">,</span><span class="s2">&quot;output_constraint&quot;</span><span class="p">)]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">slack</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span><span class="s2">&quot;slack_positivity_constraint&quot;</span><span class="p">)]</span>
 
 
         <span class="c1"># Dual mode implementation</span>
@@ -606,8 +611,8 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="p">:</span>
                 <span class="n">A_terminal</span><span class="p">,</span> <span class="n">b_terminal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span><span class="o">.</span><span class="n">b</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[</span><span class="n">A_terminal</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b_terminal</span><span class="p">]</span>
-
+                <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">A_terminal</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b_terminal</span><span class="p">,</span><span class="s2">&quot;terminal_constraint&quot;</span><span class="p">)]</span> 
+                
         <span class="c1"># Add slack penalties to the cost function</span>
         <span class="k">for</span> <span class="n">slack</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="ow">in</span> <span class="n">slack_variables</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span> <span class="o">==</span> <span class="s1">&#39;LINEAR&#39;</span><span class="p">:</span>
@@ -697,16 +702,16 @@
                 <span class="n">X_initial</span><span class="p">[:,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="n">X_initial</span><span class="p">[:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbance_value</span><span class="p">)</span><span class="o">.</span><span class="n">full</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
             <span class="c1"># Initialize V_initial to make u = uref with the proposed state trajectory</span>
-            <span class="n">V_initial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">))</span>
-
+            <span class="n">V_initial</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">))</span>
+  
         <span class="k">try</span><span class="p">:</span>
             <span class="p">(</span><span class="n">x_opt</span><span class="p">,</span> <span class="n">v_opt</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpc_controller</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">xref</span><span class="p">,</span> <span class="n">uref</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disturbance_value</span> <span class="p">,</span> <span class="n">X_initial</span><span class="p">,</span> <span class="n">V_initial</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Solver failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
+            <span class="k">raise</span> <span class="n">e</span>
+      
+       
         <span class="c1"># Extract the control and state trajectories</span>
-        <span class="c1">#v_opt = sol.value(self.v).reshape(m, N)</span>
-        <span class="c1">#x_opt = sol.value(self.x)</span>
         <span class="n">u_opt</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">@</span> <span class="p">(</span><span class="n">x_opt</span><span class="p">[:,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span> <span class="o">-</span> <span class="n">ca</span><span class="o">.</span><span class="n">repmat</span><span class="p">(</span><span class="n">xref</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">))</span> <span class="o">+</span> <span class="n">uref</span> <span class="o">+</span> <span class="n">v_opt</span>
 
 
@@ -720,22 +725,22 @@
 
 <div class="viewcode-block" id="SetPointTrackingNMPC.get_control_action">
 <a class="viewcode-back" href="../../mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.get_control_action">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_control_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">yref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_control_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">y_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        MPC controller that plans optimal controls and states over the prediction horizon</span>
 <span class="sd">        and returns the first control action in the predicted optimal sequence.</span>
 
 <span class="sd">        :param x: Current state.</span>
 <span class="sd">        :type x: np.array</span>
-<span class="sd">        :param yref: Reference output.</span>
-<span class="sd">        :type yref: np.array</span>
+<span class="sd">        :param y_ref: Reference output.</span>
+<span class="sd">        :type y_ref: np.array</span>
 <span class="sd">        :param d: Disturbance (optional).</span>
 <span class="sd">        :type d: np.array, optional</span>
 <span class="sd">        :return: The first control action in the predicted optimal sequence.</span>
 <span class="sd">        :rtype: np.array</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Plan optimal controls and states over the next N samples</span>
-        <span class="n">uPred</span><span class="p">,</span> <span class="n">xPred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_predicted_optimal_controls</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">yref</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+        <span class="n">uPred</span><span class="p">,</span> <span class="n">xPred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_predicted_optimal_controls</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y_ref</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
 
         <span class="c1"># Apply the first control action in the predicted optimal sequence</span>
         <span class="k">return</span> <span class="n">uPred</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span></div>

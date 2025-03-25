@@ -1,12 +1,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../../'))  # Ensures Sphinx finds openmpc
-
-# Make sure Sphinx finds examples
-examples_dir = os.path.abspath('../../examples')
-if examples_dir not in sys.path:
-    sys.path.insert(0, examples_dir)
-    
+sys.path.insert(0, os.path.abspath(os.path.join("..", "..", "examples")))
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -60,7 +55,7 @@ exclude_patterns = ['../build', '../testing', '.../openmpc.egg-info', '../OpenMP
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 # logo
-html_logo = '_static/mpc_logo.svg'
+html_logo = '_static/logo.png'
 html_theme_options = {
     'logo_only': True,
     'display_version': True,

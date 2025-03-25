@@ -17,11 +17,17 @@ Whether you're new to MPC or looking for an interactive way to test advanced con
 
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Getting Started:
+   :maxdepth: 2
+   :caption: Getting Started
 
    installation
    examples
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Theory
+   
+   about_openmpc
 
 
 .. toctree::

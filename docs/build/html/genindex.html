@@ -31,7 +31,7 @@
           
           <a href="index.html">
             
-              <img src="_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -41,14 +41,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#contributing">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -106,31 +110,31 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.LinearSystem.A">A (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.A">[1]</a>
+      <li><a href="models.html#models.LinearSystem.A">A (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.A">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.A">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.A">[3]</a>
 </li>
-      <li><a href="filters.html#filters.parameters.KFParameters.add_constant_disturbance_prediction">add_constant_disturbance_prediction() (KFParameters method)</a>
+      <li><a href="filters.html#filters.KFParameters.add_constant_disturbance_prediction">add_constant_disturbance_prediction() (KFParameters method)</a>, <a href="filters.html#filters.parameters.KFParameters.add_constant_disturbance_prediction">[1]</a>, <a href="openmpc.filters.html#openmpc.filters.KFParameters.add_constant_disturbance_prediction">[2]</a>, <a href="openmpc.filters.html#openmpc.filters.parameters.KFParameters.add_constant_disturbance_prediction">[3]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCProblem.add_dual_mode">add_dual_mode() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_dual_mode">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_dual_mode">add_dual_mode() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_dual_mode">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.add_dual_mode">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.add_dual_mode">[3]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCProblem.add_general_state_constraints">add_general_state_constraints() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_general_state_constraints">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_general_state_constraints">add_general_state_constraints() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_general_state_constraints">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.add_general_state_constraints">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.add_general_state_constraints">[3]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCProblem.add_input_bound_constraint">add_input_bound_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_input_bound_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_input_bound_constraint">add_input_bound_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_input_bound_constraint">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.add_input_bound_constraint">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.add_input_bound_constraint">[3]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCProblem.add_input_magnitude_constraint">add_input_magnitude_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_input_magnitude_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_input_magnitude_constraint">add_input_magnitude_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_input_magnitude_constraint">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.add_input_magnitude_constraint">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.add_input_magnitude_constraint">[3]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mpc.html#mpc.MPCProblem.add_output_bound_constraint">add_output_bound_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_output_bound_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_output_bound_constraint">add_output_bound_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_output_bound_constraint">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.add_output_bound_constraint">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.add_output_bound_constraint">[3]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCProblem.add_output_magnitude_constraint">add_output_magnitude_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_output_magnitude_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_output_magnitude_constraint">add_output_magnitude_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_output_magnitude_constraint">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.add_output_magnitude_constraint">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.add_output_magnitude_constraint">[3]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCProblem.add_reference_controller">add_reference_controller() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_reference_controller">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_reference_controller">add_reference_controller() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_reference_controller">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.add_reference_controller">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.add_reference_controller">[3]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCProblem.add_state_bound_constraint">add_state_bound_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_state_bound_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_state_bound_constraint">add_state_bound_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_state_bound_constraint">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.add_state_bound_constraint">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.add_state_bound_constraint">[3]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCProblem.add_state_magnitude_constraint">add_state_magnitude_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_state_magnitude_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_state_magnitude_constraint">add_state_magnitude_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_state_magnitude_constraint">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.add_state_magnitude_constraint">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.add_state_magnitude_constraint">[3]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCProblem.add_terminal_ingredients">add_terminal_ingredients() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_terminal_ingredients">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.add_terminal_ingredients">add_terminal_ingredients() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.add_terminal_ingredients">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.add_terminal_ingredients">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.add_terminal_ingredients">[3]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -138,11 +142,11 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.LinearSystem.B">B (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.B">[1]</a>
+      <li><a href="models.html#models.LinearSystem.B">B (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.B">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.B">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.B">[3]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.LinearSystem.Bd">Bd (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.Bd">[1]</a>
+      <li><a href="models.html#models.LinearSystem.Bd">Bd (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.Bd">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.Bd">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.Bd">[3]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -150,54 +154,64 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.LinearSystem.C">C (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.C">[1]</a>
+      <li><a href="models.html#models.LinearSystem.C">C (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.C">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.C">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.C">[3]</a>
 </li>
-      <li><a href="models.html#models.LinearSystem.c2d">c2d() (LinearSystem static method)</a>, <a href="models.html#models.linear_system.LinearSystem.c2d">[1]</a>
+      <li><a href="models.html#models.LinearSystem.c2d">c2d() (LinearSystem static method)</a>, <a href="models.html#models.linear_system.LinearSystem.c2d">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.c2d">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.c2d">[3]</a>
 
       <ul>
-        <li><a href="models.html#models.NonlinearSystem.c2d">(NonlinearSystem static method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.c2d">[1]</a>
+        <li><a href="models.html#models.NonlinearSystem.c2d">(NonlinearSystem static method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.c2d">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.c2d">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.c2d">[3]</a>
 </li>
       </ul></li>
-      <li><a href="models.html#models.LinearSystem.Cd">Cd (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.Cd">[1]</a>
+      <li><a href="models.html#models.LinearSystem.Cd">Cd (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.Cd">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.Cd">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.Cd">[3]</a>
 </li>
-      <li><a href="models.html#models.model.Model.check_and_normalise_input_signals">check_and_normalise_input_signals() (Model method)</a>
+      <li><a href="models.html#models.model.Model.check_and_normalise_input_signals">check_and_normalise_input_signals() (Model method)</a>, <a href="openmpc.models.html#openmpc.models.model.Model.check_and_normalise_input_signals">[1]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPCProblem.check_offsetfree_conditions">check_offsetfree_conditions() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.check_offsetfree_conditions">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.check_offsetfree_conditions">check_offsetfree_conditions() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.check_offsetfree_conditions">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.check_offsetfree_conditions">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.check_offsetfree_conditions">[3]</a>
 </li>
-      <li><a href="models.html#models.LinearSystem.closed_loop_simulate">closed_loop_simulate() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.closed_loop_simulate">[1]</a>
+      <li><a href="models.html#models.LinearSystem.closed_loop_simulate">closed_loop_simulate() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.closed_loop_simulate">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.closed_loop_simulate">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.closed_loop_simulate">[3]</a>
 </li>
-      <li><a href="mpc.html#mpc.MPC.compute">compute() (MPC method)</a>, <a href="mpc.html#mpc.linear_mpc.MPC.compute">[1]</a>
+      <li><a href="mpc.html#mpc.MPC.compute">compute() (MPC method)</a>, <a href="mpc.html#mpc.linear_mpc.MPC.compute">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPC.compute">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.linear_mpc.MPC.compute">[3]</a>
 
       <ul>
-        <li><a href="mpc.html#mpc.SetPointTrackingMPC.compute">(SetPointTrackingMPC method)</a>, <a href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC.compute">[1]</a>
+        <li><a href="mpc.html#mpc.SetPointTrackingMPC.compute">(SetPointTrackingMPC method)</a>, <a href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC.compute">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.SetPointTrackingMPC.compute">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.linear_mpc.SetPointTrackingMPC.compute">[3]</a>
+</li>
+      </ul></li>
+      <li><a href="models.html#models.linear_system.compute_lqr_controller">compute_lqr_controller() (in module models.linear_system)</a>
+
+      <ul>
+        <li><a href="openmpc.models.html#openmpc.models.linear_system.compute_lqr_controller">(in module openmpc.models.linear_system)</a>
+</li>
+        <li><a href="models.html#models.NonlinearSystem.compute_lqr_controller">(NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.compute_lqr_controller">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.compute_lqr_controller">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.compute_lqr_controller">[3]</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.linear_system.compute_lqr_controller">compute_lqr_controller() (in module models.linear_system)</a>
+      <li><a href="mpc.html#mpc.NMPC.compute_predicted_optimal_controls">compute_predicted_optimal_controls() (NMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.NMPC.compute_predicted_optimal_controls">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.NMPC.compute_predicted_optimal_controls">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.nonlinear_mpc.NMPC.compute_predicted_optimal_controls">[3]</a>
 
       <ul>
-        <li><a href="models.html#models.NonlinearSystem.compute_lqr_controller">(NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.compute_lqr_controller">[1]</a>
+        <li><a href="mpc.html#mpc.SetPointTrackingNMPC.compute_predicted_optimal_controls">(SetPointTrackingNMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.compute_predicted_optimal_controls">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.SetPointTrackingNMPC.compute_predicted_optimal_controls">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.nonlinear_mpc.SetPointTrackingNMPC.compute_predicted_optimal_controls">[3]</a>
 </li>
       </ul></li>
-      <li><a href="mpc.html#mpc.NMPC.compute_predicted_optimal_controls">compute_predicted_optimal_controls() (NMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.NMPC.compute_predicted_optimal_controls">[1]</a>
+      <li><a href="openmpc.support.html#openmpc.support.Constraint">Constraint (class in openmpc.support)</a>
 
       <ul>
-        <li><a href="mpc.html#mpc.SetPointTrackingNMPC.compute_predicted_optimal_controls">(SetPointTrackingNMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.compute_predicted_optimal_controls">[1]</a>
+        <li><a href="openmpc.support.html#openmpc.support.constraints.Constraint">(class in openmpc.support.constraints)</a>
 </li>
-      </ul></li>
-      <li><a href="support.html#support.Constraint">Constraint (class in support)</a>
-
-      <ul>
+        <li><a href="support.html#support.Constraint">(class in support)</a>
+</li>
         <li><a href="support.html#support.constraints.Constraint">(class in support.constraints)</a>
 </li>
       </ul></li>
-      <li><a href="invariant_sets.html#invariant_sets.Polytope.contains">contains() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.contains">[1]</a>
+      <li><a href="invariant_sets.html#invariant_sets.Polytope.contains">contains() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.contains">[1]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.Polytope.contains">[2]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.polytope.Polytope.contains">[3]</a>
 </li>
       <li><a href="invariant_sets.html#invariant_sets.control_invariant_set">control_invariant_set() (in module invariant_sets)</a>
 
       <ul>
         <li><a href="invariant_sets.html#invariant_sets.invariant_sets.control_invariant_set">(in module invariant_sets.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.control_invariant_set">(in module openmpc.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.invariant_sets.control_invariant_set">(in module openmpc.invariant_sets.invariant_sets)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -206,24 +220,24 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.LinearSystem.D">D (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.D">[1]</a>
+      <li><a href="models.html#models.LinearSystem.D">D (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.D">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.D">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.D">[3]</a>
 </li>
-      <li><a href="models.html#models.LinearSystem.discrete_dynamics">discrete_dynamics() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.discrete_dynamics">[1]</a>
+      <li><a href="models.html#models.LinearSystem.discrete_dynamics">discrete_dynamics() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.discrete_dynamics">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.discrete_dynamics">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.discrete_dynamics">[3]</a>
 
       <ul>
-        <li><a href="models.html#models.model.Model.discrete_dynamics">(Model method)</a>
+        <li><a href="models.html#models.model.Model.discrete_dynamics">(Model method)</a>, <a href="openmpc.models.html#openmpc.models.model.Model.discrete_dynamics">[1]</a>
 </li>
-        <li><a href="models.html#models.NonlinearSystem.discrete_dynamics">(NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.discrete_dynamics">[1]</a>
+        <li><a href="models.html#models.NonlinearSystem.discrete_dynamics">(NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.discrete_dynamics">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.discrete_dynamics">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.discrete_dynamics">[3]</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.LinearSystem.dt">dt (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.dt">[1]</a>
+      <li><a href="models.html#models.LinearSystem.dt">dt (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.dt">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.dt">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.dt">[3]</a>
 
       <ul>
-        <li><a href="models.html#models.model.Model.dt">(Model property)</a>
+        <li><a href="models.html#models.model.Model.dt">(Model property)</a>, <a href="openmpc.models.html#openmpc.models.model.Model.dt">[1]</a>
 </li>
-        <li><a href="models.html#models.NonlinearSystem.dt">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.dt">[1]</a>
+        <li><a href="models.html#models.NonlinearSystem.dt">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.dt">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.dt">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.dt">[3]</a>
 </li>
       </ul></li>
   </ul></td>
@@ -232,8 +246,16 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="filters.html#filters.ekf.EKF">EKF (class in filters.ekf)</a>
+      <li><a href="filters.html#filters.EKF">EKF (class in filters)</a>
+
+      <ul>
+        <li><a href="filters.html#filters.ekf.EKF">(class in filters.ekf)</a>
 </li>
+        <li><a href="openmpc.filters.html#openmpc.filters.EKF">(class in openmpc.filters)</a>
+</li>
+        <li><a href="openmpc.filters.html#openmpc.filters.ekf.EKF">(class in openmpc.filters.ekf)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -270,9 +292,13 @@
         <li><a href="filters.html#module-filters.parameters">module</a>
 </li>
       </ul></li>
-      <li><a href="support.html#support.forward_euler">forward_euler() (in module support)</a>
+      <li><a href="openmpc.support.html#openmpc.support.forward_euler">forward_euler() (in module openmpc.support)</a>
 
       <ul>
+        <li><a href="openmpc.support.html#openmpc.support.integrators.forward_euler">(in module openmpc.support.integrators)</a>
+</li>
+        <li><a href="support.html#support.forward_euler">(in module support)</a>
+</li>
         <li><a href="support.html#support.integrators.forward_euler">(in module support.integrators)</a>
 </li>
       </ul></li>
@@ -282,47 +308,51 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mpc.html#mpc.MPC.get_control_action">get_control_action() (MPC method)</a>, <a href="mpc.html#mpc.linear_mpc.MPC.get_control_action">[1]</a>
+      <li><a href="mpc.html#mpc.MPC.get_control_action">get_control_action() (MPC method)</a>, <a href="mpc.html#mpc.linear_mpc.MPC.get_control_action">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPC.get_control_action">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.linear_mpc.MPC.get_control_action">[3]</a>
 
       <ul>
-        <li><a href="mpc.html#mpc.NMPC.get_control_action">(NMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.NMPC.get_control_action">[1]</a>
+        <li><a href="mpc.html#mpc.NMPC.get_control_action">(NMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.NMPC.get_control_action">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.NMPC.get_control_action">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.nonlinear_mpc.NMPC.get_control_action">[3]</a>
 </li>
-        <li><a href="mpc.html#mpc.SetPointTrackingMPC.get_control_action">(SetPointTrackingMPC method)</a>, <a href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC.get_control_action">[1]</a>
+        <li><a href="mpc.html#mpc.SetPointTrackingMPC.get_control_action">(SetPointTrackingMPC method)</a>, <a href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC.get_control_action">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.SetPointTrackingMPC.get_control_action">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.linear_mpc.SetPointTrackingMPC.get_control_action">[3]</a>
 </li>
-        <li><a href="mpc.html#mpc.SetPointTrackingNMPC.get_control_action">(SetPointTrackingNMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.get_control_action">[1]</a>
+        <li><a href="mpc.html#mpc.SetPointTrackingNMPC.get_control_action">(SetPointTrackingNMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.get_control_action">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.SetPointTrackingNMPC.get_control_action">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.nonlinear_mpc.SetPointTrackingNMPC.get_control_action">[3]</a>
 </li>
       </ul></li>
-      <li><a href="filters.html#filters.ekf.EKF.get_covariance">get_covariance() (EKF method)</a>
+      <li><a href="filters.html#filters.EKF.get_covariance_estimate">get_covariance_estimate() (EKF method)</a>, <a href="filters.html#filters.ekf.EKF.get_covariance_estimate">[1]</a>, <a href="openmpc.filters.html#openmpc.filters.EKF.get_covariance_estimate">[2]</a>, <a href="openmpc.filters.html#openmpc.filters.ekf.EKF.get_covariance_estimate">[3]</a>
 </li>
-      <li><a href="filters.html#filters.ekf.EKF.get_estimated_disturbance">get_estimated_disturbance() (EKF method)</a>
+      <li><a href="filters.html#filters.EKF.get_disturbance_estimate">get_disturbance_estimate() (EKF method)</a>, <a href="filters.html#filters.ekf.EKF.get_disturbance_estimate">[1]</a>, <a href="openmpc.filters.html#openmpc.filters.EKF.get_disturbance_estimate">[2]</a>, <a href="openmpc.filters.html#openmpc.filters.ekf.EKF.get_disturbance_estimate">[3]</a>
 
       <ul>
-        <li><a href="filters.html#filters.kf.KalmanFilter.get_estimated_disturbance">(KalmanFilter method)</a>
+        <li><a href="filters.html#filters.KF.get_disturbance_estimate">(KF method)</a>, <a href="filters.html#filters.kf.KF.get_disturbance_estimate">[1]</a>, <a href="openmpc.filters.html#openmpc.filters.KF.get_disturbance_estimate">[2]</a>, <a href="openmpc.filters.html#openmpc.filters.kf.KF.get_disturbance_estimate">[3]</a>
 </li>
       </ul></li>
-      <li><a href="filters.html#filters.ekf.EKF.get_estimated_state">get_estimated_state() (EKF method)</a>
-
-      <ul>
-        <li><a href="filters.html#filters.kf.KalmanFilter.get_estimated_state">(KalmanFilter method)</a>
+      <li><a href="models.html#models.LinearSystem.get_lqr_controller">get_lqr_controller() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.get_lqr_controller">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.get_lqr_controller">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.get_lqr_controller">[3]</a>
 </li>
-      </ul></li>
+      <li><a href="models.html#models.LinearSystem.get_lqr_cost_matrix">get_lqr_cost_matrix() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.get_lqr_cost_matrix">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.get_lqr_cost_matrix">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.get_lqr_cost_matrix">[3]</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.LinearSystem.get_lqr_controller">get_lqr_controller() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.get_lqr_controller">[1]</a>
-</li>
-      <li><a href="models.html#models.LinearSystem.get_lqr_cost_matrix">get_lqr_cost_matrix() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.get_lqr_cost_matrix">[1]</a>
-</li>
       <li><a href="invariant_sets.html#invariant_sets.get_n_step_controllable_set">get_n_step_controllable_set() (in module invariant_sets)</a>
 
       <ul>
         <li><a href="invariant_sets.html#invariant_sets.invariant_sets.get_n_step_controllable_set">(in module invariant_sets.invariant_sets)</a>
 </li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.get_n_step_controllable_set">(in module openmpc.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.invariant_sets.get_n_step_controllable_set">(in module openmpc.invariant_sets.invariant_sets)</a>
+</li>
       </ul></li>
-      <li><a href="models.html#models.LinearSystem.get_system_matrices">get_system_matrices() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.get_system_matrices">[1]</a>
+      <li><a href="filters.html#filters.EKF.get_state_estimate">get_state_estimate() (EKF method)</a>, <a href="filters.html#filters.ekf.EKF.get_state_estimate">[1]</a>, <a href="openmpc.filters.html#openmpc.filters.EKF.get_state_estimate">[2]</a>, <a href="openmpc.filters.html#openmpc.filters.ekf.EKF.get_state_estimate">[3]</a>
+
+      <ul>
+        <li><a href="filters.html#filters.KF.get_state_estimate">(KF method)</a>, <a href="filters.html#filters.kf.KF.get_state_estimate">[1]</a>, <a href="openmpc.filters.html#openmpc.filters.KF.get_state_estimate">[2]</a>, <a href="openmpc.filters.html#openmpc.filters.kf.KF.get_state_estimate">[3]</a>
 </li>
-      <li><a href="models.html#models.NonlinearSystem.get_target_point">get_target_point() (NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.get_target_point">[1]</a>
+      </ul></li>
+      <li><a href="models.html#models.LinearSystem.get_system_matrices">get_system_matrices() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.get_system_matrices">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.get_system_matrices">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.get_system_matrices">[3]</a>
 </li>
-      <li><a href="invariant_sets.html#invariant_sets.Polytope.get_V_representation">get_V_representation() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.get_V_representation">[1]</a>
+      <li><a href="models.html#models.NonlinearSystem.get_target_point">get_target_point() (NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.get_target_point">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.get_target_point">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.get_target_point">[3]</a>
+</li>
+      <li><a href="invariant_sets.html#invariant_sets.Polytope.get_V_representation">get_V_representation() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.get_V_representation">[1]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.Polytope.get_V_representation">[2]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.polytope.Polytope.get_V_representation">[3]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -330,20 +360,30 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="support.html#support.Integrator">Integrator() (in module support)</a>
+      <li><a href="openmpc.support.html#openmpc.support.Integrator">Integrator() (in module openmpc.support)</a>
 
       <ul>
+        <li><a href="openmpc.support.html#openmpc.support.integrators.Integrator">(in module openmpc.support.integrators)</a>
+</li>
+        <li><a href="support.html#support.Integrator">(in module support)</a>
+</li>
         <li><a href="support.html#support.integrators.Integrator">(in module support.integrators)</a>
 </li>
       </ul></li>
-      <li><a href="invariant_sets.html#invariant_sets.Polytope.intersect">intersect() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.intersect">[1]</a>
+      <li><a href="invariant_sets.html#invariant_sets.Polytope.intersect">intersect() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.intersect">[1]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.Polytope.intersect">[2]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.polytope.Polytope.intersect">[3]</a>
 </li>
       <li><a href="invariant_sets.html#invariant_sets.invariant_set">invariant_set() (in module invariant_sets)</a>
 
       <ul>
         <li><a href="invariant_sets.html#invariant_sets.invariant_sets.invariant_set">(in module invariant_sets.invariant_sets)</a>
 </li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.invariant_set">(in module openmpc.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.invariant_sets.invariant_set">(in module openmpc.invariant_sets.invariant_sets)</a>
+</li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     invariant_sets
 
@@ -351,8 +391,6 @@
         <li><a href="invariant_sets.html#module-invariant_sets">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     invariant_sets.invariant_sets
 
@@ -372,6 +410,10 @@
       <ul>
         <li><a href="invariant_sets.html#invariant_sets.invariant_sets.is_invariant">(in module invariant_sets.invariant_sets)</a>
 </li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.is_invariant">(in module openmpc.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.invariant_sets.is_invariant">(in module openmpc.invariant_sets.invariant_sets)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -379,24 +421,44 @@
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="filters.html#filters.kf.KalmanFilter">KalmanFilter (class in filters.kf)</a>
+      <li><a href="filters.html#filters.KF">KF (class in filters)</a>
+
+      <ul>
+        <li><a href="filters.html#filters.kf.KF">(class in filters.kf)</a>
 </li>
+        <li><a href="openmpc.filters.html#openmpc.filters.KF">(class in openmpc.filters)</a>
+</li>
+        <li><a href="openmpc.filters.html#openmpc.filters.kf.KF">(class in openmpc.filters.kf)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="filters.html#filters.parameters.KFParameters">KFParameters (class in filters.parameters)</a>
+      <li><a href="filters.html#filters.KFParameters">KFParameters (class in filters)</a>
+
+      <ul>
+        <li><a href="filters.html#filters.parameters.KFParameters">(class in filters.parameters)</a>
 </li>
+        <li><a href="openmpc.filters.html#openmpc.filters.KFParameters">(class in openmpc.filters)</a>
+</li>
+        <li><a href="openmpc.filters.html#openmpc.filters.parameters.KFParameters">(class in openmpc.filters.parameters)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.NonlinearSystem.linearize">linearize() (NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.linearize">[1]</a>
+      <li><a href="models.html#models.NonlinearSystem.linearize">linearize() (NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.linearize">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.linearize">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.linearize">[3]</a>
 </li>
       <li><a href="models.html#models.LinearSystem">LinearSystem (class in models)</a>
 
       <ul>
         <li><a href="models.html#models.linear_system.LinearSystem">(class in models.linear_system)</a>
+</li>
+        <li><a href="openmpc.models.html#openmpc.models.LinearSystem">(class in openmpc.models)</a>
+</li>
+        <li><a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem">(class in openmpc.models.linear_system)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -406,6 +468,10 @@
       <ul>
         <li><a href="invariant_sets.html#invariant_sets.invariant_sets.lqr_set">(in module invariant_sets.invariant_sets)</a>
 </li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.lqr_set">(in module openmpc.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.invariant_sets.lqr_set">(in module openmpc.invariant_sets.invariant_sets)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -413,14 +479,18 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="filters.html#filters.ekf.EKF.measurement_update">measurement_update() (EKF method)</a>
+      <li><a href="filters.html#filters.EKF.measurement_update">measurement_update() (EKF method)</a>, <a href="filters.html#filters.ekf.EKF.measurement_update">[1]</a>, <a href="openmpc.filters.html#openmpc.filters.EKF.measurement_update">[2]</a>, <a href="openmpc.filters.html#openmpc.filters.ekf.EKF.measurement_update">[3]</a>
 
       <ul>
-        <li><a href="filters.html#filters.kf.KalmanFilter.measurement_update">(KalmanFilter method)</a>
+        <li><a href="filters.html#filters.KF.measurement_update">(KF method)</a>, <a href="filters.html#filters.kf.KF.measurement_update">[1]</a>, <a href="openmpc.filters.html#openmpc.filters.KF.measurement_update">[2]</a>, <a href="openmpc.filters.html#openmpc.filters.kf.KF.measurement_update">[3]</a>
 </li>
       </ul></li>
       <li><a href="models.html#models.model.Model">Model (class in models.model)</a>
+
+      <ul>
+        <li><a href="openmpc.models.html#openmpc.models.model.Model">(class in openmpc.models.model)</a>
 </li>
+      </ul></li>
       <li>
     models
 
@@ -483,6 +553,44 @@
 </li>
         <li><a href="mpc.html#module-mpc.parameters">mpc.parameters</a>
 </li>
+        <li><a href="openmpc.html#module-openmpc">openmpc</a>
+</li>
+        <li><a href="openmpc.filters.html#module-openmpc.filters">openmpc.filters</a>
+</li>
+        <li><a href="openmpc.filters.html#module-openmpc.filters.ekf">openmpc.filters.ekf</a>
+</li>
+        <li><a href="openmpc.filters.html#module-openmpc.filters.kf">openmpc.filters.kf</a>
+</li>
+        <li><a href="openmpc.filters.html#module-openmpc.filters.parameters">openmpc.filters.parameters</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#module-openmpc.invariant_sets">openmpc.invariant_sets</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#module-openmpc.invariant_sets.invariant_sets">openmpc.invariant_sets.invariant_sets</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#module-openmpc.invariant_sets.polytope">openmpc.invariant_sets.polytope</a>
+</li>
+        <li><a href="openmpc.models.html#module-openmpc.models">openmpc.models</a>
+</li>
+        <li><a href="openmpc.models.html#module-openmpc.models.linear_system">openmpc.models.linear_system</a>
+</li>
+        <li><a href="openmpc.models.html#module-openmpc.models.model">openmpc.models.model</a>
+</li>
+        <li><a href="openmpc.models.html#module-openmpc.models.nonlinear_system">openmpc.models.nonlinear_system</a>
+</li>
+        <li><a href="openmpc.mpc.html#module-openmpc.mpc">openmpc.mpc</a>
+</li>
+        <li><a href="openmpc.mpc.html#module-openmpc.mpc.linear_mpc">openmpc.mpc.linear_mpc</a>
+</li>
+        <li><a href="openmpc.mpc.html#module-openmpc.mpc.nonlinear_mpc">openmpc.mpc.nonlinear_mpc</a>
+</li>
+        <li><a href="openmpc.mpc.html#module-openmpc.mpc.parameters">openmpc.mpc.parameters</a>
+</li>
+        <li><a href="openmpc.support.html#module-openmpc.support">openmpc.support</a>
+</li>
+        <li><a href="openmpc.support.html#module-openmpc.support.constraints">openmpc.support.constraints</a>
+</li>
+        <li><a href="openmpc.support.html#module-openmpc.support.integrators">openmpc.support.integrators</a>
+</li>
         <li><a href="support.html#module-support">support</a>
 </li>
         <li><a href="support.html#module-support.constraints">support.constraints</a>
@@ -503,6 +611,10 @@
 
       <ul>
         <li><a href="mpc.html#mpc.linear_mpc.MPC">(class in mpc.linear_mpc)</a>
+</li>
+        <li><a href="openmpc.mpc.html#openmpc.mpc.MPC">(class in openmpc.mpc)</a>
+</li>
+        <li><a href="openmpc.mpc.html#openmpc.mpc.linear_mpc.MPC">(class in openmpc.mpc.linear_mpc)</a>
 </li>
       </ul></li>
       <li>
@@ -531,6 +643,10 @@
       <ul>
         <li><a href="mpc.html#mpc.parameters.MPCProblem">(class in mpc.parameters)</a>
 </li>
+        <li><a href="openmpc.mpc.html#openmpc.mpc.MPCProblem">(class in openmpc.mpc)</a>
+</li>
+        <li><a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem">(class in openmpc.mpc.parameters)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -538,12 +654,16 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.model.Model.name">name (Model property)</a>
+      <li><a href="models.html#models.model.Model.name">name (Model property)</a>, <a href="openmpc.models.html#openmpc.models.model.Model.name">[1]</a>
 </li>
       <li><a href="mpc.html#mpc.NMPC">NMPC (class in mpc)</a>
 
       <ul>
         <li><a href="mpc.html#mpc.nonlinear_mpc.NMPC">(class in mpc.nonlinear_mpc)</a>
+</li>
+        <li><a href="openmpc.mpc.html#openmpc.mpc.NMPC">(class in openmpc.mpc)</a>
+</li>
+        <li><a href="openmpc.mpc.html#openmpc.mpc.nonlinear_mpc.NMPC">(class in openmpc.mpc.nonlinear_mpc)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -553,8 +673,12 @@
       <ul>
         <li><a href="models.html#models.nonlinear_system.NonlinearSystem">(class in models.nonlinear_system)</a>
 </li>
+        <li><a href="openmpc.models.html#openmpc.models.NonlinearSystem">(class in openmpc.models)</a>
+</li>
+        <li><a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem">(class in openmpc.models.nonlinear_system)</a>
+</li>
       </ul></li>
-      <li><a href="invariant_sets.html#invariant_sets.Polytope.normalize">normalize() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.normalize">[1]</a>
+      <li><a href="invariant_sets.html#invariant_sets.Polytope.normalize">normalize() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.normalize">[1]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.Polytope.normalize">[2]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.polytope.Polytope.normalize">[3]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -567,15 +691,152 @@
       <ul>
         <li><a href="invariant_sets.html#invariant_sets.invariant_sets.one_step_controllable_set">(in module invariant_sets.invariant_sets)</a>
 </li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.one_step_controllable_set">(in module openmpc.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.invariant_sets.one_step_controllable_set">(in module openmpc.invariant_sets.invariant_sets)</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc
+
+      <ul>
+        <li><a href="openmpc.html#module-openmpc">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.filters
+
+      <ul>
+        <li><a href="openmpc.filters.html#module-openmpc.filters">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.filters.ekf
+
+      <ul>
+        <li><a href="openmpc.filters.html#module-openmpc.filters.ekf">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.filters.kf
+
+      <ul>
+        <li><a href="openmpc.filters.html#module-openmpc.filters.kf">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.filters.parameters
+
+      <ul>
+        <li><a href="openmpc.filters.html#module-openmpc.filters.parameters">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.invariant_sets
+
+      <ul>
+        <li><a href="openmpc.invariant_sets.html#module-openmpc.invariant_sets">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.invariant_sets.invariant_sets
+
+      <ul>
+        <li><a href="openmpc.invariant_sets.html#module-openmpc.invariant_sets.invariant_sets">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.invariant_sets.polytope
+
+      <ul>
+        <li><a href="openmpc.invariant_sets.html#module-openmpc.invariant_sets.polytope">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.models
+
+      <ul>
+        <li><a href="openmpc.models.html#module-openmpc.models">module</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.LinearSystem.output">output() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.output">[1]</a>
+      <li>
+    openmpc.models.linear_system
 
       <ul>
-        <li><a href="models.html#models.model.Model.output">(Model method)</a>
+        <li><a href="openmpc.models.html#module-openmpc.models.linear_system">module</a>
 </li>
-        <li><a href="models.html#models.NonlinearSystem.output">(NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.output">[1]</a>
+      </ul></li>
+      <li>
+    openmpc.models.model
+
+      <ul>
+        <li><a href="openmpc.models.html#module-openmpc.models.model">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.models.nonlinear_system
+
+      <ul>
+        <li><a href="openmpc.models.html#module-openmpc.models.nonlinear_system">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.mpc
+
+      <ul>
+        <li><a href="openmpc.mpc.html#module-openmpc.mpc">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.mpc.linear_mpc
+
+      <ul>
+        <li><a href="openmpc.mpc.html#module-openmpc.mpc.linear_mpc">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.mpc.nonlinear_mpc
+
+      <ul>
+        <li><a href="openmpc.mpc.html#module-openmpc.mpc.nonlinear_mpc">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.mpc.parameters
+
+      <ul>
+        <li><a href="openmpc.mpc.html#module-openmpc.mpc.parameters">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.support
+
+      <ul>
+        <li><a href="openmpc.support.html#module-openmpc.support">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.support.constraints
+
+      <ul>
+        <li><a href="openmpc.support.html#module-openmpc.support.constraints">module</a>
+</li>
+      </ul></li>
+      <li>
+    openmpc.support.integrators
+
+      <ul>
+        <li><a href="openmpc.support.html#module-openmpc.support.integrators">module</a>
+</li>
+      </ul></li>
+      <li><a href="models.html#models.LinearSystem.output">output() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.output">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.output">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.output">[3]</a>
+
+      <ul>
+        <li><a href="models.html#models.model.Model.output">(Model method)</a>, <a href="openmpc.models.html#openmpc.models.model.Model.output">[1]</a>
+</li>
+        <li><a href="models.html#models.NonlinearSystem.output">(NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.output">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.output">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.output">[3]</a>
 </li>
       </ul></li>
   </ul></td>
@@ -584,14 +845,18 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="invariant_sets.html#invariant_sets.Polytope.plot">plot() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.plot">[1]</a>
+      <li><a href="invariant_sets.html#invariant_sets.Polytope.plot">plot() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.plot">[1]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.Polytope.plot">[2]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.polytope.Polytope.plot">[3]</a>
 </li>
-      <li><a href="models.html#models.LinearSystem.plot_trajectories">plot_trajectories() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.plot_trajectories">[1]</a>
+      <li><a href="models.html#models.LinearSystem.plot_trajectories">plot_trajectories() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.plot_trajectories">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.plot_trajectories">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.plot_trajectories">[3]</a>
 </li>
       <li><a href="invariant_sets.html#invariant_sets.Polytope">Polytope (class in invariant_sets)</a>
 
       <ul>
         <li><a href="invariant_sets.html#invariant_sets.polytope.Polytope">(class in invariant_sets.polytope)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.Polytope">(class in openmpc.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.polytope.Polytope">(class in openmpc.invariant_sets.polytope)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -601,14 +866,18 @@
       <ul>
         <li><a href="invariant_sets.html#invariant_sets.invariant_sets.pre_set">(in module invariant_sets.invariant_sets)</a>
 </li>
-      </ul></li>
-      <li><a href="filters.html#filters.ekf.EKF.prediction_update">prediction_update() (EKF method)</a>
-
-      <ul>
-        <li><a href="filters.html#filters.kf.KalmanFilter.prediction_update">(KalmanFilter method)</a>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.pre_set">(in module openmpc.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.invariant_sets.pre_set">(in module openmpc.invariant_sets.invariant_sets)</a>
 </li>
       </ul></li>
-      <li><a href="invariant_sets.html#invariant_sets.Polytope.projection">projection() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.projection">[1]</a>
+      <li><a href="filters.html#filters.EKF.prediction_update">prediction_update() (EKF method)</a>, <a href="filters.html#filters.ekf.EKF.prediction_update">[1]</a>, <a href="openmpc.filters.html#openmpc.filters.EKF.prediction_update">[2]</a>, <a href="openmpc.filters.html#openmpc.filters.ekf.EKF.prediction_update">[3]</a>
+
+      <ul>
+        <li><a href="filters.html#filters.KF.prediction_update">(KF method)</a>, <a href="filters.html#filters.kf.KF.prediction_update">[1]</a>, <a href="openmpc.filters.html#openmpc.filters.KF.prediction_update">[2]</a>, <a href="openmpc.filters.html#openmpc.filters.kf.KF.prediction_update">[3]</a>
+</li>
+      </ul></li>
+      <li><a href="invariant_sets.html#invariant_sets.Polytope.projection">projection() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.projection">[1]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.Polytope.projection">[2]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.polytope.Polytope.projection">[3]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -616,13 +885,15 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="invariant_sets.html#invariant_sets.Polytope.remove_redundancies">remove_redundancies() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.remove_redundancies">[1]</a>
+      <li><a href="invariant_sets.html#invariant_sets.Polytope.remove_redundancies">remove_redundancies() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.remove_redundancies">[1]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.Polytope.remove_redundancies">[2]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.polytope.Polytope.remove_redundancies">[3]</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="support.html#support.RK">RK() (in module support)</a>
+      <li><a href="openmpc.support.html#openmpc.support.RK">RK() (in module openmpc.support)</a>
 
       <ul>
+        <li><a href="openmpc.support.html#openmpc.support.integrators.RK">(in module openmpc.support.integrators)</a>
+</li>
+        <li><a href="support.html#support.RK">(in module support)</a>
+</li>
         <li><a href="support.html#support.integrators.RK">(in module support.integrators)</a>
 </li>
       </ul></li>
@@ -632,28 +903,18 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="filters.html#filters.ekf.EKF.set_covariance_matrix">set_covariance_matrix() (EKF method)</a>
+      <li><a href="mpc.html#mpc.SetPointTrackingMPC.set_disturbance">set_disturbance() (SetPointTrackingMPC method)</a>, <a href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC.set_disturbance">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.SetPointTrackingMPC.set_disturbance">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.linear_mpc.SetPointTrackingMPC.set_disturbance">[3]</a>
 
       <ul>
-        <li><a href="filters.html#filters.kf.KalmanFilter.set_covariance_matrix">(KalmanFilter method)</a>
+        <li><a href="mpc.html#mpc.SetPointTrackingNMPC.set_disturbance">(SetPointTrackingNMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.set_disturbance">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.SetPointTrackingNMPC.set_disturbance">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.nonlinear_mpc.SetPointTrackingNMPC.set_disturbance">[3]</a>
 </li>
       </ul></li>
-      <li><a href="mpc.html#mpc.SetPointTrackingMPC.set_disturbance">set_disturbance() (SetPointTrackingMPC method)</a>, <a href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC.set_disturbance">[1]</a>
-
-      <ul>
-        <li><a href="mpc.html#mpc.SetPointTrackingNMPC.set_disturbance">(SetPointTrackingNMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.set_disturbance">[1]</a>
+      <li><a href="models.html#models.LinearSystem.set_disturbance_interface">set_disturbance_interface() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.set_disturbance_interface">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.set_disturbance_interface">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.set_disturbance_interface">[3]</a>
 </li>
-      </ul></li>
-      <li><a href="mpc.html#mpc.SetPointTrackingMPC.set_reference">set_reference() (SetPointTrackingMPC method)</a>, <a href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC.set_reference">[1]</a>
+      <li><a href="mpc.html#mpc.SetPointTrackingMPC.set_reference">set_reference() (SetPointTrackingMPC method)</a>, <a href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC.set_reference">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.SetPointTrackingMPC.set_reference">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.linear_mpc.SetPointTrackingMPC.set_reference">[3]</a>
 
       <ul>
-        <li><a href="mpc.html#mpc.SetPointTrackingNMPC.set_reference">(SetPointTrackingNMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.set_reference">[1]</a>
-</li>
-      </ul></li>
-      <li><a href="filters.html#filters.ekf.EKF.set_state">set_state() (EKF method)</a>
-
-      <ul>
-        <li><a href="filters.html#filters.kf.KalmanFilter.set_state">(KalmanFilter method)</a>
+        <li><a href="mpc.html#mpc.SetPointTrackingNMPC.set_reference">(SetPointTrackingNMPC method)</a>, <a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC.set_reference">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.SetPointTrackingNMPC.set_reference">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.nonlinear_mpc.SetPointTrackingNMPC.set_reference">[3]</a>
 </li>
       </ul></li>
       <li><a href="mpc.html#mpc.SetPointTrackingMPC">SetPointTrackingMPC (class in mpc)</a>
@@ -661,56 +922,64 @@
       <ul>
         <li><a href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC">(class in mpc.linear_mpc)</a>
 </li>
+        <li><a href="openmpc.mpc.html#openmpc.mpc.SetPointTrackingMPC">(class in openmpc.mpc)</a>
+</li>
+        <li><a href="openmpc.mpc.html#openmpc.mpc.linear_mpc.SetPointTrackingMPC">(class in openmpc.mpc.linear_mpc)</a>
+</li>
       </ul></li>
       <li><a href="mpc.html#mpc.SetPointTrackingNMPC">SetPointTrackingNMPC (class in mpc)</a>
 
       <ul>
         <li><a href="mpc.html#mpc.nonlinear_mpc.SetPointTrackingNMPC">(class in mpc.nonlinear_mpc)</a>
 </li>
-      </ul></li>
-      <li><a href="models.html#models.LinearSystem.simulate">simulate() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.simulate">[1]</a>
-
-      <ul>
-        <li><a href="models.html#models.model.Model.simulate">(Model method)</a>
+        <li><a href="openmpc.mpc.html#openmpc.mpc.SetPointTrackingNMPC">(class in openmpc.mpc)</a>
 </li>
-        <li><a href="models.html#models.NonlinearSystem.simulate">(NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.simulate">[1]</a>
+        <li><a href="openmpc.mpc.html#openmpc.mpc.nonlinear_mpc.SetPointTrackingNMPC">(class in openmpc.mpc.nonlinear_mpc)</a>
 </li>
       </ul></li>
-      <li><a href="models.html#models.LinearSystem.size_disturbance">size_disturbance (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.size_disturbance">[1]</a>
+      <li><a href="models.html#models.LinearSystem.simulate">simulate() (LinearSystem method)</a>, <a href="models.html#models.linear_system.LinearSystem.simulate">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.simulate">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.simulate">[3]</a>
 
       <ul>
-        <li><a href="models.html#models.model.Model.size_disturbance">(Model property)</a>
+        <li><a href="models.html#models.model.Model.simulate">(Model method)</a>, <a href="openmpc.models.html#openmpc.models.model.Model.simulate">[1]</a>
 </li>
-        <li><a href="models.html#models.NonlinearSystem.size_disturbance">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_disturbance">[1]</a>
+        <li><a href="models.html#models.NonlinearSystem.simulate">(NonlinearSystem method)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.simulate">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.simulate">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.simulate">[3]</a>
+</li>
+      </ul></li>
+      <li><a href="models.html#models.LinearSystem.size_disturbance">size_disturbance (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.size_disturbance">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.size_disturbance">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.size_disturbance">[3]</a>
+
+      <ul>
+        <li><a href="models.html#models.model.Model.size_disturbance">(Model property)</a>, <a href="openmpc.models.html#openmpc.models.model.Model.size_disturbance">[1]</a>
+</li>
+        <li><a href="models.html#models.NonlinearSystem.size_disturbance">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_disturbance">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.size_disturbance">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.size_disturbance">[3]</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="models.html#models.LinearSystem.size_input">size_input (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.size_input">[1]</a>
+      <li><a href="models.html#models.LinearSystem.size_input">size_input (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.size_input">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.size_input">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.size_input">[3]</a>
 
       <ul>
-        <li><a href="models.html#models.model.Model.size_input">(Model property)</a>
+        <li><a href="models.html#models.model.Model.size_input">(Model property)</a>, <a href="openmpc.models.html#openmpc.models.model.Model.size_input">[1]</a>
 </li>
-        <li><a href="models.html#models.NonlinearSystem.size_input">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_input">[1]</a>
+        <li><a href="models.html#models.NonlinearSystem.size_input">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_input">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.size_input">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.size_input">[3]</a>
 </li>
       </ul></li>
-      <li><a href="models.html#models.LinearSystem.size_output">size_output (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.size_output">[1]</a>
+      <li><a href="models.html#models.LinearSystem.size_output">size_output (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.size_output">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.size_output">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.size_output">[3]</a>
 
       <ul>
-        <li><a href="models.html#models.model.Model.size_output">(Model property)</a>
+        <li><a href="models.html#models.model.Model.size_output">(Model property)</a>, <a href="openmpc.models.html#openmpc.models.model.Model.size_output">[1]</a>
 </li>
-        <li><a href="models.html#models.NonlinearSystem.size_output">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_output">[1]</a>
+        <li><a href="models.html#models.NonlinearSystem.size_output">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_output">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.size_output">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.size_output">[3]</a>
 </li>
       </ul></li>
-      <li><a href="models.html#models.LinearSystem.size_state">size_state (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.size_state">[1]</a>
+      <li><a href="models.html#models.LinearSystem.size_state">size_state (LinearSystem property)</a>, <a href="models.html#models.linear_system.LinearSystem.size_state">[1]</a>, <a href="openmpc.models.html#openmpc.models.LinearSystem.size_state">[2]</a>, <a href="openmpc.models.html#openmpc.models.linear_system.LinearSystem.size_state">[3]</a>
 
       <ul>
-        <li><a href="models.html#models.model.Model.size_state">(Model property)</a>
+        <li><a href="models.html#models.model.Model.size_state">(Model property)</a>, <a href="openmpc.models.html#openmpc.models.model.Model.size_state">[1]</a>
 </li>
-        <li><a href="models.html#models.NonlinearSystem.size_state">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_state">[1]</a>
+        <li><a href="models.html#models.NonlinearSystem.size_state">(NonlinearSystem property)</a>, <a href="models.html#models.nonlinear_system.NonlinearSystem.size_state">[1]</a>, <a href="openmpc.models.html#openmpc.models.NonlinearSystem.size_state">[2]</a>, <a href="openmpc.models.html#openmpc.models.nonlinear_system.NonlinearSystem.size_state">[3]</a>
 </li>
       </ul></li>
-      <li><a href="mpc.html#mpc.MPCProblem.soften_tracking_constraint">soften_tracking_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.soften_tracking_constraint">[1]</a>
+      <li><a href="mpc.html#mpc.MPCProblem.soften_tracking_constraint">soften_tracking_constraint() (MPCProblem method)</a>, <a href="mpc.html#mpc.parameters.MPCProblem.soften_tracking_constraint">[1]</a>, <a href="openmpc.mpc.html#openmpc.mpc.MPCProblem.soften_tracking_constraint">[2]</a>, <a href="openmpc.mpc.html#openmpc.mpc.parameters.MPCProblem.soften_tracking_constraint">[3]</a>
 </li>
       <li>
     support
@@ -739,7 +1008,7 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="support.html#support.Constraint.to_polytope">to_polytope() (Constraint method)</a>, <a href="support.html#support.constraints.Constraint.to_polytope">[1]</a>
+      <li><a href="openmpc.support.html#openmpc.support.Constraint.to_polytope">to_polytope() (Constraint method)</a>, <a href="openmpc.support.html#openmpc.support.constraints.Constraint.to_polytope">[1]</a>, <a href="support.html#support.Constraint.to_polytope">[2]</a>, <a href="support.html#support.constraints.Constraint.to_polytope">[3]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -747,7 +1016,7 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="invariant_sets.html#invariant_sets.Polytope.volume">volume() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.volume">[1]</a>
+      <li><a href="invariant_sets.html#invariant_sets.Polytope.volume">volume() (Polytope method)</a>, <a href="invariant_sets.html#invariant_sets.polytope.Polytope.volume">[1]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.Polytope.volume">[2]</a>, <a href="openmpc.invariant_sets.html#openmpc.invariant_sets.polytope.Polytope.volume">[3]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -759,6 +1028,10 @@
 
       <ul>
         <li><a href="invariant_sets.html#invariant_sets.invariant_sets.zero_set">(in module invariant_sets.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.zero_set">(in module openmpc.invariant_sets)</a>
+</li>
+        <li><a href="openmpc.invariant_sets.html#openmpc.invariant_sets.invariant_sets.zero_set">(in module openmpc.invariant_sets.invariant_sets)</a>
 </li>
       </ul></li>
   </ul></td>

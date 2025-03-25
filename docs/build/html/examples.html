@@ -17,11 +17,13 @@
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="openmpc" href="modules.html" />
-    <link rel="prev" title="installation" href="installation.html" /> 
+    <link rel="next" title="Cessna aircraft descent" href="examples/cessna_descent.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -34,7 +36,7 @@
           
           <a href="index.html">
             
-              <img src="_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -44,16 +46,40 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#contributing">Contributing</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul class="simple">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/cessna_descent.html">Cessna aircraft descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/constraint_softening.html">Constraint softening</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/discretization_notebook.html">Comparison of Discretization Schemes for a Simple Pendulum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/double_integrator.html">Double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/helicopter.html">Helicopter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/index.html">Basic Model Predictive Control in Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/invariant_sets.html">A few notes on control invariant sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/invariant_sets.html#A-basic-example">A basic example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/invariant_sets.html#A-useful-control-invariant-set:-the-invariant-set-of-the-LQR-controller">A useful control invariant set: the invariant set of the LQR controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/invariant_sets.html#The-maximal-control-invariant-set">The maximal control invariant set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/invariant_sets.html#The-initial-feasible-set-of-the-MPC-controller">The initial feasible set of the MPC controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/multiple_shooting_pendulum_swingup.html">Open-loop optimal control of a simple pendulum using multiple-shooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/nonlinear_tracking_heat_exchanger.html">Non-linear Tracking MPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/offset_free_advanced.html">offset free NMPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/offset_free_mpc_heat_exchanger.html">Non-linear offset-free MPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/offset_free_simple.html">Simple offset-free MPC example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/reference_tracking_aircraft.html">Reference tracking NMPC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/simpleMPC_invPend.html">Pendulum on Cart System with MPC Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/single_shooting_pendulum_swingup.html">Open-loop optimal control of a simple pendulum using single-shooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/swingup_pendcart_nlmpc.html">Swingup of a pendulum on a cart using nonlinear MPC</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -88,6 +114,28 @@
 <h1>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h1>
 <p>The following examples demonstrate the usage of OpenMPC.</p>
 <div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/cessna_descent.html">Cessna aircraft descent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/constraint_softening.html">Constraint softening</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/discretization_notebook.html">Comparison of Discretization Schemes for a Simple Pendulum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/double_integrator.html">Double integrator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/helicopter.html">Helicopter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Basic Model Predictive Control in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/invariant_sets.html">A few notes on control invariant sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/invariant_sets.html#A-basic-example">A basic example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/invariant_sets.html#A-useful-control-invariant-set:-the-invariant-set-of-the-LQR-controller">A useful control invariant set: the invariant set of the LQR controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/invariant_sets.html#The-maximal-control-invariant-set">The maximal control invariant set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/invariant_sets.html#The-initial-feasible-set-of-the-MPC-controller">The initial feasible set of the MPC controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/multiple_shooting_pendulum_swingup.html">Open-loop optimal control of a simple pendulum using multiple-shooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/nonlinear_tracking_heat_exchanger.html">Non-linear Tracking MPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/offset_free_advanced.html">offset free NMPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/offset_free_mpc_heat_exchanger.html">Non-linear offset-free MPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/offset_free_simple.html">Simple offset-free MPC example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/reference_tracking_aircraft.html">Reference tracking NMPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/simpleMPC_invPend.html">Pendulum on Cart System with MPC Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/single_shooting_pendulum_swingup.html">Open-loop optimal control of a simple pendulum using single-shooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/swingup_pendcart_nlmpc.html">Swingup of a pendulum on a cart using nonlinear MPC</a></li>
+</ul>
 </div>
 </section>
 
@@ -95,8 +143,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="installation.html" class="btn btn-neutral float-left" title="installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="modules.html" class="btn btn-neutral float-right" title="openmpc" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="examples/cessna_descent.html" class="btn btn-neutral float-right" title="Cessna aircraft descent" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

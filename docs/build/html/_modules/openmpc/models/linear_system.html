@@ -31,7 +31,7 @@
           
           <a href="../../../index.html">
             
-              <img src="../../../_static/mpc_logo.svg" class="logo" alt="Logo"/>
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -41,14 +41,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#dependencies">Dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#mosek-license">Mosek License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#license">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html#contributing">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../about_openmpc.html">Model Predictive Control</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -87,7 +91,7 @@
 
 
 <div class="viewcode-block" id="LinearSystem">
-<a class="viewcode-back" href="../../../models.html#models.LinearSystem">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LinearSystem</span><span class="p">(</span><span class="n">Model</span><span class="p">)</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simple base class to define a linear system in state-space form. The system is assumed to be discrete-time.</span>
@@ -168,8 +172,16 @@
 
         <span class="k">if</span> <span class="n">Bd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span> <span class="o">=</span> <span class="n">Bd</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of rows in Bd must match the number of rows in A&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">Cd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span> <span class="o">=</span> <span class="n">Cd</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">m</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of columns in Cd must match the number of columns in D&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span> <span class="o">=</span> <span class="n">dt</span>
 
@@ -221,12 +233,35 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span>
+    
+
+<div class="viewcode-block" id="LinearSystem.set_disturbance_interface">
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem.set_disturbance_interface">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_disturbance_interface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Bd</span><span class="p">,</span> <span class="n">Cd</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the disturbance interface matrices.</span>
+
+<span class="sd">        :param Bd: Disturbance input matrix</span>
+<span class="sd">        :type Bd: np.ndarray</span>
+<span class="sd">        :param Cd: Disturbance output matrix</span>
+<span class="sd">        :type Cd: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Bd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of rows in Bd must match the number of rows in A&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Cd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of rows in Cd must match the number of rows in C&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span> <span class="o">=</span> <span class="n">Bd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span> <span class="o">=</span> <span class="n">Cd</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_disturbance</span> <span class="o">=</span> <span class="kc">True</span></div>
+
 
 
         
 
 <div class="viewcode-block" id="LinearSystem.discrete_dynamics">
-<a class="viewcode-back" href="../../../models.html#models.LinearSystem.discrete_dynamics">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem.discrete_dynamics">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">discrete_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -243,16 +278,37 @@
 <span class="sd">        :rtype: np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_state</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
-        <span class="n">u</span><span class="p">,</span><span class="n">x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check_and_normalise_inputs</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">d</span><span class="p">)</span> <span class="c1"># sets to zero none inputs</span>
-       
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;State cannot be None.&quot;</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">,)</span> <span class="c1"># flattening</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;State size mismatch the system state. Expected size is array with dimension compatible with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="si">}</span><span class="s2">, given size is </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">,)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input size mismatch the system input. Expected size is array with dimension compatible with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="si">}</span><span class="s2">, given size is </span><span class="si">{</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_input</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">,)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Disturbance size mismatch the system disturbance. Expected size is array with dimension compatible with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="si">}</span><span class="s2">, given size is </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size_disturbance</span><span class="p">)</span>
+        
         <span class="n">x_next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_A</span> <span class="o">@</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span> <span class="o">@</span> <span class="n">u</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span> <span class="o">@</span> <span class="n">d</span>
 
-        <span class="k">return</span> <span class="n">x_next</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="n">x_next</span></div>
 
     
 <div class="viewcode-block" id="LinearSystem.output">
-<a class="viewcode-back" href="../../../models.html#models.LinearSystem.output">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem.output">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Output function</span>
@@ -277,7 +333,7 @@
 
     
 <div class="viewcode-block" id="LinearSystem.simulate">
-<a class="viewcode-back" href="../../../models.html#models.LinearSystem.simulate">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem.simulate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">steps</span> <span class="o">=</span> <span class="mi">10</span> <span class="p">)</span> <span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simulate the discrete time system for a number of steps. Input should be an array of size (size_input,steps) and disturbance should be an array of size (disturbance_size,steps)</span>
@@ -328,7 +384,7 @@
     
 
 <div class="viewcode-block" id="LinearSystem.closed_loop_simulate">
-<a class="viewcode-back" href="../../../models.html#models.LinearSystem.closed_loop_simulate">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem.closed_loop_simulate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">closed_loop_simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        </span>
@@ -381,14 +437,14 @@
 
 
 <div class="viewcode-block" id="LinearSystem.get_system_matrices">
-<a class="viewcode-back" href="../../../models.html#models.LinearSystem.get_system_matrices">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem.get_system_matrices">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_system_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span></div>
 
 
     
 <div class="viewcode-block" id="LinearSystem.c2d">
-<a class="viewcode-back" href="../../../models.html#models.LinearSystem.c2d">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem.c2d">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">c2d</span><span class="p">(</span><span class="n">A_cont</span><span class="p">,</span> <span class="n">B_cont</span><span class="p">,</span> <span class="n">C_cont</span><span class="p">,</span> <span class="n">D_cont</span><span class="p">,</span><span class="n">dt</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -424,7 +480,7 @@
 
     
 <div class="viewcode-block" id="LinearSystem.get_lqr_controller">
-<a class="viewcode-back" href="../../../models.html#models.LinearSystem.get_lqr_controller">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem.get_lqr_controller">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_lqr_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Q</span><span class="p">,</span><span class="n">R</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Solve the discrete-time algebraic Riccati equation (DARE) for the given system.</span>
@@ -443,7 +499,7 @@
 
     
 <div class="viewcode-block" id="LinearSystem.get_lqr_cost_matrix">
-<a class="viewcode-back" href="../../../models.html#models.LinearSystem.get_lqr_cost_matrix">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem.get_lqr_cost_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_lqr_cost_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Q</span><span class="p">,</span><span class="n">R</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Solve the discrete-time algebraic Riccati equation (DARE) for the given system.</span>
@@ -464,7 +520,7 @@
     
     
 <div class="viewcode-block" id="LinearSystem.plot_trajectories">
-<a class="viewcode-back" href="../../../models.html#models.LinearSystem.plot_trajectories">[docs]</a>
+<a class="viewcode-back" href="../../../openmpc.models.html#models.LinearSystem.plot_trajectories">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_trj</span><span class="p">,</span> <span class="n">y_trj</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Barebone function to plot state and output trajectories.</span>
@@ -529,6 +585,8 @@
 
 
 
+<div class="viewcode-block" id="compute_lqr_controller">
+<a class="viewcode-back" href="../../../openmpc.models.html#models.compute_lqr_controller">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_lqr_controller</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Solve the discrete-time algebraic Riccati equation (DARE) for the given system.</span>
@@ -542,15 +600,17 @@
 <span class="sd">    :param R: The input weighting matrix.</span>
 <span class="sd">    :type R: np.ndarray</span>
 
-<span class="sd">    :returns: Optimal gain of the LQR solution.</span>
-<span class="sd">    :rtype: np.ndarray</span>
-<span class="sd">    :returns: symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.</span>
-<span class="sd">    :rtype np.ndarray</span>
+<span class="sd">    :returns: A tuple containing:</span>
+<span class="sd">        - The optimal gain of the LQR solution. (np.ndarray)</span>
+<span class="sd">        - The symmetric positive semidefinite solution to the discrete-time algebraic Riccati equation. (np.ndarray)</span>
+<span class="sd">    :rtype: tuple[np.ndarray, np.ndarray]</span>
+<span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">L</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">E</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">dlqr</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">L</span><span class="p">,</span><span class="n">P</span>
+    <span class="k">return</span> <span class="n">L</span><span class="p">,</span><span class="n">P</span></div>
+
 
 
 
