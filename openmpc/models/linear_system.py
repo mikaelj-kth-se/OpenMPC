@@ -479,10 +479,11 @@ def compute_lqr_controller(A, B, Q, R):
     :param R: The input weighting matrix.
     :type R: np.ndarray
 
-    :returns: Optimal gain of the LQR solution.
-    :rtype: np.ndarray
-    :returns: symmetric postive semidefinite matrix to the discrete-time algebraic Riccati equation.
-    :rtype np.ndarray
+    :returns: A tuple containing:
+        - The optimal gain of the LQR solution. (np.ndarray)
+        - The symmetric positive semidefinite solution to the discrete-time algebraic Riccati equation. (np.ndarray)
+    :rtype: tuple[np.ndarray, np.ndarray]
+    
     """
 
     L, P, E = control.dlqr(A, B, Q, R)

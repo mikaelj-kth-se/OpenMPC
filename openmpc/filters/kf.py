@@ -8,26 +8,45 @@ from openmpc.filters.parameters import KFParameters
 class KF: 
 
     """
-    Kalman filter class for output regulation for linear time-invariant systems under constant unkown input perturbations.
-    
-    Extended system takes the form
-    
+    Kalman filter class for output regulation for linear time-invariant systems under constant unknown input perturbations.
+
+    Extended system takes the form:
+
     .. math::
+
         \begin{aligned}
-        x_{t+1} = A x_t + B u_t + Bd d_t + wx_t\\
-        d_{t+1} = d_t + wd_t\\
-        y_t     = C x_t + D u_t + Cd d_t + v_t\\
+            x_{t+1} &= A x_t + B u_t + B_d d_t + w_x\\
+            d_{t+1} &= d_t + w_d\\
+            y_t     &= C x_t + D u_t + C_d d_t + v_t
         \end{aligned}
 
-    where 
+    where the extended system matrices are:
 
-    A_ext = [A Bd]
-            [0 I ]
-    B_ext = [B]
-            [0]
-    C_ext = [C Cd]
+    .. math::
+
+        A_{\text{ext}} =
+        \begin{bmatrix}
+            A & B_d \\
+            0 & I
+        \end{bmatrix}, \quad
+        B_{\text{ext}} =
+        \begin{bmatrix}
+            B \\
+            0
+        \end{bmatrix}, \quad
+        C_{\text{ext}} =
+        \begin{bmatrix}
+            C & C_d
+        \end{bmatrix}, \quad
+        D_{\text{ext}} =
+        \begin{bmatrix}
+            D \\
+            0
+        \end{bmatrix}
 
     """
+
+
     def __init__(self, parameters    : KFParameters, 
                        is_stationary : bool =True):
         """

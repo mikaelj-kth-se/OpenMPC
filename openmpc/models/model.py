@@ -47,8 +47,7 @@ class Model(ABC):
     @abstractmethod
     def discrete_dynamics(self, x : np.ndarray , u : np.ndarray | None = None, d : np.ndarray | None =None):
         """
-        Discrete dynamics
-        x_{k+1} = f(x_k,u_k,d_k)
+        Discrete dynamics :math:`x_{k+1} = f(x_k,u_k,d_k)`
 
         :param x: state at time k
         :type x: np.ndarray
@@ -65,18 +64,16 @@ class Model(ABC):
     @abstractmethod
     def output(self, x:np.ndarray , u : np.ndarray| None = None, d : np.ndarray | None = None):
         """
-        Output function
-        y = g(x)
+        Output function :math:`y_k = g(x_k)`
 
-        :param x: state
+        :param x: State
         :type x: np.ndarray
-        :param u: input
+        :param u: Input
         :type u: np.ndarray
-        :param d: disturbance
+        :param d: Disturbance
         :type d: np.ndarray
-
-        :return: output
-        :rtype np.ndarray
+        :return: Output
+        :rtype: np.ndarray
         """
         raise NotImplementedError
     

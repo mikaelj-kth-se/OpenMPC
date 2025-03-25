@@ -359,7 +359,7 @@ class MPCProblem:
         Add a reference controller to the MPC.
 
         :param controller: The reference controller for the MPC.
-        :type
+        :type controller: numpy.ndarray
         """
         self.reference_controller = controller
 
