@@ -74,6 +74,44 @@ export LDFLAGS="-L/usr/local/lib"
 pip install .
 ```
 
+## Check our examples !
+
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Fcessna_descent.ipynb) Cessna Descent
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Fconstraint_softening.ipynb) Constraint Softening
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Fdiscretization_notebook.ipynb) Discretization Notebook
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Fdouble_integrator.ipynb) Double Integrator
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Fhelicopter.ipynb) Helicopter
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Findex.ipynb) Index
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Finvariant_sets.ipynb) Invariant Sets
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Fmultiple_shooting_pendulum_swingup.ipynb) Multiple Shooting Pendulum Swing-up
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Fnonlinear_tracking_heat_exchanger.ipynb) Nonlinear Tracking Heat Exchanger
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Foffset_free_advanced.ipynb) Offset Free Advanced
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Foffset_free_mpc_heat_exchanger.ipynb) Offset Free MPC Heat Exchanger
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Foffset_free_simple.ipynb) Offset Free Simple
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Freference_tracking_aircraft.ipynb) Reference Tracking Aircraft
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2FsimpleMPC_invPend.ipynb) Simple MPC Inverted Pendulum
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Fsingle_shooting_pendulum_swingup.ipynb) Single Shooting Pendulum Swing-up
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mikaelj-kth-se/OpenMPC/HEAD?labpath=examples%2Fswingup_pendcart_nlmpc.ipynb) Swing-up Pendulum Cart NL MPC
+
+
+
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
