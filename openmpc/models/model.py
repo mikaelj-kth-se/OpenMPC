@@ -21,27 +21,27 @@ class Model(ABC):
     @abstractmethod
     def dt(self):
         """discrete time step of the model"""
-        return NotImplementedError
+        raise NotImplementedError
     
     @property
     @abstractmethod
     def size_input(self):
-        return NotImplementedError
+        raise NotImplementedError
     
     @property
     @abstractmethod
     def size_disturbance(self):
-        return NotImplementedError
+        raise NotImplementedError
         
     @property
     @abstractmethod
     def size_output(self):
-        return NotImplementedError
+        raise NotImplementedError
         
     @property
     @abstractmethod
     def size_state(self):
-        return NotImplementedError
+        raise NotImplementedError
             
 
     @abstractmethod
