@@ -97,6 +97,12 @@ class LinearSystem(Model) :
 
         self._dt = dt
 
+        # store continuous time matrices when available
+        self._A_cont = None
+        self._B_cont = None
+        self._C_cont = None
+        self._D_cont = None
+
         super().__init__()
 
     
@@ -145,6 +151,39 @@ class LinearSystem(Model) :
     @property
     def dt(self):
         return self._dt
+    
+    @property
+    def A_cont(self):
+        """
+        Continuous-time state matrix
+        """
+        if self._A_cont is None:
+            raise ValueError("Continuous-time matrices are not defined for this system.")
+        return self._A_cont
+    @property
+    def B_cont(self):
+        """
+        Continuous-time input matrix
+        """
+        if self._B_cont is None:
+            raise ValueError("Continuous-time matrices are not defined for this system.")
+        return self._B_cont
+    @property
+    def C_cont(self):
+        """
+        Continuous-time output matrix
+        """
+        if self._C_cont is None:
+            raise ValueError("Continuous-time matrices are not defined for this system.")
+        return self._C_cont
+    @property
+    def D_cont(self):
+        """
+        Continuous-time feedforward matrix
+        """
+        if self._D_cont is None:
+            raise ValueError("Continuous-time matrices are not defined for this system.")
+        return self._D_cont
     
 
     def set_disturbance_interface(self, Bd, Cd):
@@ -366,7 +405,13 @@ class LinearSystem(Model) :
 
         # Extract the discrete-time matrices
         Adist, Bdist, Cdist, Ddist = control.ssdata(sys_disc)
-        
+        system = LinearSystem(Adist, Bdist, Cdist, Ddist)
+
+        system._A_cont = A_cont
+        system._B_cont = B_cont
+        system._C_cont = C_cont
+        system._D_cont = D_cont
+       
         return LinearSystem(Adist, Bdist, Cdist, Ddist)
 
     
