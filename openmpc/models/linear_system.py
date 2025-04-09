@@ -98,10 +98,10 @@ class LinearSystem(Model) :
         self._dt = dt
 
         # store continuous time matrices when available
-        self._A_cont = None
-        self._B_cont = None
-        self._C_cont = None
-        self._D_cont = None
+        self._A_cont : np.ndarray = None
+        self._B_cont : np.ndarray = None
+        self._C_cont : np.ndarray = None
+        self._D_cont : np.ndarray = None
 
         super().__init__()
 
@@ -377,7 +377,13 @@ class LinearSystem(Model) :
 
     
     @staticmethod
-    def c2d(A_cont, B_cont, C_cont, D_cont,dt):
+    def c2d(    A_cont  : np.ndarray,
+                B_cont  : np.ndarray | None  = None, 
+                C_cont  : np.ndarray | None  = None, 
+                D_cont  : np.ndarray | None  = None,
+                Bd_cont : np.ndarray | None  = None, 
+                Cd_cont : np.ndarray | None  = None,
+                dt = 1):
         """
         Convert continuous-time state-space model to discrete-time.
         
@@ -395,24 +401,42 @@ class LinearSystem(Model) :
         :returns: Discrete-time state-space model
         :rtype: LinearSystem
         """
+        
+        # set dfauts for non given inputs
+        if B_cont is None:
+            B_cont = np.zeros((A_cont.shape[0], 1))
+        if C_cont is None:
+            C_cont = np.eye(A_cont.shape[0])
+        if D_cont is None:
+            D_cont = np.zeros((C_cont.shape[0], B_cont.shape[1]))
+        if Bd_cont is None:
+            Bd_cont = np.zeros((A_cont.shape[0], 1))
+        if Cd_cont is None:
+            Cd_cont = np.zeros((C_cont.shape[0], 1))
+        
 
         # Create the state-space system
-        sys_cont = control.ss(A_cont, B_cont, C_cont, D_cont)
+        sys_cont   = control.ss(A_cont, B_cont, C_cont, D_cont)
+        sys_cont_d = control.ss(A_cont, Bd_cont, C_cont, Cd_cont)
 
         # Sample the system with a sampling time h = 0.25 seconds
         h = dt
         sys_disc = control.c2d(sys_cont, h)
+        sys_disc_d = control.c2d(sys_cont_d, h)
 
         # Extract the discrete-time matrices
         Adist, Bdist, Cdist, Ddist = control.ssdata(sys_disc)
-        system = LinearSystem(Adist, Bdist, Cdist, Ddist)
+        Adist_d, Bdist_d, Cdist_d, Ddist_d = control.ssdata(sys_disc_d)
+
+
+        system = LinearSystem(Adist, Bdist, Cdist, Ddist,Bd = Bdist_d, Cd = Cdist_d, dt = dt)
 
         system._A_cont = A_cont
         system._B_cont = B_cont
         system._C_cont = C_cont
         system._D_cont = D_cont
        
-        return LinearSystem(Adist, Bdist, Cdist, Ddist)
+        return system
 
     
     def get_lqr_controller(self,Q,R):
