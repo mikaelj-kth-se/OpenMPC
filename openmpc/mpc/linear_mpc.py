@@ -432,3 +432,120 @@ class SetPointTrackingMPC:
         self.problem.solve(solver=self.solver)
         return self.x.value, self.u.value
 
+
+
+
+class TimedMPC(MPC):
+    r"""
+    MPC controller class for linear systems including time.
+    It is the same as a standard MPC but state constraints can be given as polyhedrons in the variable z = [x,t]
+
+    The MPC class is supposed to create a controller minimizing the following optimal control problem 
+
+    .. math::
+        &\min_{x,u} \sum_{t=0}^{N-1} (x_t^T Q x_t + u_t^T R u_t) + x_N^T Q_T x_N\\
+        &\text{s.t.} \\
+        &x_{t+1} = A x_t + B u_t \\
+        &H_u u_t \leq h_u \\
+        &H_x x_t \leq h_x \\
+        &H_y (C x_t + D u_t) \leq h_y \\
+        &Hst z_t \leq h_st \; \text{state-time constraint}\\
+        &x_0 = x_0
+    """
+    def __init__(self, mpc_params : MPCProblem, current_time : float = 0.0):
+        """
+        MPC controller class for linear systems.
+
+        :param mpc_params: The parameters for the MPC controller.
+        :type mpc_params: MPCParameters
+        """
+
+        self.time_state_constraints         : list[Constraint] = self.params.time_state_constraints
+        self.current_time                   : float            = current_time
+        self.time_step                                         = mpc_params.system.dt
+        self.time_par                       : cp.Parameter     = cp.Parameter(1)  # Time parameter for the time state constraints
+
+        super().__init__( mpc_params )  # Call the parent constructor
+
+    def _setup_problem(self):
+        """
+        Set up of the MPC constraints and cost functions.
+        """
+
+        self.cost        = 0
+        slack_variables  = []  # To collect slack variables for soft constraints
+
+        self.constraints = [self.x[:, 0] == self.x0] # initial state constraints
+        
+        # Main MPC horizon loop
+        for t in range(self.N):
+            # Add the stage cost
+            self.cost += cp.quad_form(self.x[:, t], self.Q) + cp.quad_form(self.u[:, t], self.R)
+            time       = self.time_par + t * self.time_step
+            
+            # System dynamics
+            self.constraints += [self.x[:, t + 1] == self.A @self.x[:, t] + self.B @ self.u[:, t]]
+            
+            # Add input constraints
+            for constraint in self.u_constraints:
+                H,b = constraint.to_polytope()
+                if constraint.is_hard:
+                    self.constraints += [H @self.u[:, t] <= b]
+                else:
+                    # Single slack variable for all inequalities in this constraint
+                    slack = cp.Variable(nonneg=True)
+                    slack_variables.append((slack, constraint.penalty_weight))
+                    self.constraints += [H @self.u[:, t] <= b + np.ones(H.shape[0]) * slack]
+
+            # Add state constraints 
+            for constraint in self.x_constraints:
+                H,b = constraint.to_polytope()
+                if constraint.is_hard:
+                    self.constraints += [H @self.x[:, t] <= b]
+                else:
+                    # Single slack variable for all inequalities in this constraint
+                    slack = cp.Variable(nonneg=True)
+                    slack_variables.append((slack, constraint.penalty_weight))
+                    self.constraints += [H @self.x[:, t] <= b + np.ones(H.shape[0]) * slack]
+
+            # Add output constraints
+            for constraint in self.y_constraints:
+                H,b = constraint.to_polytope()
+                if constraint.is_hard:
+                    self.constraints += [H @ (self.C @ self.x[:, t] + self.D @ self.u[:, t]) <= b]
+                else:
+                    # Single slack variable for all inequalities in this constraint
+                    slack = cp.Variable(nonneg=True)
+                    slack_variables.append((slack, constraint.penalty_weight))
+                    self.constraints += [H @ (self.C @ self.x[:, t] + self.D @ self.u[:, t]) <= b + np.ones(H.shape[0]) * slack]
+
+            # state time constraints
+            for constraint in self.time_state_constraints:
+                H,b = constraint.to_polytope()
+                if constraint.is_hard:
+                    self.constraints += [H @ cp.hstack([self.x[:, t], time]) <= b]
+                else:
+                    # Single slack variable for all inequalities in this constraint
+                    slack = cp.Variable(nonneg=True)
+                    slack_variables.append((slack, constraint.penalty_weight))
+                    self.constraints += [H @ cp.hstack([self.x[:, t], time]) <= b + np.ones(H.shape[0]) * slack]
+
+        
+    
+            
+        self.cost += cp.quad_form(self.x[:, self.N], self.QT)
+        if self.terminal_set:
+            H_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
+            self.constraints += [H_terminal @ self.x[:, self.N] <= b_terminal]
+
+        # Add slack penalties to the cost function
+        for slack, penalty_weight in slack_variables:
+            if self.slack_penalty == 'LINEAR':
+                self.cost += self.global_penalty_weight * penalty_weight * slack  # Linear penalty
+            elif self.slack_penalty == 'SQUARE':
+                self.cost += self.global_penalty_weight * penalty_weight * cp.square(slack)  # Quadratic penalty
+            else :
+                raise ValueError("Invalid slack penalty type. Must be 'LINEAR' or 'SQUARE'.")
+
+        # Create the problem instance
+        self.problem = cp.Problem(cp.Minimize(self.cost), self.constraints)
