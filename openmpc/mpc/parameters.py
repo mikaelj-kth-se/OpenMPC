@@ -82,6 +82,7 @@ class MPCProblem:
         self.u_constraints        : list[Constraint] = []
         self.x_constraints        : list[Constraint] = []
         self.y_constraints        : list[Constraint] = []
+        self.state_time_constraints : list[Constraint] = []
         self.terminal_constraints : list[Constraint] = []
         self.terminal_set         : Polytope | None  = None
 
@@ -290,6 +291,15 @@ class MPCProblem:
 
         constraint = Constraint(Ax, bx, is_hard=is_hard, penalty_weight=penalty_weight)
         self.x_constraints.append(constraint)
+
+    def general_time_state_constraints(self, Ax : np.ndarray, bx : np.ndarray, is_hard : bool =True, penalty_weight : int=1):
+        """Add general time state constraints of the form A[x,t] <= bx."""
+        
+        if Ax.shape[1] != self.system.size_state+1:
+            raise ValueError("The number of columns in A must match the state dimension of the system + 1 to account for the time dimension.")
+        
+        constraint = Constraint(Ax, bx, is_hard=is_hard, penalty_weight=penalty_weight)
+        self.time_state_constraints.append(constraint)
 
     def add_terminal_ingredients(self, controller : np.ndarray | None = None):
         """Add terminal ingredients using a controller (defaults to LQR)."""

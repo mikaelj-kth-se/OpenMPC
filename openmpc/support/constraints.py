@@ -38,3 +38,21 @@ class Constraint:
     def to_polytope(self):
         """Returns the polytope representation."""
         return self.H, self.b
+
+
+
+
+class TimedConstraint(Constraint):
+    """
+    Class to represent timed constraints of the form Hx <= b with time dependency.
+    
+    """
+    def __init__(self, H : np.ndarray , b : np.ndarray, start:float, end:float , is_hard : bool =True, penalty_weight : float | None = None):
+        
+        
+        super().__init__(H, b, is_hard, penalty_weight)
+        self.start = start
+        self.end   = end
+
+        if self.start >= self.end:
+            raise ValueError("start must be less than end.")
