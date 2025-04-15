@@ -77,23 +77,28 @@ class LinearSystem(Model) :
         
         # distrurbances assumed to be one dimension with zero effect on the output
 
-        if Bd is None and Cd is None:
+        if (Bd is None) and (Cd is None):
             self.has_disturbance = False
+            disturbance_size = 1
         else :
             self.has_disturbance = True
-
+            if Bd is None:
+                disturbance_size = Cd.shape[1]
+            elif Cd is None:
+                disturbance_size = Bd.shape[1]
+        
         if Bd is None:
-            self._Bd = np.zeros((self._A.shape[0], self._B.shape[1]))
+            self._Bd = np.zeros((self._A.shape[0], disturbance_size))
         else :
             self._Bd = Bd
             if self._Bd.shape[0] != n:
                 raise ValueError("The number of rows in Bd must match the number of rows in A")
         if Cd is None:
-            self._Cd = np.zeros((self._C.shape[0], self._B.shape[1]))  
+            self._Cd = np.zeros((self._C.shape[0], disturbance_size))  
         else :
             self._Cd = Cd
-            if self._Cd.shape[1] != m:
-                raise ValueError("The number of columns in Cd must match the number of columns in D")
+            if self._Cd.shape[0] != self._C.shape[0]:
+                raise ValueError("The number of rows of Cd must match the number of rows in C")
 
         self._dt = dt
 
@@ -410,7 +415,7 @@ class LinearSystem(Model) :
         if D_cont is None:
             D_cont = np.zeros((C_cont.shape[0], B_cont.shape[1]))
         if Bd_cont is None:
-            Bd_cont = np.zeros((A_cont.shape[0], 1))
+            Bd_cont = np.zeros((C_cont.shape[0], 1))
         if Cd_cont is None:
             Cd_cont = np.zeros((C_cont.shape[0], 1))
         
@@ -426,10 +431,10 @@ class LinearSystem(Model) :
 
         # Extract the discrete-time matrices
         Adist, Bdist, Cdist, Ddist = control.ssdata(sys_disc)
-        Adist_d, Bdist_d, Cdist_d, Ddist_d = control.ssdata(sys_disc_d)
+        Adist, Bdist_d, Cdist, Cdist_d = control.ssdata(sys_disc_d)
 
 
-        system = LinearSystem(Adist, Bdist, Cdist, Ddist,Bd = Bdist_d, Cd = Cdist_d, dt = dt)
+        system = LinearSystem(Adist, Bdist, Cdist, Ddist, Bd = Bdist_d, Cd = Cdist_d, dt = dt)
 
         system._A_cont = A_cont
         system._B_cont = B_cont
@@ -438,7 +443,31 @@ class LinearSystem(Model) :
        
         return system
 
-    
+    def is_controllable(self) :
+        """
+        Check if the system is controllable.
+
+        :returns: True if the system is controllable, False otherwise.
+        :rtype: bool
+        """
+        # build controllability matrix
+        # C = [B, AB, A^2B, ... , A^(n-1)B]
+
+        C = self.B
+        for i in range(1, self.size_state):
+            C = np.hstack((C, np.linalg.matrix_power(self.A, i) @ self.B))
+        
+        # check rank
+        #   if rank(C) == n, the system is controllable
+        #   if rank(C) < n, the system is not controllable
+        
+        rank = np.linalg.matrix_rank(C)
+        if rank == self.size_state:
+            return True
+        else:
+            return False 
+
+
     def get_lqr_controller(self,Q,R):
         """
         Solve the discrete-time algebraic Riccati equation (DARE) for the given system.

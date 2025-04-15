@@ -2,8 +2,8 @@ import cvxpy as cp
 import numpy as np
 from openmpc.mpc.parameters import MPCProblem
 from openmpc.invariant_sets import Polytope
-from openmpc.support import Constraint
-from openmpc.models import LinearSystem
+from openmpc.support        import Constraint, TimedConstraint
+from openmpc.models         import LinearSystem
 
 class MPC:
     r"""
@@ -48,7 +48,7 @@ class MPC:
         
         self.solver               : str        = self.params.solver
         self.slack_penalty        : float      = self.params.slack_penalty
-        self.terminal_set         : Polytope   = self.params.terminal_set
+        self.terminal_set         : Constraint = self.params.terminal_set
         self.dual_mode_controller : np.ndarray = self.params.dual_mode_controller
         self.dual_mode_horizon    : int        = self.params.dual_mode_horizon
 
@@ -145,14 +145,14 @@ class MPC:
             self.cost += cp.quad_form(x_dual, self.QT)
             
             if self.terminal_set:
-                H_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
+                H_terminal, b_terminal = self.terminal_set.to_polytope()
                 self.constraints += [H_terminal @ x_dual <= b_terminal]
         else:
             # Apply terminal cost and constraints at the end of the main horizon (if no dual mode is specified)
             
             self.cost += cp.quad_form(self.x[:, self.N], self.QT)
             if self.terminal_set:
-                H_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
+                H_terminal, b_terminal = self.terminal_set.to_polytope()
                 self.constraints += [H_terminal @ self.x[:, self.N] <= b_terminal]
 
         # Add slack penalties to the cost function
@@ -167,7 +167,7 @@ class MPC:
         # Create the problem instance
         self.problem = cp.Problem(cp.Minimize(self.cost), self.constraints)
 
-    def compute(self, x0):
+    def compute(self, x0,*args, **kwargs) -> tuple[np.ndarray, np.ndarray]:
         """
         Compute the optimal control action for a given initial state.
 
@@ -182,7 +182,7 @@ class MPC:
         self.problem.solve(solver=self.solver)
         return self.x.value, self.u.value
 
-    def get_control_action(self, x0):
+    def get_control_action(self, x0,*args, **kwargs):
         """
         Get the first control action for a given initial state.
 
@@ -225,7 +225,7 @@ class SetPointTrackingMPC:
         """
 
         # Extract MPC parameters
-        self.params              : MPCProblem = mpc_params
+        self.params               : MPCProblem   = mpc_params
         self.system               : LinearSystem = self.params.system
         self.A, self.B, self.C, self.D = self.system.get_system_matrices()
 
@@ -245,13 +245,13 @@ class SetPointTrackingMPC:
         
         self.solver               : str        = self.params.solver
         self.slack_penalty        : float      = self.params.slack_penalty
-        self.terminal_set         : Polytope   = self.params.terminal_set
+        self.terminal_set         : Constraint = self.params.terminal_set
         self.dual_mode_controller : np.ndarray = self.params.dual_mode_controller
         self.dual_mode_horizon    : int        = self.params.dual_mode_horizon
 
 
         # Tracking reference and siturbance parameters
-        self.r       = cp.Parameter(self.system.size_output)  # Ensure r is a 1D array with appropriate shape
+        self.r       = cp.Parameter(self.system.size_output)  
         self.d       = cp.Parameter(self.system.size_disturbance)     # Disturbance parameter
         
         self.r.value = np.zeros(self.system.size_output)        # Initialize with a default value (e.g., zero)
@@ -307,9 +307,10 @@ class SetPointTrackingMPC:
         
         self.cost = 0
         self.constraints = [self.x[:, 0] == self.x0]
-
-        # Steady-state reference constraints with or without disturbance
-        self.constraints += [self.A @self.x_ref + self.B @ self.u_ref + self.Bd @ self.d == self.x_ref]
+        
+        if self.params.reference_reached_at_steady_state :
+            # Steady-state reference constraints with or without disturbance
+            self.constraints += [self.A @self.x_ref + self.B @ self.u_ref + self.Bd @ self.d == self.x_ref]
       
         # Tracking constraint with or without disturbance
         if self.soft_tracking:
@@ -361,7 +362,7 @@ class SetPointTrackingMPC:
 
         # Terminal set constraint
         if self.terminal_set:
-            H_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
+            H_terminal, b_terminal = self.terminal_set.to_polytope()
             self.constraints += [H_terminal @ self.x[:, self.N] <= b_terminal]
 
         # Dual-mode implementation
@@ -406,18 +407,19 @@ class SetPointTrackingMPC:
                 self.cost += self.global_penalty_weight * penalty_weight * cp.square(slack)  # Quadratic penalty
             else :
                 raise ValueError("Invalid slack penalty type. Must be 'LINEAR' or 'SQUARE'.")
-            
+        
         if self.soft_tracking:
             if self.slack_penalty == 'LINEAR':
                 self.cost += self.tracking_penalty_weight * cp.norm(self.slack_tracking, 1)
             elif self.slack_penalty == 'SQUARE':
-                self.cost += self.tracking_penalty_weight * cp.square(self.slack_tracking)
+                self.cost += self.tracking_penalty_weight * cp.sum_squares(self.slack_tracking)
 
         # Create the problem instance
         self.problem = cp.Problem(cp.Minimize(self.cost), self.constraints)
         
 
-    def get_control_action(self, x0, reference, disturbance=None):
+    def get_control_action(self, x0 : np.ndarray, reference : np.ndarray, disturbance : np.ndarray | None =None, **kwargs):
+        
         """Compute the control action for a given state, reference, and optional disturbance."""
         self.set_reference(reference)
         if disturbance is not None and self.system.has_disturbance:
@@ -430,121 +432,115 @@ class SetPointTrackingMPC:
     def compute(self, x0):
         self.x0.value = x0
         self.problem.solve(solver=self.solver)
+        if self.problem.status != cp.OPTIMAL:
+            raise ValueError(f"MPC problem is {self.problem.status}.")
         return self.x.value, self.u.value
 
 
 
-class TimedMPC(MPC):
+class TimedMPC(SetPointTrackingMPC):
     r"""
-    MPC controller class for linear systems including time.
-    It is the same as a standard MPC but state constraints can be given as polyhedrons in the variable z = [x,t]
+    MPC controller class for set-point tracking of linear systems.
 
-    The MPC class is supposed to create a controller minimizing the following optimal control problem 
+
+    Main controller :
 
     .. math::
-        &\min_{x,u} \sum_{t=0}^{N-1} (x_t^T Q x_t + u_t^T R u_t) + x_N^T Q_T x_N\\
-        &\text{s.t.} \\
-        &x_{t+1} = A x_t + B u_t \\
+
+        &\min_{x,u} sum_{t=0}^{N-1} (x_t - x_{ref})^T Q (x_t - x_{ref}) + (u_t - u_{ref})^T R (u_t - u_{ref})\\
+        &s.t.\\
+        &x_{t+1} = A x_t + B u_t + B_d d_t\\
         &H_u u_t \leq h_u \\
         &H_x x_t \leq h_x \\
         &H_y (C x_t + D u_t) \leq h_y \\
-        &Hst z_t \leq h_st \; \text{state-time constraint}\\
         &x_0 = x_0
     """
-    def __init__(self, mpc_params : MPCProblem, current_time : float = 0.0):
-        """
-        MPC controller class for linear systems.
 
-        :param mpc_params: The parameters for the MPC controller.
+    def __init__(self, mpc_params : MPCProblem):
+
+        """
+        Initializes the TrackingMPC with the given MPC parameters.
+
+        :param mpc_params: The parameters for the MPC.
         :type mpc_params: MPCParameters
         """
 
-        self.time_state_constraints         : list[Constraint] = self.params.time_state_constraints
-        self.current_time                   : float            = current_time
-        self.time_step                                         = mpc_params.system.dt
-        self.time_par                       : cp.Parameter     = cp.Parameter(1)  # Time parameter for the time state constraints
+        self.time_state_constraints         : list[TimedConstraint] = mpc_params.state_time_constraints
+        self.time_step                       :float                 = mpc_params.system.dt
+        self.time_par                       : cp.Parameter          = cp.Parameter(1)  # Time parameter for the time state constraints
+        
+        
+        self.activation_parameters : dict[Constraint,cp.Parameter] = {}
+        for constraint in self.time_state_constraints:
+            self.activation_parameters[constraint] = cp.Parameter(shape=(mpc_params.horizon+1,),value =np.ones(mpc_params.horizon+1,),integer = True)
+               
+        # Set up the MPC tracking problem
+        super().__init__(mpc_params)
+        
+    def set_time(self, time : float):
+        """
+        Set the current time for the timed constraints.
 
-        super().__init__( mpc_params )  # Call the parent constructor
+        :param time: The current time.
+        :type time: float
+        """
+        
+        self.time_par.value = np.array(time).reshape(1,)
+
+    def update_activation_parameters(self, time : float):
+        """
+        Update the activation parameters for the timed constraints.
+
+        :param time: The current time.
+        :type time: float
+        """
+        
+        time_horizon_range = np.linspace(time , self.time_step*self.N + time ,self.N+1)
+        for constraint in self.time_state_constraints:
+            active_set = np.bitwise_and(time_horizon_range >= constraint.start, time_horizon_range <= constraint.end)
+            self.activation_parameters[constraint].value = active_set
+    
 
     def _setup_problem(self):
-        """
-        Set up of the MPC constraints and cost functions.
-        """
 
-        self.cost        = 0
-        slack_variables  = []  # To collect slack variables for soft constraints
-
-        self.constraints = [self.x[:, 0] == self.x0] # initial state constraints
-        
-        # Main MPC horizon loop
-        for t in range(self.N):
-            # Add the stage cost
-            self.cost += cp.quad_form(self.x[:, t], self.Q) + cp.quad_form(self.u[:, t], self.R)
-            time       = self.time_par + t * self.time_step
-            
-            # System dynamics
-            self.constraints += [self.x[:, t + 1] == self.A @self.x[:, t] + self.B @ self.u[:, t]]
-            
-            # Add input constraints
-            for constraint in self.u_constraints:
-                H,b = constraint.to_polytope()
-                if constraint.is_hard:
-                    self.constraints += [H @self.u[:, t] <= b]
-                else:
-                    # Single slack variable for all inequalities in this constraint
-                    slack = cp.Variable(nonneg=True)
-                    slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [H @self.u[:, t] <= b + np.ones(H.shape[0]) * slack]
-
-            # Add state constraints 
-            for constraint in self.x_constraints:
-                H,b = constraint.to_polytope()
-                if constraint.is_hard:
-                    self.constraints += [H @self.x[:, t] <= b]
-                else:
-                    # Single slack variable for all inequalities in this constraint
-                    slack = cp.Variable(nonneg=True)
-                    slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [H @self.x[:, t] <= b + np.ones(H.shape[0]) * slack]
-
-            # Add output constraints
-            for constraint in self.y_constraints:
-                H,b = constraint.to_polytope()
-                if constraint.is_hard:
-                    self.constraints += [H @ (self.C @ self.x[:, t] + self.D @ self.u[:, t]) <= b]
-                else:
-                    # Single slack variable for all inequalities in this constraint
-                    slack = cp.Variable(nonneg=True)
-                    slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [H @ (self.C @ self.x[:, t] + self.D @ self.u[:, t]) <= b + np.ones(H.shape[0]) * slack]
-
-            # state time constraints
+        super()._setup_problem()
+        # add the timed-constraints
+        for t in range(self.N+1):
+            time = self.time_par + t * self.time_step
+            # state time constraints (Only difference with standard set point tracking MPC)
             for constraint in self.time_state_constraints:
                 H,b = constraint.to_polytope()
-                if constraint.is_hard:
-                    self.constraints += [H @ cp.hstack([self.x[:, t], time]) <= b]
-                else:
-                    # Single slack variable for all inequalities in this constraint
-                    slack = cp.Variable(nonneg=True)
-                    slack_variables.append((slack, constraint.penalty_weight))
-                    self.constraints += [H @ cp.hstack([self.x[:, t], time]) <= b + np.ones(H.shape[0]) * slack]
-
-        
-    
-            
-        self.cost += cp.quad_form(self.x[:, self.N], self.QT)
-        if self.terminal_set:
-            H_terminal, b_terminal = self.terminal_set.A, self.terminal_set.b
-            self.constraints += [H_terminal @ self.x[:, self.N] <= b_terminal]
-
-        # Add slack penalties to the cost function
-        for slack, penalty_weight in slack_variables:
-            if self.slack_penalty == 'LINEAR':
-                self.cost += self.global_penalty_weight * penalty_weight * slack  # Linear penalty
-            elif self.slack_penalty == 'SQUARE':
-                self.cost += self.global_penalty_weight * penalty_weight * cp.square(slack)  # Quadratic penalty
-            else :
-                raise ValueError("Invalid slack penalty type. Must be 'LINEAR' or 'SQUARE'.")
+                activation_bit   = self.activation_parameters[constraint][t]
+                self.constraints += [H @ cp.hstack((self.x[:, t], time)) <= b + (1 - activation_bit) * 1e6] # add time varying constraints
 
         # Create the problem instance
         self.problem = cp.Problem(cp.Minimize(self.cost), self.constraints)
+        
+
+    def get_control_action(self, x0 : np.ndarray, reference : np.ndarray, disturbance : np.ndarray | None =None, **kwargs):
+        """Compute the control action for a given state, reference, and optional disturbance."""
+        
+        t0 = kwargs['t0']
+        self.set_reference(reference)
+        self.set_time(t0)
+        self.update_activation_parameters(t0) # selects active constraint
+
+        if disturbance is not None and self.system.has_disturbance:
+            self.set_disturbance(disturbance)
+        _, u_pred = self.compute(x0)
+
+        return np.atleast_1d(u_pred[:, 0])  # Return the entire vector for the first control input
+
+    
+    def get_state_and_control_trajectory(self, x0 : np.ndarray,t0:float, reference : np.ndarray, disturbance : np.ndarray | None =None)-> tuple[np.ndarray, np.ndarray,float]:
+
+        self.set_reference(reference)
+        self.set_time(t0)
+        self.update_activation_parameters(t0) # selects active constraint
+
+        if disturbance is not None and self.system.has_disturbance:
+            self.set_disturbance(disturbance)
+        x_pred, u_pred = self.compute(x0)
+        terminal_time = self.time_par.value + self.time_step * self.N
+        return x_pred, u_pred, terminal_time
+        
