@@ -476,6 +476,8 @@ class TimedMPC(SetPointTrackingMPC):
                
         # Set up the MPC tracking problem
         super().__init__(mpc_params)
+
+        self._setup_problem()  # Call the parent class's setup method to initialize the problem
         
     def set_time(self, time : float):
         """
@@ -503,7 +505,81 @@ class TimedMPC(SetPointTrackingMPC):
 
     def _setup_problem(self):
 
-        super()._setup_problem()
+        self.cost = 0
+        self.constraints = [self.x[:, 0] == self.x0]
+        
+        if self.params.reference_reached_at_steady_state :
+            # Steady-state reference constraints with or without disturbance
+            self.constraints += [self.A @self.x_ref + self.B @ self.u_ref + self.Bd @ self.d == self.x_ref]
+      
+        # Tracking constraint with or without disturbance
+        if self.soft_tracking:
+            self.constraints += [self.C @ self.x_ref + self.D @ self.u_ref + self.Cd @ self.d == self.r + self.slack_tracking]
+        else:
+            self.constraints += [self.C @ self.x_ref + self.D @ self.u_ref + self.Cd @ self.d == self.r]
+   
+
+        # Main MPC horizon loop
+        slack_variables = []  # To collect slack variables for other soft constraints
+        for t in range(self.N):
+            # Add the tracking cost
+            self.cost += cp.quad_form(self.x[:, t] - self.x_ref, self.Q) + cp.quad_form(self.u[:, t] - self.u_ref, self.R)
+
+            # System dynamics including disturbance if it exists
+            self.constraints += [self.x[:, t + 1] == self.A @self.x[:, t] + self.B @ self.u[:, t] + self.Bd @ self.d]
+
+            # Add input constraints
+            for constraint in self.u_constraints:
+                H,b = constraint.to_polytope()
+                if constraint.is_hard:
+                    self.constraints += [H @self.u[:, t] <= b]
+                else:
+                    slack = cp.Variable(nonneg=True)
+                    slack_variables.append((slack, constraint.penalty_weight))
+                    self.constraints += [H @self.u[:, t] <= b + np.ones(H.shape[0]) * slack]
+
+            # Add state constraints
+            for constraint in self.x_constraints:
+                H,b = constraint.to_polytope()
+                if constraint.is_hard:
+                    self.constraints += [H @self.x[:, t] <= b]
+                else:
+                    slack = cp.Variable(nonneg=True)
+                    slack_variables.append((slack, constraint.penalty_weight))
+                    self.constraints += [H @self.x[:, t] <= b + np.ones(H.shape[0]) * slack]
+
+            for constraint in self.y_constraints:
+                H,b = constraint.to_polytope()
+                if constraint.is_hard:
+                    self.constraints += [H @self.C @ self.x[:, t] <= b]
+                else:
+                    slack = cp.Variable(nonneg=True)
+                    slack_variables.append((slack, constraint.penalty_weight))
+                    self.constraints += [H @ (self.C @ self.x[:, t] + self.D @ self.u[:,t])  <= b + np.ones(H.shape[0]) * slack]
+
+        # Terminal cost
+        self.cost += cp.quad_form(self.x[:, self.N] - self.x_ref, self.QT)
+
+        # add exact terminal constraint 
+        if not self.soft_tracking:
+            self.constraints += [self.x[:, self.N] == self.x_ref]
+
+        
+        # Add slack penalties for other soft constraints
+        for slack, penalty_weight in slack_variables:
+            if self.slack_penalty == 'LINEAR':
+                self.cost += self.global_penalty_weight * penalty_weight * slack  # Linear penalty
+            elif self.slack_penalty == 'SQUARE':
+                self.cost += self.global_penalty_weight * penalty_weight * cp.square(slack)  # Quadratic penalty
+            else :
+                raise ValueError("Invalid slack penalty type. Must be 'LINEAR' or 'SQUARE'.")
+        
+        if self.soft_tracking:
+            if self.slack_penalty == 'LINEAR':
+                self.cost += self.tracking_penalty_weight * cp.norm(self.slack_tracking, 1)
+            elif self.slack_penalty == 'SQUARE':
+                self.cost += self.tracking_penalty_weight * cp.sum_squares(self.slack_tracking)
+
         # add the timed-constraints
         for t in range(self.N+1):
             time = self.time_par + t * self.time_step
