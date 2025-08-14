@@ -8,6 +8,7 @@
   <title>models.linear_system &mdash; openmpc 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
@@ -15,7 +16,6 @@
       <script src="../../_static/documentation_options.js?v=837179f8"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -165,25 +165,36 @@
         
         <span class="c1"># distrurbances assumed to be one dimension with zero effect on the output</span>
 
-        <span class="k">if</span> <span class="n">Bd</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">Cd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">Bd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">Cd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">has_disturbance</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">disturbance_size</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">else</span> <span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">has_disturbance</span> <span class="o">=</span> <span class="kc">True</span>
-
+            <span class="k">if</span> <span class="n">Bd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">disturbance_size</span> <span class="o">=</span> <span class="n">Cd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">Cd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">disturbance_size</span> <span class="o">=</span> <span class="n">Bd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        
         <span class="k">if</span> <span class="n">Bd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">disturbance_size</span><span class="p">))</span>
         <span class="k">else</span> <span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span> <span class="o">=</span> <span class="n">Bd</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Bd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of rows in Bd must match the number of rows in A&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">Cd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">disturbance_size</span><span class="p">))</span>  
         <span class="k">else</span> <span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span> <span class="o">=</span> <span class="n">Cd</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">m</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of columns in Cd must match the number of columns in D&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Cd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of rows of Cd must match the number of rows in C&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span> <span class="o">=</span> <span class="n">dt</span>
+
+        <span class="c1"># store continuous time matrices when available</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_A_cont</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_B_cont</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_C_cont</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_D_cont</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -233,6 +244,39 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">A_cont</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Continuous-time state matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_A_cont</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Continuous-time matrices are not defined for this system.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_A_cont</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">B_cont</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Continuous-time input matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B_cont</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Continuous-time matrices are not defined for this system.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_B_cont</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">C_cont</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Continuous-time output matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C_cont</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Continuous-time matrices are not defined for this system.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C_cont</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">D_cont</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Continuous-time feedforward matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D_cont</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Continuous-time matrices are not defined for this system.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D_cont</span>
     
 
 <div class="viewcode-block" id="LinearSystem.set_disturbance_interface">
@@ -446,7 +490,13 @@
 <div class="viewcode-block" id="LinearSystem.c2d">
 <a class="viewcode-back" href="../../models.html#models.linear_system.LinearSystem.c2d">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">c2d</span><span class="p">(</span><span class="n">A_cont</span><span class="p">,</span> <span class="n">B_cont</span><span class="p">,</span> <span class="n">C_cont</span><span class="p">,</span> <span class="n">D_cont</span><span class="p">,</span><span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">c2d</span><span class="p">(</span>    <span class="n">A_cont</span>  <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                <span class="n">B_cont</span>  <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                <span class="n">C_cont</span>  <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                <span class="n">D_cont</span>  <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">dt</span>      <span class="p">:</span> <span class="nb">float</span>              <span class="o">=</span> <span class="mi">1</span> <span class="p">,</span>
+                <span class="n">Bd_cont</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                <span class="n">Cd_cont</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span><span class="p">,):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert continuous-time state-space model to discrete-time.</span>
 <span class="sd">        </span>
@@ -464,21 +514,72 @@
 <span class="sd">        :returns: Discrete-time state-space model</span>
 <span class="sd">        :rtype: LinearSystem</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1"># set dfauts for non given inputs</span>
+        <span class="k">if</span> <span class="n">B_cont</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">B_cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">A_cont</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">C_cont</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">C_cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">A_cont</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">D_cont</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">D_cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">C_cont</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">B_cont</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">Bd_cont</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Bd_cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">A_cont</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">Cd_cont</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Cd_cont</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">C_cont</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+        
 
         <span class="c1"># Create the state-space system</span>
-        <span class="n">sys_cont</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">ss</span><span class="p">(</span><span class="n">A_cont</span><span class="p">,</span> <span class="n">B_cont</span><span class="p">,</span> <span class="n">C_cont</span><span class="p">,</span> <span class="n">D_cont</span><span class="p">)</span>
+        <span class="n">sys_cont</span>   <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">ss</span><span class="p">(</span><span class="n">A_cont</span><span class="p">,</span> <span class="n">B_cont</span><span class="p">,</span> <span class="n">C_cont</span><span class="p">,</span> <span class="n">D_cont</span><span class="p">)</span>
+        <span class="n">sys_cont_d</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">ss</span><span class="p">(</span><span class="n">A_cont</span><span class="p">,</span> <span class="n">Bd_cont</span><span class="p">,</span> <span class="n">C_cont</span><span class="p">,</span> <span class="n">Cd_cont</span><span class="p">)</span>
 
         <span class="c1"># Sample the system with a sampling time h = 0.25 seconds</span>
         <span class="n">h</span> <span class="o">=</span> <span class="n">dt</span>
         <span class="n">sys_disc</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">c2d</span><span class="p">(</span><span class="n">sys_cont</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+        <span class="n">sys_disc_d</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">c2d</span><span class="p">(</span><span class="n">sys_cont_d</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
 
         <span class="c1"># Extract the discrete-time matrices</span>
         <span class="n">Adist</span><span class="p">,</span> <span class="n">Bdist</span><span class="p">,</span> <span class="n">Cdist</span><span class="p">,</span> <span class="n">Ddist</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">ssdata</span><span class="p">(</span><span class="n">sys_disc</span><span class="p">)</span>
+        <span class="n">Adist</span><span class="p">,</span> <span class="n">Bdist_d</span><span class="p">,</span> <span class="n">Cdist</span><span class="p">,</span> <span class="n">Cdist_d</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">ssdata</span><span class="p">(</span><span class="n">sys_disc_d</span><span class="p">)</span>
+
+
+        <span class="n">system</span> <span class="o">=</span> <span class="n">LinearSystem</span><span class="p">(</span><span class="n">Adist</span><span class="p">,</span> <span class="n">Bdist</span><span class="p">,</span> <span class="n">Cdist</span><span class="p">,</span> <span class="n">Ddist</span><span class="p">,</span> <span class="n">Bd</span> <span class="o">=</span> <span class="n">Bdist_d</span><span class="p">,</span> <span class="n">Cd</span> <span class="o">=</span> <span class="n">Cdist_d</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="p">)</span>
+
+        <span class="n">system</span><span class="o">.</span><span class="n">_A_cont</span> <span class="o">=</span> <span class="n">A_cont</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">_B_cont</span> <span class="o">=</span> <span class="n">B_cont</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">_C_cont</span> <span class="o">=</span> <span class="n">C_cont</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">_D_cont</span> <span class="o">=</span> <span class="n">D_cont</span>
+       
+        <span class="k">return</span> <span class="n">system</span></div>
+
+
+<div class="viewcode-block" id="LinearSystem.is_controllable">
+<a class="viewcode-back" href="../../models.html#models.linear_system.LinearSystem.is_controllable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_controllable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if the system is controllable.</span>
+
+<span class="sd">        :returns: True if the system is controllable, False otherwise.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># build controllability matrix</span>
+        <span class="c1"># C = [B, AB, A^2B, ... , A^(n-1)B]</span>
+
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">):</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">C</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">))</span>
         
-        <span class="k">return</span> <span class="n">LinearSystem</span><span class="p">(</span><span class="n">Adist</span><span class="p">,</span> <span class="n">Bdist</span><span class="p">,</span> <span class="n">Cdist</span><span class="p">,</span> <span class="n">Ddist</span><span class="p">)</span></div>
+        <span class="c1"># check rank</span>
+        <span class="c1">#   if rank(C) == n, the system is controllable</span>
+        <span class="c1">#   if rank(C) &lt; n, the system is not controllable</span>
+        
+        <span class="n">rank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_state</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span> </div>
 
 
-    
+
 <div class="viewcode-block" id="LinearSystem.get_lqr_controller">
 <a class="viewcode-back" href="../../models.html#models.linear_system.LinearSystem.get_lqr_controller">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_lqr_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Q</span><span class="p">,</span><span class="n">R</span><span class="p">):</span>

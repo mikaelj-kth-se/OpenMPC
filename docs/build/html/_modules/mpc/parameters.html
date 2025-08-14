@@ -8,6 +8,7 @@
   <title>mpc.parameters &mdash; openmpc 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
@@ -15,7 +16,6 @@
       <script src="../../_static/documentation_options.js?v=837179f8"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -87,7 +87,7 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">control</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.invariant_sets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Polytope</span><span class="p">,</span> <span class="n">invariant_set</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.support.constraints</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constraint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.support.constraints</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constraint</span><span class="p">,</span> <span class="n">TimedConstraint</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openmpc.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearSystem</span><span class="p">,</span> <span class="n">NonlinearSystem</span>
 
 
@@ -147,6 +147,8 @@
 <span class="sd">        :type soft_tracking: bool</span>
 <span class="sd">        :param tracking_penalty_weight: The penalty weight for soft tracking.</span>
 <span class="sd">        :type tracking_penalty_weight: float</span>
+<span class="sd">        :param reference_reached_at_steady_state: Whether the reference is reached at steady state.</span>
+<span class="sd">        :type reference_reached_at_steady_state: bool</span>
 <span class="sd">        :param dt: The time step for the system.</span>
 <span class="sd">        :type dt: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -167,11 +169,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">slack_penalty</span>         <span class="o">=</span> <span class="n">slack_penalty</span>  <span class="c1"># Changed from slack_norm to slack_penalty</span>
 
         <span class="c1"># Constraints as lists of `Constraint` objects</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">u_constraints</span>        <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span>        <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span>        <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_constraints</span> <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span>         <span class="p">:</span> <span class="n">Polytope</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_constraints</span>          <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span>          <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span>          <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_constraints</span>   <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Constraint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span>           <span class="p">:</span> <span class="n">Constraint</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Dual mode parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dual_mode_controller</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span><span class="p">))</span>
@@ -182,7 +184,10 @@
         <span class="c1"># Tracking parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">soft_tracking</span>           <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tracking_penalty_weight</span> <span class="o">=</span> <span class="mf">1.</span>  <span class="c1"># Default penalty weight for soft tracking</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference_reached_at_steady_state</span> <span class="o">=</span> <span class="kc">True</span>
+        
+        <span class="c1"># Advanced</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_time_constraints</span> <span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TimedConstraint</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     
 <div class="viewcode-block" id="MPCProblem.add_input_magnitude_constraint">
 <a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_input_magnitude_constraint">[docs]</a>
@@ -388,18 +393,69 @@
         
 <div class="viewcode-block" id="MPCProblem.add_general_state_constraints">
 <a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_general_state_constraints">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_general_state_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ax</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bx</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add general state constraints of the form Ax * x &lt;= bx.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_general_state_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Hx</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bx</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add general state constraints of the form Hx * x &lt;= bx.&quot;&quot;&quot;</span>
 
 
-        <span class="k">if</span> <span class="n">Ax</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">Hx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of columns in A must match the state dimension of the system.&quot;</span><span class="p">)</span>
         
 
-        <span class="n">constraint</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span><span class="n">Ax</span><span class="p">,</span> <span class="n">bx</span><span class="p">,</span> <span class="n">is_hard</span><span class="o">=</span><span class="n">is_hard</span><span class="p">,</span> <span class="n">penalty_weight</span><span class="o">=</span><span class="n">penalty_weight</span><span class="p">)</span>
+        <span class="n">constraint</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span><span class="n">Hx</span><span class="p">,</span> <span class="n">bx</span><span class="p">,</span> <span class="n">is_hard</span><span class="o">=</span><span class="n">is_hard</span><span class="p">,</span> <span class="n">penalty_weight</span><span class="o">=</span><span class="n">penalty_weight</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="MPCProblem.add_general_output_constraints">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_general_output_constraints">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_general_output_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Hy</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">by</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add general output constraints of the form Hy * y &lt;= by.&quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">Hy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_output</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of columns in A must match the output dimension of the system.&quot;</span><span class="p">)</span>
+        
+        <span class="n">constraint</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span><span class="n">Hy</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">is_hard</span><span class="o">=</span><span class="n">is_hard</span><span class="p">,</span> <span class="n">penalty_weight</span><span class="o">=</span><span class="n">penalty_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MPCProblem.add_general_input_constraints">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_general_input_constraints">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_general_input_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Hu</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bu</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add general input constraints of the form Hu * u &lt;= bu.&quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">Hu</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_input</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of columns in A must match the input dimension of the system.&quot;</span><span class="p">)</span>
+        
+        <span class="n">constraint</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span><span class="n">Hu</span><span class="p">,</span> <span class="n">bu</span><span class="p">,</span> <span class="n">is_hard</span><span class="o">=</span><span class="n">is_hard</span><span class="p">,</span> <span class="n">penalty_weight</span><span class="o">=</span><span class="n">penalty_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MPCProblem.add_general_state_time_constraints">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_general_state_time_constraints">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_general_state_time_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Hx</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bx</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">start_time</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">end_time</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span><span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add general time state constraints of the form A[x,t] &lt;= bx.&quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">Hx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">size_state</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of columns in A must match the state dimension of the system + 1 to account for the time dimension.&quot;</span><span class="p">)</span>
+        
+        <span class="n">constraint</span> <span class="o">=</span> <span class="n">TimedConstraint</span><span class="p">(</span><span class="n">Hx</span><span class="p">,</span> <span class="n">bx</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">is_hard</span><span class="o">=</span><span class="n">is_hard</span><span class="p">,</span> <span class="n">penalty_weight</span><span class="o">=</span><span class="n">penalty_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_time_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span></div>
+
+
+    
+<div class="viewcode-block" id="MPCProblem.reach_refererence_at_steady_state">
+<a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.reach_refererence_at_steady_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reach_refererence_at_steady_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span> <span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the option to reach the reference at steady state or let the reference be reached from any state.</span>
+<span class="sd">        </span>
+<span class="sd">        :param option: If True, the reference is reached at steady state. If False, the reference can be reached from any state.</span>
+<span class="sd">        :type option: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference_reached_at_steady_state</span> <span class="o">=</span> <span class="n">option</span></div>
+
+
+    
 <div class="viewcode-block" id="MPCProblem.add_terminal_ingredients">
 <a class="viewcode-back" href="../../mpc.html#mpc.parameters.MPCProblem.add_terminal_ingredients">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_terminal_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -434,9 +490,9 @@
             <span class="n">Ax_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">A</span><span class="nd">@controller</span><span class="p">)</span>
             <span class="n">bx_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 
-        <span class="n">Px</span> <span class="o">=</span> <span class="n">Polytope</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">Ax_list</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">bx_list</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span> <span class="o">=</span> <span class="n">invariant_set</span><span class="p">(</span><span class="n">A_cl</span><span class="p">,</span> <span class="n">Px</span><span class="p">)</span></div>
-
+        <span class="n">Px</span>                <span class="p">:</span> <span class="n">Polytope</span>   <span class="o">=</span> <span class="n">Polytope</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">Ax_list</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">bx_list</span><span class="p">))</span>
+        <span class="n">terminal_set</span>      <span class="p">:</span> <span class="n">Polytope</span>   <span class="o">=</span> <span class="n">invariant_set</span><span class="p">(</span><span class="n">A_cl</span><span class="p">,</span> <span class="n">Px</span><span class="p">)</span> <span class="c1"># set computations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_set</span> <span class="p">:</span> <span class="n">Constraint</span> <span class="o">=</span> <span class="n">Constraint</span><span class="p">(</span><span class="n">terminal_set</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">terminal_set</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">is_hard</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
                 

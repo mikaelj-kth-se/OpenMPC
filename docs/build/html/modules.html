@@ -9,6 +9,7 @@
   <title>openmpc &mdash; openmpc 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -16,9 +17,7 @@
       <script src="_static/documentation_options.js?v=837179f8"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -155,11 +154,15 @@
 <li class="toctree-l2"><a class="reference internal" href="models.html#module-models.linear_system">models.linear_system module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="models.html#models.linear_system.LinearSystem"><code class="docutils literal notranslate"><span class="pre">LinearSystem</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.A"><code class="docutils literal notranslate"><span class="pre">LinearSystem.A</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.A_cont"><code class="docutils literal notranslate"><span class="pre">LinearSystem.A_cont</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.B"><code class="docutils literal notranslate"><span class="pre">LinearSystem.B</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.B_cont"><code class="docutils literal notranslate"><span class="pre">LinearSystem.B_cont</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.Bd"><code class="docutils literal notranslate"><span class="pre">LinearSystem.Bd</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.C"><code class="docutils literal notranslate"><span class="pre">LinearSystem.C</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.C_cont"><code class="docutils literal notranslate"><span class="pre">LinearSystem.C_cont</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.Cd"><code class="docutils literal notranslate"><span class="pre">LinearSystem.Cd</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.D"><code class="docutils literal notranslate"><span class="pre">LinearSystem.D</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.D_cont"><code class="docutils literal notranslate"><span class="pre">LinearSystem.D_cont</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.c2d"><code class="docutils literal notranslate"><span class="pre">LinearSystem.c2d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.closed_loop_simulate"><code class="docutils literal notranslate"><span class="pre">LinearSystem.closed_loop_simulate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.discrete_dynamics"><code class="docutils literal notranslate"><span class="pre">LinearSystem.discrete_dynamics()</span></code></a></li>
@@ -167,6 +170,7 @@
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.get_lqr_controller"><code class="docutils literal notranslate"><span class="pre">LinearSystem.get_lqr_controller()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.get_lqr_cost_matrix"><code class="docutils literal notranslate"><span class="pre">LinearSystem.get_lqr_cost_matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.get_system_matrices"><code class="docutils literal notranslate"><span class="pre">LinearSystem.get_system_matrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.is_controllable"><code class="docutils literal notranslate"><span class="pre">LinearSystem.is_controllable()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.output"><code class="docutils literal notranslate"><span class="pre">LinearSystem.output()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.plot_trajectories"><code class="docutils literal notranslate"><span class="pre">LinearSystem.plot_trajectories()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.linear_system.LinearSystem.set_disturbance_interface"><code class="docutils literal notranslate"><span class="pre">LinearSystem.set_disturbance_interface()</span></code></a></li>
@@ -217,11 +221,15 @@
 <li class="toctree-l2"><a class="reference internal" href="models.html#module-models">Module contents</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="models.html#models.LinearSystem"><code class="docutils literal notranslate"><span class="pre">LinearSystem</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.A"><code class="docutils literal notranslate"><span class="pre">LinearSystem.A</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.A_cont"><code class="docutils literal notranslate"><span class="pre">LinearSystem.A_cont</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.B"><code class="docutils literal notranslate"><span class="pre">LinearSystem.B</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.B_cont"><code class="docutils literal notranslate"><span class="pre">LinearSystem.B_cont</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.Bd"><code class="docutils literal notranslate"><span class="pre">LinearSystem.Bd</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.C"><code class="docutils literal notranslate"><span class="pre">LinearSystem.C</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.C_cont"><code class="docutils literal notranslate"><span class="pre">LinearSystem.C_cont</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.Cd"><code class="docutils literal notranslate"><span class="pre">LinearSystem.Cd</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.D"><code class="docutils literal notranslate"><span class="pre">LinearSystem.D</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.D_cont"><code class="docutils literal notranslate"><span class="pre">LinearSystem.D_cont</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.c2d"><code class="docutils literal notranslate"><span class="pre">LinearSystem.c2d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.closed_loop_simulate"><code class="docutils literal notranslate"><span class="pre">LinearSystem.closed_loop_simulate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.discrete_dynamics"><code class="docutils literal notranslate"><span class="pre">LinearSystem.discrete_dynamics()</span></code></a></li>
@@ -229,6 +237,7 @@
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.get_lqr_controller"><code class="docutils literal notranslate"><span class="pre">LinearSystem.get_lqr_controller()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.get_lqr_cost_matrix"><code class="docutils literal notranslate"><span class="pre">LinearSystem.get_lqr_cost_matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.get_system_matrices"><code class="docutils literal notranslate"><span class="pre">LinearSystem.get_system_matrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.is_controllable"><code class="docutils literal notranslate"><span class="pre">LinearSystem.is_controllable()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.output"><code class="docutils literal notranslate"><span class="pre">LinearSystem.output()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.plot_trajectories"><code class="docutils literal notranslate"><span class="pre">LinearSystem.plot_trajectories()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="models.html#models.LinearSystem.set_disturbance_interface"><code class="docutils literal notranslate"><span class="pre">LinearSystem.set_disturbance_interface()</span></code></a></li>
@@ -273,6 +282,13 @@
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.linear_mpc.SetPointTrackingMPC.set_reference"><code class="docutils literal notranslate"><span class="pre">SetPointTrackingMPC.set_reference()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="mpc.html#mpc.linear_mpc.TimedMPC"><code class="docutils literal notranslate"><span class="pre">TimedMPC</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.linear_mpc.TimedMPC.get_control_action"><code class="docutils literal notranslate"><span class="pre">TimedMPC.get_control_action()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.linear_mpc.TimedMPC.get_state_and_control_trajectory"><code class="docutils literal notranslate"><span class="pre">TimedMPC.get_state_and_control_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.linear_mpc.TimedMPC.set_time"><code class="docutils literal notranslate"><span class="pre">TimedMPC.set_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.linear_mpc.TimedMPC.update_activation_parameters"><code class="docutils literal notranslate"><span class="pre">TimedMPC.update_activation_parameters()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="mpc.html#module-mpc.nonlinear_mpc">mpc.nonlinear_mpc module</a><ul>
@@ -293,7 +309,10 @@
 <li class="toctree-l2"><a class="reference internal" href="mpc.html#module-mpc.parameters">mpc.parameters module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem"><code class="docutils literal notranslate"><span class="pre">MPCProblem</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.add_dual_mode"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_dual_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.add_general_input_constraints"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_general_input_constraints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.add_general_output_constraints"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_general_output_constraints()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.add_general_state_constraints"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_general_state_constraints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.add_general_state_time_constraints"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_general_state_time_constraints()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.add_input_bound_constraint"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_input_bound_constraint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.add_input_magnitude_constraint"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_input_magnitude_constraint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.add_output_bound_constraint"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_output_bound_constraint()</span></code></a></li>
@@ -303,6 +322,7 @@
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.add_state_magnitude_constraint"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_state_magnitude_constraint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.add_terminal_ingredients"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_terminal_ingredients()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.check_offsetfree_conditions"><code class="docutils literal notranslate"><span class="pre">MPCProblem.check_offsetfree_conditions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.reach_refererence_at_steady_state"><code class="docutils literal notranslate"><span class="pre">MPCProblem.reach_refererence_at_steady_state()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.parameters.MPCProblem.soften_tracking_constraint"><code class="docutils literal notranslate"><span class="pre">MPCProblem.soften_tracking_constraint()</span></code></a></li>
 </ul>
 </li>
@@ -316,7 +336,10 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="mpc.html#mpc.MPCProblem"><code class="docutils literal notranslate"><span class="pre">MPCProblem</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.add_dual_mode"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_dual_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.add_general_input_constraints"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_general_input_constraints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.add_general_output_constraints"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_general_output_constraints()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.add_general_state_constraints"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_general_state_constraints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.add_general_state_time_constraints"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_general_state_time_constraints()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.add_input_bound_constraint"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_input_bound_constraint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.add_input_magnitude_constraint"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_input_magnitude_constraint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.add_output_bound_constraint"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_output_bound_constraint()</span></code></a></li>
@@ -326,6 +349,7 @@
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.add_state_magnitude_constraint"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_state_magnitude_constraint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.add_terminal_ingredients"><code class="docutils literal notranslate"><span class="pre">MPCProblem.add_terminal_ingredients()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.check_offsetfree_conditions"><code class="docutils literal notranslate"><span class="pre">MPCProblem.check_offsetfree_conditions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.reach_refererence_at_steady_state"><code class="docutils literal notranslate"><span class="pre">MPCProblem.reach_refererence_at_steady_state()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.MPCProblem.soften_tracking_constraint"><code class="docutils literal notranslate"><span class="pre">MPCProblem.soften_tracking_constraint()</span></code></a></li>
 </ul>
 </li>
@@ -348,6 +372,13 @@
 <li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.SetPointTrackingNMPC.set_reference"><code class="docutils literal notranslate"><span class="pre">SetPointTrackingNMPC.set_reference()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="mpc.html#mpc.TimedMPC"><code class="docutils literal notranslate"><span class="pre">TimedMPC</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.TimedMPC.get_control_action"><code class="docutils literal notranslate"><span class="pre">TimedMPC.get_control_action()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.TimedMPC.get_state_and_control_trajectory"><code class="docutils literal notranslate"><span class="pre">TimedMPC.get_state_and_control_trajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.TimedMPC.set_time"><code class="docutils literal notranslate"><span class="pre">TimedMPC.set_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mpc.html#mpc.TimedMPC.update_activation_parameters"><code class="docutils literal notranslate"><span class="pre">TimedMPC.update_activation_parameters()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -359,6 +390,7 @@
 <li class="toctree-l4"><a class="reference internal" href="support.html#support.constraints.Constraint.to_polytope"><code class="docutils literal notranslate"><span class="pre">Constraint.to_polytope()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="support.html#support.constraints.TimedConstraint"><code class="docutils literal notranslate"><span class="pre">TimedConstraint</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="support.html#module-support.integrators">support.integrators module</a><ul>
@@ -374,6 +406,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="support.html#support.Integrator"><code class="docutils literal notranslate"><span class="pre">Integrator()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="support.html#support.RK"><code class="docutils literal notranslate"><span class="pre">RK()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="support.html#support.TimedConstraint"><code class="docutils literal notranslate"><span class="pre">TimedConstraint</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="support.html#support.forward_euler"><code class="docutils literal notranslate"><span class="pre">forward_euler()</span></code></a></li>
 </ul>
 </li>

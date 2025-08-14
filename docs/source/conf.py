@@ -20,14 +20,20 @@ release = '0.0'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc',    # Auto-generates API docs
-    "sphinx.ext.autosummary", # Generates summaries of modules/classes
-    'sphinx.ext.napoleon',   # Supports Google-style docstrings
-    'sphinx.ext.viewcode',   # Adds links to source code
-    'sphinx.ext.mathjax',
-    'myst_parser',           # Enables Markdown (.md) support
-    'nbsphinx'               # Enables Jupyter notebooks rendering
+    'sphinx.ext.autodoc',     # Auto-generates API docs
+    'sphinx.ext.autosummary', # Generates summaries of modules/classes
+    'sphinx.ext.napoleon',    # Supports Google-style docstrings
+    'sphinx.ext.viewcode',    # Adds links to source code
+    'sphinx.ext.mathjax',     # Render LaTeX equations in HTML
+    'myst_nb'                 # Enables Jupyter notebooks rendering (no Pandoc needed)
 ]
+
+# MyST-NB settings
+nb_execution_mode = 'off'  # Don't execute notebooks during build
+nb_render_markdown_format = 'myst'  # MyST parser for markdown cells
+
+# Optional: Control warnings if cells fail
+nb_execution_allow_errors = True
 
 autodoc_default_options = {
     "members": True,

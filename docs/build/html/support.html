@@ -9,6 +9,7 @@
   <title>support package &mdash; openmpc 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -16,7 +17,6 @@
       <script src="_static/documentation_options.js?v=837179f8"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -67,6 +67,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-support.constraints">support.constraints module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#support.constraints.Constraint"><code class="docutils literal notranslate"><span class="pre">Constraint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#support.constraints.TimedConstraint"><code class="docutils literal notranslate"><span class="pre">TimedConstraint</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-support.integrators">support.integrators module</a><ul>
@@ -79,6 +80,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#support.Constraint"><code class="docutils literal notranslate"><span class="pre">Constraint</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#support.Integrator"><code class="docutils literal notranslate"><span class="pre">Integrator()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#support.RK"><code class="docutils literal notranslate"><span class="pre">RK()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#support.TimedConstraint"><code class="docutils literal notranslate"><span class="pre">TimedConstraint</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#support.forward_euler"><code class="docutils literal notranslate"><span class="pre">forward_euler()</span></code></a></li>
 </ul>
 </li>
@@ -132,6 +134,13 @@
 <dd><p>Returns the polytope representation.</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="support.constraints.TimedConstraint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TimedConstraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">H</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_hard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/support/constraints.html#TimedConstraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#support.constraints.TimedConstraint" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#support.constraints.Constraint" title="support.constraints.Constraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constraint</span></code></a></p>
+<p>Class to represent timed constraints of the form Hx &lt;= b with time dependency.</p>
 </dd></dl>
 
 </section>
@@ -239,6 +248,13 @@ The same holds for the disturbances. The state must always be given.</p>
 <dd class="field-odd"><p>casadi.MX</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="support.TimedConstraint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TimedConstraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">H</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_hard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">penalty_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/openmpc/support/constraints.html#TimedConstraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#support.TimedConstraint" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#support.Constraint" title="openmpc.support.constraints.Constraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constraint</span></code></a></p>
+<p>Class to represent timed constraints of the form Hx &lt;= b with time dependency.</p>
 </dd></dl>
 
 <dl class="py function">

@@ -8,6 +8,7 @@
   <title>openmpc.models.nonlinear_system &mdash; openmpc 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -15,7 +16,6 @@
       <script src="../../../_static/documentation_options.js?v=837179f8"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -92,7 +92,7 @@
 
 
 <div class="viewcode-block" id="NonlinearSystem">
-<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem">[docs]</a>
+<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NonlinearSystem</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disturbances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outfcn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
@@ -200,7 +200,7 @@
     
     
 <div class="viewcode-block" id="NonlinearSystem.c2d">
-<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.c2d">[docs]</a>
+<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.c2d">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">c2d</span><span class="p">(</span><span class="n">updfcn</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disturbances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outfcn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">integrator</span><span class="o">=</span><span class="s1">&#39;RK4&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -234,7 +234,7 @@
     
     
 <div class="viewcode-block" id="NonlinearSystem.discrete_dynamics">
-<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.discrete_dynamics">[docs]</a>
+<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.discrete_dynamics">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">discrete_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Discrete dynamics</span>
@@ -262,7 +262,7 @@
 
     
 <div class="viewcode-block" id="NonlinearSystem.output">
-<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.output">[docs]</a>
+<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.output">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Output function</span>
@@ -289,7 +289,7 @@
 
 
 <div class="viewcode-block" id="NonlinearSystem.simulate">
-<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.simulate">[docs]</a>
+<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.simulate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Simulate the discrete time system for a number of steps. Input should be an array of size (steps, size_input) and disturbance should be an array of size (steps, disturbance_size)</span>
@@ -339,7 +339,7 @@
     
     
 <div class="viewcode-block" id="NonlinearSystem.linearize">
-<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.linearize">[docs]</a>
+<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.linearize">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">linearize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">u_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">d_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Linearize the NonlinearSystem around a target point with the form (xref, uref, dref).</span>
@@ -401,7 +401,7 @@
 
 
 <div class="viewcode-block" id="NonlinearSystem.get_target_point">
-<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.get_target_point">[docs]</a>
+<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.get_target_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_target_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a reference output valye y_ref we want to find the the eqilubrium pair (xref, uref) that satisfies the equilibrium conditions:</span>
@@ -469,7 +469,7 @@
 
     
 <div class="viewcode-block" id="NonlinearSystem.compute_lqr_controller">
-<a class="viewcode-back" href="../../../openmpc.models.html#models.NonlinearSystem.compute_lqr_controller">[docs]</a>
+<a class="viewcode-back" href="../../../models.html#models.NonlinearSystem.compute_lqr_controller">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_lqr_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
                                      <span class="n">R</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
                                      <span class="n">x_ref</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 

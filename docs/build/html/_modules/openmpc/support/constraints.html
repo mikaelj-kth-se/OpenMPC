@@ -8,6 +8,7 @@
   <title>openmpc.support.constraints &mdash; openmpc 0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -15,7 +16,6 @@
       <script src="../../../_static/documentation_options.js?v=837179f8"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -87,7 +87,7 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <div class="viewcode-block" id="Constraint">
-<a class="viewcode-back" href="../../../support.html#openmpc.support.constraints.Constraint">[docs]</a>
+<a class="viewcode-back" href="../../../support.html#support.Constraint">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Constraint</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simple class to represent polyhedral constraints of the form Hx &lt;= b.</span>
@@ -116,19 +116,41 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span>       <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_hard</span> <span class="o">=</span> <span class="n">is_hard</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">penalty_weight</span> <span class="o">=</span> <span class="n">penalty_weight</span>  <span class="c1"># Only used if is_hard is False</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">penalty_weight</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;penalty_weight must be non-negative.&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">penalty_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">penalty_weight</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;penalty_weight must be non-negative.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">!=</span> <span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of rows in A must match the length of b. A has shape </span><span class="si">{}</span><span class="s2"> and b has length </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="Constraint.to_polytope">
-<a class="viewcode-back" href="../../../support.html#openmpc.support.constraints.Constraint.to_polytope">[docs]</a>
+<a class="viewcode-back" href="../../../support.html#support.Constraint.to_polytope">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_polytope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the polytope representation.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span></div>
 </div>
+
+
+
+
+
+<div class="viewcode-block" id="TimedConstraint">
+<a class="viewcode-back" href="../../../support.html#support.TimedConstraint">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TimedConstraint</span><span class="p">(</span><span class="n">Constraint</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to represent timed constraints of the form Hx &lt;= b with time dependency.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">H</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">,</span> <span class="n">b</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span><span class="nb">float</span> <span class="p">,</span> <span class="n">is_hard</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">penalty_weight</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">is_hard</span><span class="p">,</span> <span class="n">penalty_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span>   <span class="o">=</span> <span class="n">end</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">:</span> <span class="c1"># the equal condition is accepted (corresponding to a singleton)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;start must be less than end.&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 
