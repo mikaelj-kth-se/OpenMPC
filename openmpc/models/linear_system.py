@@ -386,9 +386,9 @@ class LinearSystem(Model) :
                 B_cont  : np.ndarray | None  = None, 
                 C_cont  : np.ndarray | None  = None, 
                 D_cont  : np.ndarray | None  = None,
+                dt      : float              = 1 ,
                 Bd_cont : np.ndarray | None  = None, 
-                Cd_cont : np.ndarray | None  = None,
-                dt = 1):
+                Cd_cont : np.ndarray | None  = None,):
         """
         Convert continuous-time state-space model to discrete-time.
         
@@ -415,7 +415,7 @@ class LinearSystem(Model) :
         if D_cont is None:
             D_cont = np.zeros((C_cont.shape[0], B_cont.shape[1]))
         if Bd_cont is None:
-            Bd_cont = np.zeros((C_cont.shape[0], 1))
+            Bd_cont = np.zeros((A_cont.shape[0], 1))
         if Cd_cont is None:
             Cd_cont = np.zeros((C_cont.shape[0], 1))
         
