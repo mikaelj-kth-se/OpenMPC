@@ -35,6 +35,11 @@ nb_render_markdown_format = 'myst'  # MyST parser for markdown cells
 # Optional: Control warnings if cells fail
 nb_execution_allow_errors = True
 
+myst_heading_anchors = 2  # still allows anchor links from H2+
+myst_enable_extensions = ["colon_fence"]
+myst_heading_h1_level = 2  # treat notebook H1s as H2
+
+
 autodoc_default_options = {
     "members": True,
     "undoc-members": True,
