@@ -28,9 +28,10 @@ class Constraint:
         self.b       = b.flatten()
         self.is_hard = is_hard
         self.penalty_weight = penalty_weight  # Only used if is_hard is False
-
-        if self.penalty_weight < 0:
-            raise ValueError("penalty_weight must be non-negative.")
+        
+        if self.penalty_weight is not None:
+            if self.penalty_weight < 0:
+                raise ValueError("penalty_weight must be non-negative.")
 
         if len(b) != H.shape[0]:
             raise ValueError("Number of rows in A must match the length of b. A has shape {} and b has length {}.".format(H.shape, len(b)))
@@ -38,3 +39,21 @@ class Constraint:
     def to_polytope(self):
         """Returns the polytope representation."""
         return self.H, self.b
+
+
+
+
+class TimedConstraint(Constraint):
+    """
+    Class to represent timed constraints of the form Hx <= b with time dependency.
+    
+    """
+    def __init__(self, H : np.ndarray , b : np.ndarray, start:float, end:float , is_hard : bool =True, penalty_weight : float | None = None):
+        
+        
+        super().__init__(H, b, is_hard, penalty_weight)
+        self.start = start
+        self.end   = end
+
+        if self.start > self.end: # the equal condition is accepted (corresponding to a singleton)
+            raise ValueError("start must be less than end.")

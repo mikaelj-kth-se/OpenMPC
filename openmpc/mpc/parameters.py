@@ -1,7 +1,7 @@
 import control
 import numpy as np
 from openmpc.invariant_sets import Polytope, invariant_set
-from openmpc.support.constraints import Constraint
+from openmpc.support.constraints import Constraint, TimedConstraint
 from openmpc.models import LinearSystem, NonlinearSystem
 
 
@@ -59,6 +59,8 @@ class MPCProblem:
         :type soft_tracking: bool
         :param tracking_penalty_weight: The penalty weight for soft tracking.
         :type tracking_penalty_weight: float
+        :param reference_reached_at_steady_state: Whether the reference is reached at steady state.
+        :type reference_reached_at_steady_state: bool
         :param dt: The time step for the system.
         :type dt: float
         """
@@ -79,11 +81,11 @@ class MPCProblem:
         self.slack_penalty         = slack_penalty  # Changed from slack_norm to slack_penalty
 
         # Constraints as lists of `Constraint` objects
-        self.u_constraints        : list[Constraint] = []
-        self.x_constraints        : list[Constraint] = []
-        self.y_constraints        : list[Constraint] = []
-        self.terminal_constraints : list[Constraint] = []
-        self.terminal_set         : Polytope | None  = None
+        self.u_constraints          : list[Constraint] = []
+        self.x_constraints          : list[Constraint] = []
+        self.y_constraints          : list[Constraint] = []
+        self.terminal_constraints   : list[Constraint] = []
+        self.terminal_set           : Constraint | None  = None
 
         # Dual mode parameters
         self.dual_mode_controller : np.ndarray = np.zeros((self.system.size_input, self.system.size_state))
@@ -94,7 +96,10 @@ class MPCProblem:
         # Tracking parameters
         self.soft_tracking           = False
         self.tracking_penalty_weight = 1.  # Default penalty weight for soft tracking
-
+        self.reference_reached_at_steady_state = True
+        
+        # Advanced
+        self.state_time_constraints : list[TimedConstraint] = []
     
     def add_input_magnitude_constraint(self, limit :float , input_index : int | None = None, is_hard : bool = True, penalty_weight : float =1.):
         """
@@ -280,17 +285,56 @@ class MPCProblem:
         self.x_constraints.append(constraint)
         
         
-    def add_general_state_constraints(self, Ax : np.ndarray, bx : np.ndarray, is_hard : bool =True, penalty_weight : int=1):
-        """Add general state constraints of the form Ax * x <= bx."""
+    def add_general_state_constraints(self, Hx : np.ndarray, bx : np.ndarray, is_hard : bool =True, penalty_weight : int=1):
+        """Add general state constraints of the form Hx * x <= bx."""
 
 
-        if Ax.shape[1] != self.system.size_state:
+        if Hx.shape[1] != self.system.size_state:
             raise ValueError("The number of columns in A must match the state dimension of the system.")
         
 
-        constraint = Constraint(Ax, bx, is_hard=is_hard, penalty_weight=penalty_weight)
+        constraint = Constraint(Hx, bx, is_hard=is_hard, penalty_weight=penalty_weight)
         self.x_constraints.append(constraint)
 
+    def add_general_output_constraints(self, Hy : np.ndarray, by : np.ndarray, is_hard : bool =True, penalty_weight : int=1):
+        """Add general output constraints of the form Hy * y <= by."""
+        
+        if Hy.shape[1] != self.system.size_output:
+            raise ValueError("The number of columns in A must match the output dimension of the system.")
+        
+        constraint = Constraint(Hy, by, is_hard=is_hard, penalty_weight=penalty_weight)
+        self.y_constraints.append(constraint)
+
+    def add_general_input_constraints(self, Hu : np.ndarray, bu : np.ndarray, is_hard : bool =True, penalty_weight : int=1):
+        """Add general input constraints of the form Hu * u <= bu."""
+        
+        if Hu.shape[1] != self.system.size_input:
+            raise ValueError("The number of columns in A must match the input dimension of the system.")
+        
+        constraint = Constraint(Hu, bu, is_hard=is_hard, penalty_weight=penalty_weight)
+        self.u_constraints.append(constraint)
+
+    def add_general_state_time_constraints(self, Hx : np.ndarray, bx : np.ndarray, start_time:float, end_time:float,is_hard : bool =True, penalty_weight : int=1):
+        """Add general time state constraints of the form A[x,t] <= bx."""
+        
+        if Hx.shape[1] != self.system.size_state+1:
+            raise ValueError("The number of columns in A must match the state dimension of the system + 1 to account for the time dimension.")
+        
+        constraint = TimedConstraint(Hx, bx, start_time, end_time, is_hard=is_hard, penalty_weight=penalty_weight)
+        self.state_time_constraints.append(constraint)
+
+    
+    def reach_refererence_at_steady_state(self, option :bool = True):
+        """
+        Set the option to reach the reference at steady state or let the reference be reached from any state.
+        
+        :param option: If True, the reference is reached at steady state. If False, the reference can be reached from any state.
+        :type option: bool
+        """
+
+        self.reference_reached_at_steady_state = option
+
+    
     def add_terminal_ingredients(self, controller : np.ndarray | None = None):
         """Add terminal ingredients using a controller (defaults to LQR)."""
 
@@ -323,9 +367,9 @@ class MPCProblem:
             Ax_list.append(A@controller)
             bx_list.append(b)
 
-        Px = Polytope(np.vstack(Ax_list), np.concatenate(bx_list))
-        self.terminal_set = invariant_set(A_cl, Px)
-
+        Px                : Polytope   = Polytope(np.vstack(Ax_list), np.concatenate(bx_list))
+        terminal_set      : Polytope   = invariant_set(A_cl, Px) # set computations
+        self.terminal_set : Constraint = Constraint(terminal_set.A, terminal_set.b, is_hard=True)
 
                 
     def add_dual_mode(self, horizon : int, controller : np.ndarray ) : 
