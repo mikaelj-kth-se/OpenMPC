@@ -3,119 +3,149 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
-from openmpc.models import NonlinearSystem 
-from openmpc.mpc import SetPointTrackingNMPC, MPCProblem, NMPC
+from openmpc.models import LinearSystem
+from openmpc.mpc import MPC, MPCProblem
 
 
 
-# Define the pendulum system with friction and given model
-def pendulum_system():
-    # Pendulum parameters
-    m = 0.2
-    b = 0.1
-    l = 0.3
-    I = 0.006
-    g = 9.81
+# create system matrix
 
-    a = m * g * l / (I + m * l**2)
-    c = m * l / (I + m * l**2)
+v_ref  = 5
+Lp     = 0.18 *v_ref
 
-    th = ca.MX.sym("th")
-    thDot = ca.MX.sym("thDot")
-    u = ca.MX.sym("u")  # Control input
-
-    states = ca.vertcat(th, thDot)
-    inputs = ca.vertcat(u)
-
-    # Pendulum dynamics with friction term
-    rhs = ca.vertcat(
-        thDot,                     # dth/dt
-        a * ca.sin(th) + c * ca.cos(th) * u - b * thDot  # dth_dot/dt
-    )
-
-    return states, inputs, rhs
-
-# Create the NonlinearSystem object
-states, inputs, rhs = pendulum_system()
-
-dt = 0.1
-nlsys_pendulum = NonlinearSystem.c2d(updfcn=rhs, states=states, inputs=inputs,dt = dt)
-
-mpc_parameters = MPCProblem( system  = nlsys_pendulum, 
-                                horizon = 20, 
-                                Q       = np.eye(2), 
-                                R       = np.eye(1), 
-                                QT      = np.eye(2)*1000)
+Iz = 6286
+lr = 1.9
+lf = 1.27
+m  = 1823
+Cf = 42000
+Cr = 62000
 
 
-
-mpc_parameters.add_input_magnitude_constraint(10.)
-mpc_parameters.add_output_magnitude_constraint(10.)
-
-mpc_controller = NMPC(mpc_params=mpc_parameters)
+c1 = -(Cf + Cr)
+c2 = -(Cf * lf - Cr * lr)
+c3 = -(Cf * lf**2 + Cr * lr**2) 
 
 
-# Simulation parameters
-x0      = np.array([np.pi, 0])
-Tsim    = 10.0  # Total simulation time
-N_steps = int(Tsim /0.1)
-time    = np.linspace(0, Tsim, N_steps + 1)
+r1 = [v_ref, 0    ,-1           , -Lp              ,  0]
+r2 = [0,     0    ,    0        ,  -1              ,  0.]
+r3 = [0,     0    , c1/(m*v_ref), c2/(m*v_ref**2)-1.,   Cf/(m*v_ref)]
+r4 = [0,     0    , c2/Iz       , c3/(Iz*v_ref)    ,   Cf*lf/(Iz)]
+r5 = [0,     0    , 0          , 0                ,  0]
 
-# Initialize arrays to store the simulation results
-x_sim = np.zeros((2, N_steps + 1))
-u_sim = np.zeros(N_steps)
+A = np.array([r1, r2, r3, r4, r5])
 
-# Set initial state
-x_sim[:, 0] = x0
-
-# Simulation loop
-for k in range(N_steps):
-    # Compute the control input using MPC
-    u_sim[k] = mpc_controller.get_control_action(x_sim[:, k])[0]
-    
-    # Apply the control input to the system
-    x_sim[:, k + 1] = nlsys_pendulum.discrete_dynamics(x_sim[:, k], u_sim[k])
+b1 = [0.,0.]
+b2 = [0., 0.]
+b3 = [0., 0.]
+b4 = [0., 1/Iz]
+b5 = [1., 0.]
+B = np.array([b1, b2, b3, b4, b5])
 
 
-# Plot the results
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
+print(A)
+print(np.real(np.linalg.eig(A)[0]))
+system = LinearSystem.c2d(A,B, dt = 0.1)
 
-# Plot the state trajectories on the first subplot
-ax1.plot(time, x_sim[0, :], label='theta', linewidth=2)
-ax1.plot(time, x_sim[1, :], label='theta_dot', linewidth=2)
-ax1.set_xlabel('Time [s]', fontsize=18)
-ax1.set_ylabel('State', fontsize=18)
-ax1.set_xlim([0, Tsim])
-ax1.set_ylim([-2.5 * np.pi, 2.5 * np.pi])
-ax1.legend(fontsize=14)
-ax1.set_title('State Trajectories', fontsize=18)
-ax1.grid(True)
+print(np.real(np.linalg.eig(system.A)[0]))
 
-# Set grid steps
-ax1.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
-ax1.yaxis.set_major_locator(ticker.MultipleLocator(np.pi / 4))
+Q = np.diag([100, 100, 1, 1, 1])
+R = np.diag([10, 10])
 
-# Plot the control trajectory on the second subplot
-ax2.step(time[:-1], u_sim, 'k', label='u', where='post', linewidth=2)
-ax2.set_xlabel('Time [s]', fontsize=18)
-ax2.set_ylabel('Control', fontsize=18)
-ax2.set_xlim([0, Tsim])
-ax2.set_ylim([-10, 10])
-ax2.legend(fontsize=14)
-ax2.set_title('Control Trajectory', fontsize=18)
-ax2.grid(True)
+L = system.get_lqr_controller(Q, R)
 
-# Set grid steps
-ax2.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
-ax2.yaxis.set_major_locator(ticker.MultipleLocator(2))
-
-# Set tick font size
-ax1.tick_params(axis='both', which='major', labelsize=14)
-ax2.tick_params(axis='both', which='major', labelsize=14)
-
-# Adjust layout to make space for larger labels
-plt.tight_layout(pad=3.0)
+x0 = np.array([0.2, -0.1, 0, 0, 0])
+n_steps = 100
+x = np.zeros((n_steps, system.size_state))
+u = np.zeros((n_steps, system.size_input))
+x[0] = x0
+for i in range(n_steps - 1):
+    u[i] = -L @ x[i] 
+    x[i + 1] = system.A @ x[i] + system.B @ u[i]
 
 
-# Show the plots
+fig, ax = plt.subplots(5,1)
+ax[0].plot(x[:, 0])
+ax[0].set_xlabel('Time step')
+ax[0].set_ylabel(r' $e_{d}$ m')
+ax[0].grid()
+
+
+ax[1].plot(x[:, 1])
+ax[1].set_xlabel('Time step')
+ax[1].set_ylabel(r' $e_{\psi}$ rad')
+ax[1].grid()
+
+ax[2].plot(x[:, 2])
+ax[2].set_xlabel('Time step')
+ax[2].set_ylabel(r' $v_{y}$ m/s')
+ax[2].grid()
+
+ax[3].plot(x[:, 3])
+ax[3].set_xlabel('Time step')
+ax[3].set_ylabel(r' $\dot{\phi}$ rad/s')
+ax[3].grid()
+
+ax[4].plot(x[:, 4])
+ax[4].set_xlabel('Time step')
+ax[4].set_ylabel(r' $\delta$ rad')
+ax[4].grid()
+
+
+
+
+
+fig, ax = plt.subplots(2,1)
+ax[0].plot(u[:, 0])
+ax[0].set_xlabel('Time step')
+ax[0].set_ylabel(r' $u_{1}$ rad')
+ax[0].grid()
+ax[1].plot(u[:, 1])
+ax[1].set_xlabel('Time step')
+ax[1].set_ylabel(r' $u_{2}$ $N \cdot m$')
+ax[1].grid()
+
+
+
+# Define MPC controller
+T = 10  # Prediction horizon
+
+# Create MPC parameters object
+mpc_params = MPCProblem(system= system, horizon=T, Q=Q, R=R, QT=np.zeros((5, 5)))
+
+
+# Add output magnitude constraint on the pitch angle (±20°)
+mpc_params.add_output_magnitude_constraint(limit=np.deg2rad(20), output_index=4, is_hard=True)
+
+# extract LQR controller
+L = system.get_lqr_controller(Q,R)
+
+# # Add dual-mode with LQR controller
+# mpc_params.add_dual_mode(horizon=5, controller=L)
+
+# Create the MPC object
+mpc = MPC(mpc_params)
+
+
+# Simulation settings
+num_steps = 20  # Number of simulation steps to cover 5 seconds
+x_sim = np.zeros((5, num_steps + 1))  # Store state trajectory
+u_sim = np.zeros(num_steps)  # Store control inputs
+x_sim[:, 0] = x0  # Set initial state
+
+# Simulate the system
+for t in range(num_steps):
+    # Get the current state
+    current_state = x_sim[:, t]
+
+    # Compute the control action using MPC
+    u_t = mpc.get_control_action(current_state)
+    u_sim[t] = u_t  # Store the control input
+    print(u_t)
+    # Apply the control input to the discrete-time system
+    x_next = system.A @ current_state + system.B @ u_t.flatten()
+    x_sim[:, t + 1] = x_next
+
+
+
+plt.tight_layout()
 plt.show()

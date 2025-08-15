@@ -52,6 +52,8 @@ class MPC:
         self.dual_mode_controller : np.ndarray = self.params.dual_mode_controller
         self.dual_mode_horizon    : int        = self.params.dual_mode_horizon
 
+        self.verbose              : bool = True
+
         # Define optimization variables
         self.x  = cp.Variable((self.n, self.N + 1))
         self.u  = cp.Variable((self.m, self.N))
@@ -179,7 +181,7 @@ class MPC:
           
         self.x0.value = x0
         # Use the solver specified in the parameters; if None, cvxpy will select the default solver
-        self.problem.solve(solver=self.solver)
+        self.problem.solve(solver=self.solver, verbose = self.verbose )
         return self.x.value, self.u.value
 
     def get_control_action(self, x0,*args, **kwargs):
@@ -192,7 +194,7 @@ class MPC:
         :rtype: float
         """
         _, u_pred = self.compute(x0)
-        return np.atleast_1d(u_pred[0])[0]  # Return the first control input as a scalar
+        return np.atleast_1d(u_pred[0])  # Return the first control input as a scalar
 
 
 
